@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GéoLab Pro - Propulsé par GeoGebra</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#1e3c72,#2a5298);min-height:100vh;padding:20px}
+.main-container{max-width:1600px;margin:0 auto;background:rgba(255,255,255,0.97);border-radius:30px;box-shadow:0 30px 60px rgba(0,0,0,0.3);overflow:hidden;transition:all .3s}
+.main-container.proj-full{max-width:100%;height:100vh;border-radius:0;position:fixed;top:0;left:0;z-index:10000;overflow:hidden}
+.main-container.proj-full .toolbar,.main-container.proj-full header,.main-container.proj-full .status-bar,.main-container.proj-full .panel{display:none}
+.main-container.proj-full .main-content{padding:0;height:100vh}
+.main-container.proj-full .canvas-area{flex:1;margin:0;padding:0;border-radius:0;height:100vh;display:flex;flex-direction:column}
+.main-container.proj-full .canvas-header{display:none}
+.main-container.proj-full .canvas-info{display:none}
+.main-container.proj-full #ggb-element{border:none;border-radius:0;min-height:0}
+.proj-controls{display:none;position:absolute;z-index:99999;transition:opacity .4s}
+.proj-controls.top-right{top:16px;right:16px}
+.proj-controls.proj-hide{opacity:0;pointer-events:none}
+.proj-title{display:none;position:absolute;top:0;left:0;right:0;z-index:99998;background:linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 70%,transparent);color:white;padding:16px 24px 32px;font-size:20px;font-weight:700;text-align:center;pointer-events:none;text-shadow:0 2px 10px rgba(0,0,0,.6);transition:opacity .4s}
+.proj-title.proj-hide{opacity:0}
+.proj-title .proj-slide-sub{display:block;font-size:12px;font-weight:400;opacity:.8;margin-top:3px;letter-spacing:.5px}
+.main-container.proj-full .proj-title{display:block}
+.main-container.proj-full .proj-controls{display:flex}
+.proj-bottom-bar{position:absolute;bottom:0;left:0;right:0;z-index:99999;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15) 80%,transparent);padding:30px 20px 14px 20px;display:none;align-items:flex-end;justify-content:space-between;transition:opacity .4s;pointer-events:none}
+.proj-bottom-bar.proj-hide{opacity:0}
+.main-container.proj-full .proj-bottom-bar{display:flex}
+.proj-bottom-left{display:flex;flex-direction:column;gap:2px;pointer-events:auto}
+.proj-bottom-left .proj-slide-label{color:rgba(255,255,255,.6);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.proj-bottom-left .proj-slide-name{color:white;font-size:16px;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.proj-bottom-right{display:flex;align-items:center;gap:8px;pointer-events:auto}
+.proj-btn{padding:8px 14px;border:none;border-radius:8px;background:rgba(255,255,255,.15);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px);display:flex;align-items:center;gap:4px}
+.proj-btn:hover{background:rgba(102,126,234,.7);transform:scale(1.05)}
+.proj-btn-exit{padding:8px 14px;border:none;border-radius:8px;background:rgba(0,0,0,.5);color:white;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;backdrop-filter:blur(6px)}
+.proj-btn-exit:hover{background:rgba(245,101,101,.8);transform:scale(1.05)}
+.proj-btn-zoom{width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,.15);color:white;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center}
+.proj-btn-zoom:hover{background:rgba(102,126,234,.7);transform:scale(1.1)}
+.proj-counter{color:white;font-size:14px;font-weight:600;min-width:50px;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:16px 20px;text-align:center}
+header h1{font-size:1.8em;margin-bottom:4px}
+header p{font-size:.9em;opacity:.9}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 15px;background:#f8f9fa;border-bottom:2px solid #e9ecef;max-height:300px;overflow-y:auto}
+.tool-group{display:flex;gap:4px;padding:4px 6px;background:white;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.1);flex-wrap:wrap;align-items:center}
+.tool-group .group-label{font-size:10px;color:#a0aec0;text-transform:uppercase;font-weight:700;letter-spacing:.5px;padding:0 4px;user-select:none}
+.tool-btn{padding:6px 10px;border:none;border-radius:6px;background:white;color:#2c3e50;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:3px;border:2px solid transparent;white-space:nowrap}
+.tool-btn:hover{background:#e3f2fd;transform:translateY(-1px)}
+.tool-btn.active{background:#667eea;color:white;border-color:#5a67d8}
+.tool-btn.danger{background:#f56565;color:white}
+.tool-btn.danger:hover{background:#e53e3e}
+.tool-btn.success{background:#48bb78;color:white}
+.tool-btn.success:hover{background:#38a169}
+.tool-btn.warning{background:#fbbf24;color:#2c3e50}
+.tool-btn.warning:hover{background:#f59e0b}
+.main-content{display:flex;padding:20px;gap:20px;transition:all .3s}
+.canvas-area{flex:2;background:white;border-radius:20px;padding:15px;box-shadow:0 10px 30px rgba(0,0,0,.1);display:flex;flex-direction:column;position:relative}
+.canvas-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.canvas-header h3{color:#2c3e50;font-size:1.1em}
+.canvas-controls{display:flex;gap:8px}
+.control-btn{padding:4px 10px;border:none;border-radius:5px;background:#f8f9fa;color:#2c3e50;cursor:pointer;font-size:11px;transition:all .2s}
+.control-btn:hover{background:#e9ecef}
+.control-btn.proj-btn{background:#667eea;color:white}
+.control-btn.proj-btn:hover{background:#5a67d8}
+#ggb-element{width:100%;flex:1;min-height:400px;border:2px solid #e9ecef;border-radius:10px;overflow:hidden;position:relative}
+#ggb-element.proj-fade{opacity:0.85;transition:opacity .25s}
+#ggb-element .geogebraweb{width:100%!important;height:100%!important}
+.canvas-info{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#718096}
+.panel{flex:1;background:#f8f9fa;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.1);max-height:800px;overflow-y:auto;display:flex;flex-direction:column;gap:15px}
+.panel-section{background:white;border-radius:12px;padding:12px}
+.panel-section h3{color:#2c3e50;margin-bottom:10px;padding-bottom:4px;border-bottom:3px solid #667eea;font-size:1em;display:flex;align-items:center;gap:5px}
+.empty-state{text-align:center;padding:20px;color:#a0aec0;font-size:13px}
+.construction-list{max-height:150px;overflow-y:auto}
+.construction-item{background:#f8f9fa;padding:6px 8px;margin:3px 0;border-radius:6px;border-left:4px solid #667eea;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.construction-item button{background:none;border:none;color:#f56565;cursor:pointer;padding:2px 5px;font-size:13px}
+.status-bar{background:#e9ecef;padding:8px 20px;font-size:12px;color:#2c3e50;display:flex;justify-content:space-between;align-items:center}
+.status-message{display:flex;align-items:center;gap:8px}
+.status-indicator{width:8px;height:8px;border-radius:50%;background:#48bb78}
+.measurements-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.measure-card{background:linear-gradient(135deg,#f8f9fa,#e9ecef);padding:10px;border-radius:8px;text-align:center}
+.measure-label{font-size:10px;color:#718096;text-transform:uppercase}
+.measure-value{font-size:16px;font-weight:700;color:#2c3e50}
+.measure-unit{font-size:10px;color:#a0aec0}
+.quick-actions{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.quick-btn{flex:1;min-width:60px;padding:8px;border:2px solid #e9ecef;border-radius:8px;background:white;cursor:pointer;font-size:11px;transition:all .2s;white-space:nowrap}
+.quick-btn:hover{background:#667eea;color:white;border-color:#5a67d8}
+.slides-toolbar{display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.slide-item{background:#f8f9fa;padding:8px;margin:4px 0;border-radius:6px;border-left:4px solid #667eea;display:flex;justify-content:space-between;align-items:center;font-size:12px;cursor:pointer;transition:all .2s}
+.slide-item:hover{background:#e9ecef}
+.slide-item.active{border-left-color:#f56565;background:#fff5f5}
+.slide-item .slide-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-item .slide-del{background:none;border:none;color:#f56565;cursor:pointer;padding:2px 6px;font-size:13px}
+.slide-item .slide-del:hover{color:#e53e3e}
+.slide-item .slide-save{background:none;border:none;color:#667eea;cursor:pointer;padding:2px 6px;font-size:13px;text-decoration:none}
+.slide-item .slide-save:hover{color:#5a67d8}
+.slide-item .slide-upd{background:none;border:none;color:#48bb78;cursor:pointer;padding:2px 6px;font-size:13px}
+.slide-item .slide-upd:hover{color:#38a169}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);justify-content:center;align-items:center;z-index:11000}
+.modal-content{background:white;padding:25px;border-radius:15px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-content h3{margin-bottom:12px;color:#2c3e50}
+.modal-content input,.modal-content select,.modal-content textarea{width:100%;padding:8px;margin:8px 0;border:2px solid #e9ecef;border-radius:6px;font-size:13px}
+.modal-buttons{display:flex;gap:10px;margin-top:12px}
+.modal-btn{flex:1;padding:8px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px}
+.modal-btn.confirm{background:#667eea;color:white}
+.modal-btn.cancel{background:#e9ecef;color:#2c3e50}
+.slider{width:100%;margin:10px 0}
+.simulation-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:13px}
+.simulation-item:last-child{border-bottom:none}
+.simulation-label{font-weight:600;color:#2c3e50}
+.simulation-value{color:#667eea;font-weight:700}
+.latex-preview{background:#f8f9fa;padding:12px;border-radius:8px;margin:8px 0;font-size:16px;text-align:center;border:2px solid #667eea;min-height:50px;display:flex;align-items:center;justify-content:center}
+.latex-input{font-family:monospace;font-size:13px}
+.sim-detect{text-align:center;padding:4px;border-radius:4px;font-weight:600;font-size:12px;margin-top:8px}
+.coordinates-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.point-input{background:#f8f9fa;padding:6px;border-radius:6px;text-align:center}
+.point-input label{display:block;font-weight:700;font-size:11px;margin-bottom:2px}
+.point-input input{width:100%;padding:4px;border:2px solid #e9ecef;border-radius:4px;text-align:center;font-size:11px}
+.color-picker-mini{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.color-sample{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.1s}
+.color-sample:hover{transform:scale(1.1)}
+.color-sample.selected{border-color:#2c3e50}
+.ggb-tip{background:#f0f4f8;border-radius:8px;padding:10px;font-size:11px;color:#4a5568;margin:8px 0;border-left:4px solid #667eea;line-height:1.5}
+.ggb-tip strong{color:#667eea}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']],packages:['base','ams']},svg:{fontCache:'global'},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'tex2jax_process'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+</head>
+<body>
+<div class="main-container" id="appContainer">
+<header><h1>📐 GéoLab Pro</h1><p>Géométrie, algèbre & LaTeX — <em>propulsé par GeoGebra</em></p></header>
+<div class="toolbar" id="toolbar">
+  <div class="tool-group">
+    <span class="group-label">GéoLab</span>
+    <button class="tool-btn success" onclick="ggbTriangle()">🔺 Triangle</button>
+    <button class="tool-btn success" onclick="ggbRectangle()">🔲 Rectangle</button>
+    <button class="tool-btn success" onclick="ggbCircle()">⭕ Cercle</button>
+    <button class="tool-btn success" onclick="ggbPoints()">📍 Points</button>
+    <button class="tool-btn" onclick="ggbClear()">🗑️ Effacer</button>
+  </div>
+  <div class="tool-group">
+    <span class="group-label">Outils</span>
+    <button class="tool-btn warning" onclick="toggleGrid()">🔲 Grille</button>
+    <button class="tool-btn warning" onclick="ggbUndo()">↩ Annuler</button>
+    <button class="tool-btn warning" onclick="ggbRedo()">↪ Rétablir</button>
+    <button class="tool-btn" onclick="ggbExport()">📸 Exporter</button>
+    <button class="tool-btn proj-btn" onclick="toggleProj()">⛶ Projeter</button>
+  </div>
+  <div class="tool-group">
+    <span class="group-label">Simulation</span>
+    <button class="tool-btn" onclick="showAngleSimulator()">🔄 Angles</button>
+    <button class="tool-btn" onclick="showPythagore()">📐 Pythagore</button>
+  </div>
+  <div class="tool-group">
+    <span class="group-label">Texte</span>
+    <button class="tool-btn" onclick="showTextModal()">📝 Texte</button>
+    <button class="tool-btn" onclick="showLatexModal()">📄 LaTeX</button>
+  </div>
+</div>
+<div class="main-content">
+  <div class="canvas-area">
+    <div class="canvas-header">
+      <h3>Zone de construction GeoGebra</h3>
+      <div class="canvas-controls">
+        <button class="control-btn" onclick="ggbZoom(0.8)">− Zoom</button>
+        <button class="control-btn" onclick="ggbZoom(1.25)">+ Zoom</button>
+        <button class="control-btn" onclick="ggbZoomFit()">↺ Ajuster</button>
+        <button class="control-btn proj-btn" onclick="toggleProj()">▶ Présentation</button>
+        <button class="control-btn proj-btn" onclick="toggleProjCanvas()" style="background:#48bb78">⛶ Plein écran</button>
+      </div>
+    </div>
+    <div id="ggb-element"></div>
+    <div id="projSlideTitle" class="proj-title"><span id="projTitleMain">Présentation GéoLab</span><span id="projTitleSub" class="proj-slide-sub"></span></div>
+    <div class="proj-controls top-right"><button class="proj-btn-exit" onclick="toggleProj()">✕ Quitter</button></div>
+    <div class="proj-bottom-bar">
+      <div class="proj-bottom-left">
+        <span class="proj-slide-label">Diapositive</span>
+        <span class="proj-slide-name" id="projSlideName"></span>
+      </div>
+      <div class="proj-bottom-right">
+        <button class="proj-btn" id="projToggleUI" onclick="toggleProjUI()" title="Afficher/Masquer l'interface">⊙</button>
+        <span style="width:1px;height:24px;background:rgba(255,255,255,.2)"></span>
+        <button class="proj-btn" onclick="prevSlide()" title="Précédente (←)">◀</button>
+        <span class="proj-counter" id="projSlideNum"></span>
+        <button class="proj-btn" onclick="nextSlide()" title="Suivante (→)">▶</button>
+        <span style="width:1px;height:24px;background:rgba(255,255,255,.2)"></span>
+        <button class="proj-btn-zoom" onclick="ggbZoom(0.7)" title="Zoom arrière">−</button>
+        <button class="proj-btn-zoom" onclick="ggbZoom(1.4)" title="Zoom avant">+</button>
+        <button class="proj-btn-zoom" onclick="ggbZoomFit()" title="Ajuster" style="font-size:16px">⟷</button>
+      </div>
+    </div>
+    <div class="canvas-info">
+      <span id="ggbStatus">Chargement de GeoGebra...</span>
+      <span id="objectCount">0 objets</span>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-section"><h3>📋 Objets</h3><div class="construction-list" id="constructionList"><div class="empty-state">Chargement...</div></div></div>
+    <div class="panel-section"><h3>📊 Mesures</h3><div id="measurements" class="empty-state">Sélectionnez des objets</div></div>
+    <div class="panel-section"><h3>💡 Astuces</h3><div class="ggb-tip">Utilisez la barre d'outils <strong>GeoGebra</strong> (au-dessus du canvas) pour tous les outils de géométrie : point, segment, cercle, polygone, etc.<br><br>👆 Survolez un outil pour voir son nom.</div></div>
+    <div class="panel-section" id="simulationPanel" style="display:none"><h3>⚡ Simulation</h3><div id="simulationContent"></div></div>
+    <div class="panel-section"><h3>📽️ Présentations</h3><div id="slidesPanel">
+      <div class="slides-toolbar" style="gap:6px">
+        <select id="presSelect" onchange="switchPres(+this.value)" style="flex:1;min-width:0;padding:4px 4px;border:2px solid #e9ecef;border-radius:4px;font-size:11px"></select>
+        <button class="modal-btn confirm" style="font-size:11px;padding:2px 6px" onclick="addPres()" title="Nouvelle présentation">+</button>
+        <button class="modal-btn cancel" style="font-size:11px;padding:2px 6px" onclick="delPres()" title="Supprimer">−</button>
+      </div>
+      <div class="slides-toolbar"><input type="text" id="presTitle" value="" style="flex:1;min-width:0;padding:4px 6px;border:2px solid #e9ecef;border-radius:4px;font-size:11px" onchange="renamePres(this.value)" placeholder="Titre"></div>
+      <div class="slides-toolbar"><button class="modal-btn confirm" style="font-size:12px;padding:3px 8px" onclick="addSlide()">+ Ajouter</button><button class="modal-btn" style="font-size:12px;padding:3px 8px;background:#e2e8f0;color:#2c3e50;border:none;border-radius:4px;cursor:pointer" onclick="exportPres()">💾 Sauver</button><button class="modal-btn" style="font-size:12px;padding:3px 8px;background:#e2e8f0;color:#2c3e50;border:none;border-radius:4px;cursor:pointer" onclick="document.getElementById('importFileInput').click()">📂 Ouvrir</button><input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importPres(event)"><span id="slideCount" style="font-size:11px;color:#718096;margin-left:6px">0</span></div>
+      <div id="slideList" class="empty-state" style="font-size:12px">Aucune diapo</div>
+    </div></div>
+  </div>
+</div>
+<div class="status-bar">
+  <div class="status-message"><span class="status-indicator"></span><span id="statusText">Prêt — GéoLab + GeoGebra</span></div>
+  <div><span id="pointCount">0 objets</span></div>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="textModal"><div class="modal-content">
+  <h3>📝 Texte enrichi</h3>
+  <p style="font-size:12px;color:#718096">Saisissez le texte avec mise en forme</p>
+  <div style="display:flex;gap:4px;margin:6px 0;flex-wrap:wrap;align-items:center">
+    <button class="modal-btn cn" style="flex:0;padding:3px 10px;font-weight:700;background:#e2e8f0;border:none;border-radius:4px;cursor:pointer;font-size:13px" id="fmtB" onclick="toggleFmt('bold')">G</button>
+    <button class="modal-btn cn" style="flex:0;padding:3px 10px;font-style:italic;background:#e2e8f0;border:none;border-radius:4px;cursor:pointer;font-size:13px" id="fmtI" onclick="toggleFmt('italic')">I</button>
+    <button class="modal-btn cn" style="flex:0;padding:3px 10px;text-decoration:underline;background:#e2e8f0;border:none;border-radius:4px;cursor:pointer;font-size:13px" id="fmtU" onclick="toggleFmt('underline')">S</button>
+    <select id="fmtFont" style="width:auto;padding:3px 4px;border:2px solid #e9ecef;border-radius:4px;font-size:11px"><option>Arial</option><option>Times New Roman</option><option>Courier New</option><option>Georgia</option><option>Verdana</option></select>
+    <select id="fmtSize" style="width:auto;padding:3px 4px;border:2px solid #e9ecef;border-radius:4px;font-size:11px"><option value="10">10</option><option value="12">12</option><option value="14" selected>14</option><option value="18">18</option><option value="24">24</option><option value="32">32</option></select>
+    <label style="font-size:10px;display:flex;align-items:center;gap:2px">🎨<input type="color" id="fmtColor" value="#2d3748" style="width:30px;height:24px;padding:0;border:none"></label>
+  </div>
+  <textarea id="textContent" rows="2" style="width:100%;padding:8px;border:2px solid #e9ecef;border-radius:6px;font-size:14px;font-family:Arial" placeholder="Votre texte..."></textarea>
+  <div class="modal-buttons"><button class="modal-btn confirm" onclick="ggbText()">Ajouter</button><button class="modal-btn cancel" onclick="closeModal('textModal')">Annuler</button></div>
+</div></div>
+<div class="modal" id="latexModal"><div class="modal-content">
+  <h3>📄 Formule LaTeX</h3>
+  <p style="font-size:13px;color:#718096">Saisissez une formule LaTeX (ex: a^2 + b^2 = c^2)</p>
+  <input type="text" id="latexInput" class="latex-input" placeholder="a^2 + b^2 = c^2" value="a^2 + b^2 = c^2">
+  <div class="latex-preview" id="latexPreview">\(a^2 + b^2 = c^2\)</div>
+  <div class="ggb-tip">📌 Note : GeoGebra utilise <strong>FormulaText</strong> pour le rendu LaTeX. Les formules complexes peuvent ne pas s'afficher parfaitement.</div>
+  <div class="modal-buttons"><button class="modal-btn confirm" onclick="addGGLatex()">Ajouter</button><button class="modal-btn cancel" onclick="closeModal('latexModal')">Annuler</button></div>
+</div></div>
+<div class="modal" id="angleSimulatorModal"><div class="modal-content">
+  <h3>🔄 Simulateur d'angles</h3><p style="font-size:13px;color:#718096">Ajustez l'angle</p>
+  <input type="range" id="angleSlider" min="0" max="180" value="90" step="1" class="slider">
+  <div style="text-align:center;margin:15px 0"><span style="font-size:28px;font-weight:700" id="angleValue">90°</span></div>
+  <div class="simulation-item"><span class="simulation-label">Type :</span><span class="simulation-value" id="angleType">Angle droit</span></div>
+  <div class="simulation-item"><span class="simulation-label">Complément :</span><span class="simulation-value" id="angleComplement">0°</span></div>
+  <div class="simulation-item"><span class="simulation-label">Supplément :</span><span class="simulation-value" id="angleSupplement">90°</span></div>
+  <div class="modal-buttons"><button class="modal-btn confirm" onclick="drawGGSimulatedAngle()">Dessiner cet angle</button><button class="modal-btn cancel" onclick="closeModal('angleSimulatorModal')">Fermer</button></div>
+</div></div>
+<div class="modal" id="pythagoreModal"><div class="modal-content">
+  <h3>📐 Théorème de Pythagore</h3><p style="font-size:13px;color:#718096">\(a^2 + b^2 = c^2\)</p>
+  <div style="display:flex;gap:10px;margin:15px 0"><div style="flex:1"><label style="font-size:12px">a (cm)</label><input type="number" id="pythagoreA" value="3" step=".1" min=".1"></div><div style="flex:1"><label style="font-size:12px">b (cm)</label><input type="number" id="pythagoreB" value="4" step=".1" min=".1"></div><div style="flex:1"><label style="font-size:12px">c (cm)</label><input type="number" id="pythagoreC" value="5" step=".1" min=".1"></div></div>
+  <div class="simulation-item"><span class="simulation-label">\(a^2 + b^2 =\)</span><span class="simulation-value" id="pythagoreSum">25</span></div>
+  <div class="simulation-item"><span class="simulation-label">\(c^2 =\)</span><span class="simulation-value" id="pythagoreCSquare">25</span></div>
+  <div class="simulation-item"><span class="simulation-label">Vérification :</span><span class="simulation-value" id="pythagoreCheck">✅ Égalité vérifiée</span></div>
+  <div class="modal-buttons"><button class="modal-btn confirm" onclick="drawGGPythagore()">Dessiner le triangle</button><button class="modal-btn cancel" onclick="closeModal('pythagoreModal')">Fermer</button></div>
+</div></div>
+
+<script>
+// ===================== GEOGEBRA SETUP =====================
+let ggb = null;
+let projActive = false;
+let projShowUI = true;
+let rFmtState = {bold:false, italic:false, underline:false};
+let presentations = [{title: 'Présentation GéoLab', slides: []}];
+let currentPres = 0;
+let currentSlide = -1;
+
+function getSlides() { return presentations[currentPres] ? presentations[currentPres].slides : []; }
+function getPresTitle() { return presentations[currentPres] ? presentations[currentPres].title : ''; }
+
+function savePresData() {
+  try { localStorage.setItem('geolab_pres', JSON.stringify(presentations)); } catch(e) {}
+}
+function loadPresData() {
+  try {
+    const d = localStorage.getItem('geolab_pres');
+    if (d) { const p = JSON.parse(d); if (p && p.length) { presentations = p; return true; } }
+  } catch(e) {}
+  return false;
+}
+
+const ggbParams = {
+  "appName": "geometry",
+  "width": 900,
+  "height": 520,
+  "showToolBar": true,
+  "showMenuBar": false,
+  "showAlgebraInput": false,
+  "showResetIcon": false,
+  "showZoomButtons": false,
+  "showToolBarHelp": false,
+  "showFullscreenButton": false,
+  "enableRightClick": true,
+  "enableLabelDrags": true,
+  "enableShiftDragZoom": true,
+  "language": "fr",
+  "scale": 1,
+  "appletOnLoad": function(api) {
+    ggb = api;
+    document.getElementById('ggbStatus').textContent = 'GeoGebra prêt';
+    loadPresData();
+    updateConstructionList();
+    renderPresList();
+    renderSlideList();
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      document.querySelectorAll('.latex-preview').forEach(el => MathJax.typesetPromise([el]).catch(()=>{}));
+    }
+  }
+};
+
+const ggbApp = new GGBApplet(ggbParams, true);
+window.addEventListener('load', function() {
+  ggbApp.inject('ggb-element');
+});
+
+// ===================== UI HELPERS =====================
+function updateStatus(m) {
+  const s = document.getElementById('statusText');
+  if (s) s.textContent = m;
+}
+
+function showModal(id) {
+  document.getElementById(id).style.display = 'flex';
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+window.onclick = function(e) {
+  if (e.target.classList.contains('modal')) closeModal(e.target.id);
+};
+
+// ===================== GGB WRAPPER =====================
+function ggbCmd(cmd) {
+  if (!ggb) { updateStatus('GeoGebra pas encore chargé'); return false; }
+  try { ggb.evalCommand(cmd); return true; } catch(e) { updateStatus('Erreur: ' + e.message); return false; }
+}
+
+function updateConstructionList() {
+  const l = document.getElementById('constructionList');
+  if (!l) return;
+  if (!ggb) { l.innerHTML = '<div class="empty-state">Chargement...</div>'; return; }
+  const names = ggb.getAllObjectNames();
+  if (!names || !names.length) {
+    l.innerHTML = '<div class="empty-state">Aucun objet</div>';
+    document.getElementById('pointCount').textContent = '0 objets';
+    document.getElementById('objectCount').textContent = '0 objets';
+    return;
+  }
+  l.innerHTML = names.map(n => {
+    let icon = '📍';
+    try { const t = ggb.getObjectType(n); if (t === 'segment') icon = '〰️'; else if (t === 'line') icon = '↔️'; else if (t === 'circle') icon = '⭕'; else if (t === 'polygon') icon = '🔷'; else if (t === 'angle') icon = '∠'; } catch(e){}
+    return '<div class="construction-item"><span>' + icon + ' ' + n.replace(/</g,'&lt;') + '</span></div>';
+  }).join('');
+  document.getElementById('pointCount').textContent = names.length + ' objet' + (names.length > 1 ? 's' : '');
+  document.getElementById('objectCount').textContent = names.length + ' objet' + (names.length > 1 ? 's' : '');
+}
+
+function toggleGrid() {
+  if (!ggb) return;
+  const v = !ggb.getGridVisible();
+  ggb.setGridVisible(v);
+}
+
+function ggbUndo() { if (ggb) { ggb.undo(); updateConstructionList(); } }
+function ggbRedo() { if (ggb) { ggb.redo(); updateConstructionList(); } }
+
+function ggbZoom(f) {
+  if (!ggb) return;
+  const ev = document.createEvent('WheelEvent');
+  // Use zoom in/out via evalCommand
+  if (f < 1) ggb.evalCommand('ZoomOut(1)');
+  else ggb.evalCommand('ZoomIn(1)');
+}
+
+function ggbZoomFit() {
+  if (!ggb) return;
+  ggb.setCoordSystem(-5, 25, -2, 18);
+}
+
+function ggbExport() {
+  if (!ggb) return;
+  const png = ggb.getPNGBase64();
+  const link = document.createElement('a');
+  link.download = 'geolab-geogebra.png';
+  link.href = 'data:image/png;base64,' + png;
+  link.click();
+  updateStatus('Image exportée');
+}
+
+function ggbClear() {
+  if (!ggb) return;
+  if (confirm('Tout effacer ?')) {
+    ggb.newConstruction();
+    updateConstructionList();
+    updateStatus('Construction effacée');
+  }
+}
+
+function resizeGGB() {
+  if (!ggb) return;
+  const el = document.getElementById('ggb-element');
+  const rect = el.getBoundingClientRect();
+  ggb.setSize(Math.round(rect.width), Math.round(rect.height));
+}
+
+function toggleProj() {
+  const app = document.getElementById('appContainer');
+  projActive = !projActive;
+  if (projActive) {
+    app.classList.add('proj-full');
+    if (ggb) { ggb.setShowToolBar(false); ggb.setShowAlgebraInput(false); }
+    if (app.requestFullscreen) { app.requestFullscreen(); }
+    else if (app.webkitRequestFullscreen) { app.webkitRequestFullscreen(); }
+    else if (app.msRequestFullscreen) { app.msRequestFullscreen(); }
+    const slides = getSlides();
+    if (slides.length && currentSlide < 0) { loadSlide(0); }
+    if (!projShowUI) { hideProjUI(); }
+    startProjAutoHide();
+    const btn = document.getElementById('projToggleUI');
+    if (btn) btn.style.background = projShowUI ? 'rgba(102,126,234,.7)' : '';
+  } else {
+    app.classList.remove('proj-full');
+    if (ggb) { ggb.setShowToolBar(true); }
+    if (document.exitFullscreen) { document.exitFullscreen(); }
+    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+    else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+    stopProjAutoHide();
+  }
+  setTimeout(function() {
+    resizeGGB();
+    if (ggb) ggb.setCoordSystem(-5, 25, -2, 18);
+  }, 400);
+}
+
+function toggleProjCanvas() {
+  if (!projActive) { projShowUI = false; toggleProj(); }
+  else { toggleProj(); }
+}
+
+let projHideTimer = null;
+function startProjAutoHide() {
+  if (!projShowUI) return;
+  showProjUI();
+  document.addEventListener('mousemove', onProjMouseMove);
+}
+function stopProjAutoHide() {
+  document.removeEventListener('mousemove', onProjMouseMove);
+  clearTimeout(projHideTimer);
+}
+function onProjMouseMove() {
+  if (projShowUI) {
+    showProjUI();
+    clearTimeout(projHideTimer);
+    projHideTimer = setTimeout(hideProjUI, 2500);
+  }
+}
+function showProjUI() {
+  document.querySelectorAll('.proj-title, .proj-bottom-bar, .proj-controls').forEach(el => el.classList.remove('proj-hide'));
+}
+function hideProjUI() {
+  document.querySelectorAll('.proj-title, .proj-bottom-bar, .proj-controls').forEach(el => el.classList.add('proj-hide'));
+}
+function toggleProjUI() {
+  projShowUI = !projShowUI;
+  const btn = document.getElementById('projToggleUI');
+  if (projShowUI) {
+    showProjUI();
+    startProjAutoHide();
+    if (btn) btn.style.background = 'rgba(102,126,234,.7)';
+  } else {
+    hideProjUI();
+    stopProjAutoHide();
+    document.querySelectorAll('.proj-bottom-bar').forEach(el => el.classList.remove('proj-hide'));
+    if (btn) btn.style.background = '';
+  }
+}
+
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement && projActive) {
+    projActive = false;
+    const app = document.getElementById('appContainer');
+    app.classList.remove('proj-full');
+    if (ggb) ggb.setShowToolBar(true);
+    stopProjAutoHide();
+  }
+});
+document.addEventListener('webkitfullscreenchange', function() {
+  if (!document.webkitFullscreenElement && projActive) {
+    projActive = false;
+    const app = document.getElementById('appContainer');
+    app.classList.remove('proj-full');
+    if (ggb) ggb.setShowToolBar(true);
+    stopProjAutoHide();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ggbUndo(); }
+  if ((e.key === 'y' || e.key === 'Y') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ggbRedo(); }
+  if (e.key === 'F5') { e.preventDefault(); toggleProj(); }
+  if (e.key === 'ArrowLeft' && projActive) { e.preventDefault(); prevSlide(); }
+  if (e.key === 'ArrowRight' && projActive) { e.preventDefault(); nextSlide(); }
+});
+
+// ===================== PRESENTATIONS & SLIDES =====================
+function addPres() {
+  const name = prompt('Nom de la présentation :', 'Présentation ' + (presentations.length + 1));
+  if (!name) return;
+  presentations.push({title: name, slides: []});
+  currentPres = presentations.length - 1;
+  currentSlide = -1;
+  savePresData();
+  renderPresList();
+  renderSlideList();
+  updateStatus('📽️ Présentation "' + name + '" créée');
+}
+function delPres() {
+  if (presentations.length <= 1) { updateStatus('Gardez au moins une présentation'); return; }
+  if (!confirm('Supprimer "' + presentations[currentPres].title + '" ?')) return;
+  presentations.splice(currentPres, 1);
+  if (currentPres >= presentations.length) currentPres = presentations.length - 1;
+  currentSlide = -1;
+  savePresData();
+  renderPresList();
+  renderSlideList();
+  updateStatus('📽️ Présentation supprimée');
+}
+function switchPres(idx) {
+  if (idx === currentPres) return;
+  currentPres = idx;
+  currentSlide = -1;
+  renderSlideList();
+  renderPresList();
+  updateProjTitle();
+  updateStatus('📽️ ' + presentations[currentPres].title);
+}
+function renamePres(title) {
+  if (presentations[currentPres]) presentations[currentPres].title = title;
+  savePresData();
+  updateProjTitle();
+}
+function renderPresList() {
+  const sel = document.getElementById('presSelect');
+  const inp = document.getElementById('presTitle');
+  if (!sel || !inp) return;
+  sel.innerHTML = presentations.map((p, i) => '<option value="' + i + '"' + (i === currentPres ? ' selected' : '') + '>' + p.title.replace(/</g,'&lt;') + '</option>').join('');
+  inp.value = getPresTitle();
+  updateProjTitle();
+}
+
+function addSlide() {
+  const slides = getSlides();
+  if (!ggb) return;
+  const xml = ggb.getXML();
+  const name = prompt('Nom de la diapo :', 'Diapo ' + (slides.length + 1));
+  if (!name) return;
+  slides.push({ name: name, xml: xml });
+  currentSlide = slides.length - 1;
+  savePresData();
+  renderSlideList();
+  updateStatus('📽️ Diapo "' + name + '" ajoutée');
+}
+function loadSlide(idx) {
+  const slides = getSlides();
+  if (!ggb || idx < 0 || idx >= slides.length) return;
+  currentSlide = idx;
+  const el = document.getElementById('ggb-element');
+  if (el) el.classList.add('proj-fade');
+  ggb.setXML(slides[idx].xml);
+  renderSlideList();
+  updateProjTitle();
+  setTimeout(updateConstructionList, 300);
+  setTimeout(function() { if (el) el.classList.remove('proj-fade'); }, 50);
+  updateStatus('📽️ Diapo "' + slides[idx].name + '" chargée');
+}
+function deleteSlide(idx) {
+  const slides = getSlides();
+  if (idx < 0 || idx >= slides.length) return;
+  slides.splice(idx, 1);
+  if (currentSlide === idx) currentSlide = -1;
+  else if (currentSlide > idx) currentSlide--;
+  savePresData();
+  renderSlideList();
+  updateStatus('📽️ Diapo supprimée');
+}
+function saveSlide(idx) {
+  const slides = getSlides();
+  if (idx < 0 || idx >= slides.length) return;
+  const s = slides[idx];
+  const blob = new Blob([s.xml], {type:'application/xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.download = (s.name.replace(/[^a-zA-Z0-9_-]/g,'_') || 'diapo') + '.ggb';
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+  updateStatus('💾 Diapo "' + s.name + '" téléchargée');
+}
+function exportPres() {
+  const p = presentations[currentPres];
+  if (!p) return;
+  const data = {title: p.title, slides: p.slides.map(s => ({name:s.name, xml:s.xml}))};
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.download = (p.title.replace(/[^a-zA-Z0-9_-]/g,'_') || 'presentation') + '.json';
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+  updateStatus('💾 "' + p.title + '" sauvegardée (' + p.slides.length + ' diapo(s))');
+}
+function importPres(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      let data = JSON.parse(ev.target.result);
+      if (data.title && data.slides) {
+        presentations.push({title: data.title + ' (importée)', slides: data.slides});
+      } else if (Array.isArray(data)) {
+        data.forEach(d => presentations.push({title: (d.title || 'Importée') + ' (importée)', slides: d.slides || []}));
+      } else {
+        updateStatus('Erreur : format de fichier inconnu'); return;
+      }
+      currentPres = presentations.length - 1;
+      currentSlide = -1;
+      savePresData();
+      renderPresList();
+      renderSlideList();
+      updateStatus('📂 Présentation(s) importée(s)');
+    } catch(err) { updateStatus('Erreur de lecture du fichier'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+function updateSlideContent(idx) {
+  const slides = getSlides();
+  if (!ggb || idx < 0 || idx >= slides.length) return;
+  if (!confirm('Remplacer le contenu de "' + slides[idx].name + '" par la figure courante ?')) return;
+  slides[idx].xml = ggb.getXML();
+  savePresData();
+  updateStatus('🔄 Diapo "' + slides[idx].name + '" mise à jour');
+}
+function renameSlide(idx) {
+  const slides = getSlides();
+  if (idx < 0 || idx >= slides.length) return;
+  const name = prompt('Nouveau nom :', slides[idx].name);
+  if (!name || name === slides[idx].name) return;
+  slides[idx].name = name;
+  savePresData();
+  renderSlideList();
+  updateStatus('📝 Diapo renommée en "' + name + '"');
+}
+function prevSlide() {
+  const slides = getSlides();
+  if (!slides.length) return;
+  const idx = currentSlide < 0 ? slides.length - 1 : (currentSlide - 1 + slides.length) % slides.length;
+  loadSlide(idx);
+}
+function nextSlide() {
+  const slides = getSlides();
+  if (!slides.length) return;
+  const idx = currentSlide < 0 ? 0 : (currentSlide + 1) % slides.length;
+  loadSlide(idx);
+}
+function updateProjTitle() {
+  const main = document.getElementById('projTitleMain');
+  const sub = document.getElementById('projTitleSub');
+  const nameEl = document.getElementById('projSlideName');
+  if (!main || !sub) return;
+  const slides = getSlides();
+  const t = getPresTitle();
+  main.textContent = t;
+  if (currentSlide >= 0 && currentSlide < slides.length) {
+    sub.textContent = slides[currentSlide].name;
+    if (nameEl) nameEl.textContent = slides[currentSlide].name;
+    document.getElementById('projSlideNum').textContent = (currentSlide + 1) + ' / ' + slides.length;
+  } else {
+    sub.textContent = slides.length ? '◀ ▶ pour démarrer' : '';
+    if (nameEl) nameEl.textContent = '';
+    document.getElementById('projSlideNum').textContent = slides.length ? '1 / ' + slides.length : '';
+  }
+}
+function renderSlideList() {
+  const list = document.getElementById('slideList');
+  const count = document.getElementById('slideCount');
+  if (!list || !count) return;
+  const slides = getSlides();
+  if (!slides.length) {
+    list.innerHTML = '<div class="empty-state" style="font-size:12px">Aucune diapo</div>';
+    count.textContent = '0';
+    document.getElementById('projSlideNum').textContent = '';
+    updateProjTitle();
+    return;
+  }
+  count.textContent = slides.length + ' diapo' + (slides.length > 1 ? 's' : '');
+  list.innerHTML = slides.map((s, i) =>
+    '<div class="slide-item' + (i === currentSlide ? ' active' : '') + '" onclick="loadSlide(' + i + ')">' +
+    '<span class="slide-name">' + s.name.replace(/</g,'&lt;') + '</span>' +
+    '<span style="display:flex;gap:2px">' +
+    '<button class="slide-upd" onclick="event.stopPropagation();updateSlideContent(' + i + ')" title="Remplacer par la figure courante">🔄</button>' +
+    '<button class="slide-save" onclick="event.stopPropagation();saveSlide(' + i + ')" title="Télécharger">💾</button>' +
+    '<button class="slide-del" onclick="event.stopPropagation();deleteSlide(' + i + ')" title="Supprimer">✕</button></span></div>'
+  ).join('');
+  if (currentSlide >= 0 && currentSlide < slides.length) {
+    document.getElementById('projSlideNum').textContent = (currentSlide + 1) + '/' + slides.length;
+  }
+  updateProjTitle();
+}
+
+// ===================== QUICK START TEMPLATES =====================
+function ggbTriangle() {
+  if (!ggb) return;
+  ggb.newConstruction();
+  ggb.evalCommand('A = (5,5)');
+  ggb.evalCommand('B = (15,5)');
+  ggb.evalCommand('C = (10,12)');
+  ggb.evalCommand('Polygon(A,B,C)');
+  ggb.evalCommand('SetLabelMode(A,1)');
+  ggb.evalCommand('SetLabelMode(B,1)');
+  ggb.evalCommand('SetLabelMode(C,1)');
+  updateConstructionList();
+  updateStatus('🔺 Triangle créé');
+}
+
+function ggbRectangle() {
+  if (!ggb) return;
+  ggb.newConstruction();
+  ggb.evalCommand('A = (5,5)');
+  ggb.evalCommand('B = (15,5)');
+  ggb.evalCommand('C = (15,12)');
+  ggb.evalCommand('D = (5,12)');
+  ggb.evalCommand('Polygon(A,B,C,D)');
+  ggb.evalCommand('SetLabelMode(A,1);SetLabelMode(B,1);SetLabelMode(C,1);SetLabelMode(D,1)');
+  updateConstructionList();
+  updateStatus('🔲 Rectangle créé');
+}
+
+function ggbCircle() {
+  if (!ggb) return;
+  ggb.newConstruction();
+  ggb.evalCommand('O = (10,8)');
+  ggb.evalCommand('A = (15,8)');
+  ggb.evalCommand('c = Circle(O,A)');
+  ggb.evalCommand('SetLabelMode(O,1);SetLabelMode(A,1)');
+  updateConstructionList();
+  updateStatus('⭕ Cercle créé');
+}
+
+function ggbPoints() {
+  if (!ggb) return;
+  ggb.newConstruction();
+  ggb.evalCommand('A = (3,3)');
+  ggb.evalCommand('B = (8,5)');
+  ggb.evalCommand('C = (12,8)');
+  ggb.evalCommand('D = (5,12)');
+  ggb.evalCommand('E = (15,10)');
+  updateConstructionList();
+  updateStatus('📍 Points créés');
+}
+
+// ===================== TEXT & LATEX =====================
+function showTextModal() {
+  rFmtState = {bold:false, italic:false, underline:false};
+  ['B','I','U'].forEach(k => { const el = document.getElementById('fmt'+k); if (el) el.style.background = '#e2e8f0'; });
+  const cp = document.getElementById('fmtColor');
+  if (cp) cp.value = '#2d3748';
+  document.getElementById('textContent').value = '';
+  showModal('textModal');
+}
+
+function toggleFmt(t) {
+  rFmtState[t] = !rFmtState[t];
+  const map = {bold:'B', italic:'I', underline:'U'};
+  const el = document.getElementById('fmt'+map[t]);
+  if (el) el.style.background = rFmtState[t] ? '#667eea' : '#e2e8f0';
+}
+
+function ggbText() {
+  const t = document.getElementById('textContent').value;
+  if (!t || !ggb) return;
+  const bold = rFmtState.bold, italic = rFmtState.italic, underline = rFmtState.underline;
+  const font = document.getElementById('fmtFont').value;
+  const size = +document.getElementById('fmtSize').value;
+  const color = document.getElementById('fmtColor').value;
+  let latex = t.replace(/[\\{}_^$%&#]/g, function(m) {
+    return '\\' + m;
+  });
+  if (bold) latex = '\\mathbf{' + latex + '}';
+  if (italic) latex = '\\mathit{' + latex + '}';
+  if (underline) latex = '\\underline{' + latex + '}';
+  ggb.evalCommand('FormulaText("' + latex.replace(/"/g, '\\"') + '", 10, 10)');
+  const names = ggb.getAllObjectNames();
+  const last = names && names.length ? names[names.length - 1] : null;
+  if (last) {
+    const r = parseInt(color.slice(1,3), 16);
+    const g = parseInt(color.slice(3,5), 16);
+    const b = parseInt(color.slice(5,7), 16);
+    try { ggb.setColor(last, r, g, b); } catch(e) {}
+    try { ggb.setFontSize(last, Math.round(size * 1.2)); } catch(e) {}
+  }
+  document.getElementById('textContent').value = '';
+  rFmtState = {bold:false, italic:false, underline:false};
+  ['B','I','U'].forEach(k => { const el = document.getElementById('fmt'+k); if (el) el.style.background = '#e2e8f0'; });
+  closeModal('textModal');
+  updateConstructionList();
+  updateStatus('📝 Texte enrichi ajouté');
+}
+
+function showLatexModal() { showModal('latexModal'); setTimeout(() => updateLatexPreview(), 100); }
+
+function updateLatexPreview() {
+  const input = document.getElementById('latexInput').value;
+  const preview = document.getElementById('latexPreview');
+  if (!preview) return;
+  preview.innerHTML = '\\(' + input.replace(/^\$|\$$/g, '') + '\\)';
+  if (window.MathJax) MathJax.typesetPromise([preview]).catch(() => {});
+}
+
+document.getElementById('latexInput').addEventListener('input', updateLatexPreview);
+
+function addGGLatex() {
+  const latex = document.getElementById('latexInput').value;
+  if (!latex || !ggb) return;
+  // Use FormulaText for LaTeX rendering
+  const clean = latex.replace(/^\$|\$$/g, '').replace(/"/g, '\\"');
+  ggb.evalCommand('FormulaText("' + clean + '", 10, 8)');
+  closeModal('latexModal');
+  updateConstructionList();
+  updateStatus('📄 Formule ajoutée');
+}
+
+// ===================== ANGLE SIMULATOR =====================
+function showAngleSimulator() { showModal('angleSimulatorModal'); updateAngleSimulator(); }
+
+function updateAngleSimulator() {
+  const v = +document.getElementById('angleSlider').value;
+  document.getElementById('angleValue').textContent = v + '°';
+  let t = 'Angle aigu';
+  if (v > 90) t = 'Angle obtus';
+  if (v === 90) t = 'Angle droit';
+  document.getElementById('angleType').textContent = t;
+  document.getElementById('angleComplement').textContent = (90 - v) + '°';
+  document.getElementById('angleSupplement').textContent = (180 - v) + '°';
+}
+
+document.getElementById('angleSlider').addEventListener('input', updateAngleSimulator);
+
+function drawGGSimulatedAngle() {
+  if (!ggb) return;
+  const v = +document.getElementById('angleSlider').value;
+  // Create an angle at origin with given measure
+  ggb.evalCommand('A = (0,0)');
+  ggb.evalCommand('B = (6,0)');
+  ggb.evalCommand('angle = Angle(A, B, ' + v + '°)');
+  ggb.evalCommand('SetLabelMode(angle,1)');
+  closeModal('angleSimulatorModal');
+  updateConstructionList();
+  updateStatus('🔄 Angle de ' + v + '° créé');
+}
+
+// ===================== PYTHAGORE =====================
+function showPythagore() { showModal('pythagoreModal'); updatePythagore(); }
+
+function updatePythagore() {
+  const a = +document.getElementById('pythagoreA').value || 0;
+  const b = +document.getElementById('pythagoreB').value || 0;
+  const c = +document.getElementById('pythagoreC').value || 0;
+  const sum = a * a + b * b, cs = c * c;
+  document.getElementById('pythagoreSum').textContent = sum.toFixed(2);
+  document.getElementById('pythagoreCSquare').textContent = cs.toFixed(2);
+  const el = document.getElementById('pythagoreCheck');
+  if (Math.abs(sum - cs) < 0.01) { el.textContent = '✅ Égalité vérifiée'; el.style.color = '#48bb78'; }
+  else { el.textContent = '❌ Non vérifiée'; el.style.color = '#f56565'; }
+}
+
+['pythagoreA', 'pythagoreB', 'pythagoreC'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updatePythagore));
+
+function drawGGPythagore() {
+  if (!ggb) return;
+  const a = +document.getElementById('pythagoreA').value || 3;
+  const b = +document.getElementById('pythagoreB').value || 4;
+  ggb.evalCommand('A = (0,0)');
+  ggb.evalCommand('B = (' + b + ',0)');
+  ggb.evalCommand('C = (0,' + a + ')');
+  ggb.evalCommand('Polygon(A,B,C)');
+  ggb.evalCommand('SetLabelMode(A,1);SetLabelMode(B,1);SetLabelMode(C,1)');
+  // Add right angle symbol
+  ggb.evalCommand('Angle(B, A, C)');
+  closeModal('pythagoreModal');
+  updateConstructionList();
+  updateStatus('📐 Triangle rectangle tracé');
+}
+
+// ===================== POLLING FOR UPDATES =====================
+setInterval(function() {
+  if (ggb) updateConstructionList();
+}, 1000);
+
+updateStatus('Prêt — GéoLab + GeoGebra');
+</script>
+</body>
+</html>

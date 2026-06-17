@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Fiche de leçon Maths 5e · Togo · Programme officiel complet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0b4d3a;
+            --primary: #1b6e54;
+            --primary-light: #d0f0e4;
+            --accent: #f3b33d;
+            --bg-light: #f0f8f5;
+            --text: #1b4637;
+            --white: #ffffff;
+            --shadow: 0 10px 20px -8px rgba(0,40,20,0.25);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* BANDEAU RESPONSIVE */
+        .bandeau {
+            background: linear-gradient(148deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(1.5rem, 5vw, 2.8rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2.8rem);
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .bandeau h1 {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            font-weight: 600;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .bandeau h2 {
+            font-size: clamp(0.95rem, 4vw, 1.3rem);
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        .badge-prog {
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 0.4rem clamp(1rem, 3vw, 2.2rem);
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            box-shadow: 0 4px 8px #b57f1a;
+            white-space: normal;
+            text-align: center;
+        }
+
+        /* CARTE GÉNÉRATEUR */
+        .card-outil {
+            background: var(--white);
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2.4rem) clamp(1.2rem, 4vw, 3rem);
+            margin-bottom: clamp(1.8rem, 5vw, 2.8rem);
+            border: 2px solid #c3e3d6;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .card-outil h3 {
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            color: var(--primary);
+            border-bottom: 4px solid #c4ecd9;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1 1 200px;
+            min-width: 160px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #c6e2d7;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            background: #f9fffd;
+            transition: 0.2s;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27,110,84,0.2);
+        }
+
+        .btn-generer {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            width: 100%;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 15px 25px -10px var(--primary);
+            white-space: normal;
+            line-height: 1.3;
+        }
+
+        .btn-generer:hover {
+            background: #0f543f;
+            transform: translateY(-2px);
+        }
+
+        /* FICHE GÉNÉRÉE */
+        .fiche-finale {
+            background: var(--white);
+            border-radius: clamp(25px, 6vw, 60px);
+            padding: clamp(1.2rem, 4vw, 3rem) clamp(1.2rem, 4vw, 3.5rem);
+            border: 4px solid #a5d7c4;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fiche-header {
+            text-align: center;
+            border-bottom: 3px dashed var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .fiche-header h2 {
+            font-size: clamp(1.6rem, 6vw, 2.6rem);
+            color: var(--primary);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        /* sections guide */
+        .section-guide {
+            background: #f6fdfa;
+            border-radius: clamp(18px, 4vw, 40px);
+            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.2rem, 4vw, 2.5rem);
+            margin-bottom: 1.8rem;
+            border-left: clamp(8px, 2vw, 16px) solid var(--primary);
+            box-shadow: 0 6px 12px #c1ddd1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .section-guide h4 {
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            color: #1a5b45;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-consigne {
+            background: #fef7e5;
+            border-left: clamp(4px, 1.5vw, 8px) solid var(--accent);
+            padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 30px;
+            font-size: clamp(0.9rem, 3vw, 1.05rem);
+            margin: 1rem 0;
+            box-shadow: 0 3px 8px #d9e6df;
+            word-break: break-word;
+        }
+
+        .bullet-list {
+            margin-left: 1.2rem;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            padding-right: 0.5rem;
+        }
+
+        .bullet-list li {
+            margin-bottom: 0.4rem;
+            word-break: break-word;
+        }
+
+        /* tableau responsive */
+        .table-cap {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px #c4ddd1;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+        }
+
+        .table-cap th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        .table-cap td {
+            border: 1px solid #b7dbc9;
+            padding: 10px 8px;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        /* actions */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .btn-print {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 120px;
+            flex: 1 0 auto;
+            max-width: 200px;
+            white-space: nowrap;
+        }
+
+        .btn-print:hover {
+            background: #e2f3eb;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 0.5rem; }
+            .btn-print { white-space: normal; min-width: unset; flex-basis: 100%; }
+            .form-group { flex-basis: 100%; }
+        }
+
+        @media print {
+            .no-print, .card-outil, .actions { display: none !important; }
+            .fiche-finale { border: none; box-shadow: none; padding: 1.2cm; }
+            .section-guide { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- BANDEAU OFFICIEL 5ème -->
+    <div class="bandeau no-print">
+        <h1>🇹🇬 MINISTÈRE DES ENSEIGNEMENTS PRIMAIRE ET SECONDAIRE</h1>
+        <h2>RÉPUBLIQUE TOGOLAISE – Travail-Liberté-Patrie – PROGRAMME 5e (PAREC 2018-2019)</h2>
+        <div class="badge-prog">MATHÉMATIQUES 5ème – GUIDE D'EXÉCUTION INTÉGRAL</div>
+        <p style="margin-top:1rem; font-size:clamp(0.9rem,3vw,1.2rem);">Prisme · Cylindre · Distance · Angles · Triangles · Cercle · Polygones · Symétrie · Repérage · Arithmétique · Fractions · Relatifs · Puissances · Équations · Proportionnalité</p>
+    </div>
+
+    <!-- GÉNÉRATEUR -->
+    <div class="card-outil no-print">
+        <h3>📘 GÉNÉRATEUR DE FICHE – PROGRAMME 5ème TOGO</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>📌 Leçon</label>
+                <select id="leconSelect">
+                    <option value="">-- Choisir une leçon --</option>
+                    <optgroup label="⚙️ Configurations espace">
+                        <option value="prisme-droit">Prisme droit</option>
+                        <option value="cylindre-droit">Cylindre droit</option>
+                    </optgroup>
+                    <optgroup label="📐 Configurations plan">
+                        <option value="distance-segments">Distance et segments</option>
+                        <option value="angles-5e">Angles (complémentaires, supplémentaires, opposés)</option>
+                        <option value="triangles-5e">Triangles (somme des angles)</option>
+                        <option value="cercle-5e">Cercle circonscrit</option>
+                        <option value="polygones">Polygones (parallélogrammes, trapèze, symétrie)</option>
+                    </optgroup>
+                    <optgroup label="🔄 Applications plan">
+                        <option value="symetrie-5e">Figures symétriques (droite/point) – approfondissement</option>
+                    </optgroup>
+                    <optgroup label="📊 Outils vectoriels / repérage">
+                        <option value="reperage">Repérage sur droite et quadrillage</option>
+                    </optgroup>
+                    <optgroup label="🧮 Calcul numérique">
+                        <option value="division-euclidienne">Division euclidienne</option>
+                        <option value="nombres-premiers">Nombres premiers – PPCM – PGCD</option>
+                        <option value="fractions-5e">Fractions (irréductible, opérations)</option>
+                        <option value="relatifs-5e">Nombres décimaux relatifs (somme, différence, multiplication)</option>
+                        <option value="puissances">Puissances (exposant naturel)</option>
+                    </optgroup>
+                    <optgroup label="📝 Calcul littéral / équations">
+                        <option value="equations">Notion d'équation (x+a=b, ax=b)</option>
+                    </optgroup>
+                    <optgroup label="📈 Organisation données">
+                        <option value="proportionnalite-5e">Proportionnalité – pourcentage – échelle</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>⏱️ Durée</label>
+                <input type="text" id="dureeField" value="6 heures" placeholder="ex: 8h">
+            </div>
+            <div class="form-group">
+                <label>📅 Date</label>
+                <input type="date" id="dateField">
+            </div>
+        </div>
+        <button class="btn-generer" id="btnGenerer">✨ GÉNÉRER LA FICHE (contenus · stratégies · consignes · évaluation)</button>
+    </div>
+
+    <!-- FICHE GÉNÉRÉE -->
+    <div class="fiche-finale hidden" id="ficheGeneree">
+        <div id="contenuFiche"></div>
+        <div class="actions no-print">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+            <button class="btn-print" onclick="alert('Imprimer → Enregistrer en PDF')">📄 PDF</button>
+            <button class="btn-print" onclick="exportWord()">📝 Word</button>
+            <button class="btn-print" onclick="resetFiche()">🔄 Nouvelle</button>
+        </div>
+        <div style="margin-top:1.5rem; background:#fdf3da; padding:0.8rem 1.5rem; border-radius:60px; font-size:clamp(0.8rem,2.5vw,0.95rem); text-align:center;" class="no-print">
+            ⚡ Fiche conforme au programme officiel de 5ème – Guide d'exécution intégré.
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ==================== BASE DE DONNÉES COMPLÈTE CLASSE DE 5ème ====================
+    const lecons = {
+        // --- PRISME DROIT ---
+        'prisme-droit': {
+            theme: 'Configurations de l\'espace',
+            titre: 'Prisme droit',
+            contenusSynth: [
+                'Prisme droit : définitions, vocabulaire (faces, arêtes, sommets, bases, surface latérale)',
+                'Patron d’un prisme droit',
+                'Aire latérale, aire de base, aire totale, volume (base triangulaire ou rectangulaire)'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes : observation de prismes droits réels',
+                'Découverte des différentes parties : faces (forme, nombre), arêtes, sommets, surface latérale, bases',
+                'Défaire le solide pour découvrir le patron, puis construction individuelle'
+            ],
+            consignes: [
+                'Mettre la classe en situation d’observation réelle de prismes droits (matériel individuel/collectif)',
+                'Faire distinguer et nommer les différentes parties du solide',
+                'Défaire le solide et faire découvrir le patron obtenu ; présenter éventuellement d’autres formes de patron',
+                'Veiller à ce que chaque apprenant réalise personnellement le solide à partir d’un patron'
+            ],
+            evaluation: [
+                'Reconnaissance du prisme droit dans un groupe de solides',
+                'Désignation par leurs noms des différentes parties',
+                'Construction du patron et réalisation du solide',
+                'Calcul des grandeurs (aire latérale, totale, volume) par application des formules'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier un solide', contenu: 'Prisme droit : définitions, vocabulaire, caractéristiques' },
+                { capacite: 'Décrire un solide', contenu: 'Vocabulaire : faces, arêtes, sommets, bases, surface latérale' },
+                { capacite: 'Construire le patron', contenu: 'Patron d’un prisme droit' },
+                { capacite: 'Réaliser le solide à partir du patron', contenu: 'Prisme droit et patron' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Aire latérale, aire de base, aire totale, volume d’un prisme droit à base triangulaire ou rectangulaire' }
+            ],
+            prerequis: ['Notions de base en géométrie (cube, pavé droit)', 'Utilisation des instruments'],
+            materiel: ['Modèles de prismes droits', 'Papier cartonné, ciseaux, colle', 'Règle, équerre, compas']
+        },
+        // --- CYLINDRE DROIT ---
+        'cylindre-droit': {
+            theme: 'Configurations de l\'espace',
+            titre: 'Cylindre droit',
+            contenusSynth: [
+                'Cylindre droit : définitions, vocabulaire (bases, surface latérale, génératrice)',
+                'Patron d’un cylindre de révolution',
+                'Aire latérale, aire totale, volume d’un cylindre'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes : observation de cylindres réels',
+                'Découverte des différentes parties : bases circulaires, surface latérale, génératrices',
+                'Défaire un cylindre pour découvrir le patron (rectangle + deux cercles)',
+                'Construction individuelle à partir du patron'
+            ],
+            consignes: [
+                'Présenter des objets cylindriques (boîte de conserve, rouleau)',
+                'Faire distinguer les bases et la surface latérale',
+                'Montrer le patron en déroulant la surface latérale',
+                'Veiller à la précision du tracé des cercles et du rectangle'
+            ],
+            evaluation: [
+                'Reconnaissance du cylindre droit dans un groupe de solides',
+                'Désignation des bases, de la surface latérale',
+                'Construction correcte du patron et réalisation du solide',
+                'Calcul de l’aire latérale, totale et du volume'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier un solide', contenu: 'Cylindre droit : définitions, vocabulaire, caractéristiques' },
+                { capacite: 'Décrire un solide', contenu: 'Vocabulaire : bases circulaires, surface latérale, génératrice' },
+                { capacite: 'Construire le patron', contenu: 'Patron d’un cylindre de révolution' },
+                { capacite: 'Réaliser le solide à partir du patron', contenu: 'Cylindre et patron' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Aire latérale, aire totale, volume d’un cylindre' }
+            ],
+            prerequis: ['Cercle, périmètre, aire du disque', 'Notions de pavé droit'],
+            materiel: ['Objets cylindriques', 'Papier cartonné, compas, ciseaux', 'Règle']
+        },
+        // --- DISTANCE ET SEGMENTS (5e) ---
+        'distance-segments': {
+            theme: 'Configurations du plan',
+            titre: 'Distance et segments',
+            contenusSynth: [
+                'Distance de deux points, inégalité triangulaire',
+                'Caractérisation d’un segment, de la médiatrice',
+                'Régionnement du plan par la médiatrice'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Méthode démonstrative ; faire faire',
+                'Construction de points vérifiant MA = MB, MA < MB, MA > MB'
+            ],
+            consignes: [
+                'Renforcer les notions de 6e (segment, milieu, médiatrice)',
+                'Faire découvrir que tout point équidistant des extrémités d’un segment appartient à la médiatrice (réciproque)',
+                'Faire construire des points avec des conditions de distance'
+            ],
+            evaluation: [
+                'Mesure et comparaison de longueurs, distance de deux points',
+                'Construction de la médiatrice (règle et compas)',
+                'Appartenance d’un point à une région délimitée par la médiatrice'
+            ],
+            capacitesDetails: [
+                { capacite: 'Mesurer des grandeurs', contenu: 'Distance de deux points, inégalité triangulaire' },
+                { capacite: 'Caractériser une configuration', contenu: 'Segment, médiatrice d’un segment' },
+                { capacite: 'Construire', contenu: 'Médiatrice (règle et compas), régionnement du plan par la médiatrice' },
+                { capacite: 'Justifier', contenu: 'Point milieu, appartenance à la médiatrice, propriétés' }
+            ],
+            prerequis: ['Segments, milieu, médiatrice (6e)'],
+            materiel: ['Règle graduée, compas, équerre']
+        },
+        // --- ANGLES (5e) ---
+        'angles-5e': {
+            theme: 'Configurations du plan',
+            titre: 'Angles – complémentaires, supplémentaires, opposés par le sommet',
+            contenusSynth: [
+                'Angles complémentaires, supplémentaires, opposés par le sommet',
+                'Égalité angulaire'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Méthode démonstrative ; faire mesurer, calculer'
+            ],
+            consignes: [
+                'Renforcer les notions d’angles vues en 6e',
+                'Faire utiliser le vocabulaire approprié',
+                'Faire mobiliser les connaissances pour calculer des mesures'
+            ],
+            evaluation: [
+                'Identification d’angles complémentaires, supplémentaires, opposés',
+                'Calcul de mesures d’angles',
+                'Justification de la nature de deux angles'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Angles complémentaires, supplémentaires, opposés par le sommet' },
+                { capacite: 'Comparer/Calculer', contenu: 'Mesures d’angles, égalité angulaire' },
+                { capacite: 'Construire', contenu: 'Angles, angles particuliers' },
+                { capacite: 'Justifier', contenu: 'Égalité angulaire, nature de deux angles' }
+            ],
+            prerequis: ['Angles (6e)', 'Utilisation du rapporteur'],
+            materiel: ['Rapporteurs, règles, équerres']
+        },
+        // --- TRIANGLES (5e) : somme des angles, caractérisation ---
+        'triangles-5e': {
+            theme: 'Configurations du plan',
+            titre: 'Triangles – somme des angles, caractérisation',
+            contenusSynth: [
+                'Triangles particuliers (isocèle, équilatéral, rectangle) – caractérisation par les angles',
+                'Somme des angles d’un triangle (180°)',
+                'Droites particulières : hauteur, médiatrice, bissectrice, médiane'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Faire mesurer les angles de divers triangles pour découvrir la somme de 180°',
+                'Construction de triangles avec contraintes'
+            ],
+            consignes: [
+                'Renforcer les notions de triangles déjà installées en 6e',
+                'Faire mesurer les trois angles et constater la somme constante',
+                'Utiliser la somme des angles pour calculer des mesures inconnues'
+            ],
+            evaluation: [
+                'Identification de triangles particuliers',
+                'Calcul de mesures d’angles dans un triangle',
+                'Construction de triangles connaissant des angles et côtés',
+                'Justification de la nature d’un triangle ou d’une droite'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Triangles particuliers (isocèle, équilatéral, rectangle), droites particulières' },
+                { capacite: 'Caractériser', contenu: 'Triangle isocèle, équilatéral, rectangle (angles)' },
+                { capacite: 'Construire/Reproduire', contenu: 'Triangles (mesures de côtés et angles), droites particulières' },
+                { capacite: 'Calculer', contenu: 'Somme des angles d’un triangle, égalité angulaire' },
+                { capacite: 'Justifier', contenu: 'Égalité angulaire, nature d’un triangle, nature d’une droite (hauteur, médiatrice, bissectrice, médiane)' }
+            ],
+            prerequis: ['Angles, triangles (6e)'],
+            materiel: ['Rapporteurs, règles, compas, équerres']
+        },
+        // --- CERCLE (5e) : cercle circonscrit ---
+        'cercle-5e': {
+            theme: 'Configurations du plan',
+            titre: 'Cercle – cercle circonscrit à un triangle',
+            contenusSynth: [
+                'Cercle, cercle circonscrit à un triangle (notamment triangle rectangle)',
+                'Régionnement du plan : intérieur, extérieur d’un cercle'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Faire découvrir le point de concours des médiatrices comme centre du cercle circonscrit',
+                'Construction de cercles circonscrits'
+            ],
+            consignes: [
+                'Renforcer les notions de cercle vues en 6e',
+                'Faire construire les médiatrices d’un triangle pour trouver le centre du cercle circonscrit'
+            ],
+            evaluation: [
+                'Identification du cercle circonscrit à un triangle',
+                'Construction du cercle circonscrit (médiatrices)',
+                'Appartenance d’un point à l’intérieur/extérieur d’un cercle'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Cercles, cercle circonscrit à un triangle (rectangle)' },
+                { capacite: 'Construire/Reproduire', contenu: 'Cercles, cercle circonscrit à un triangle, régionnement intérieur/extérieur' },
+                { capacite: 'Justifier', contenu: 'Appartenance d’un point à un cercle, à l’intérieur/extérieur (caractérisation)' }
+            ],
+            prerequis: ['Cercle (6e)', 'Médiatrices'],
+            materiel: ['Compas, règle, équerre']
+        },
+        // --- POLYGONES (5e) ---
+        'polygones': {
+            theme: 'Configurations du plan',
+            titre: 'Polygones – parallélogrammes particuliers, trapèze, symétrie',
+            contenusSynth: [
+                'Notion de polygone (triangle, quadrilatère)',
+                'Parallélogrammes particuliers : losange, rectangle, carré ; trapèze',
+                'Éléments de symétrie (axe, centre) dans triangles particuliers (isocèle, équilatéral) et parallélogrammes particuliers'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Découverte par les élèves des éléments de symétrie des polygones particuliers',
+                'Construction de polygones particuliers'
+            ],
+            consignes: [
+                'Renforcer les notions de 6e (parallélogrammes)',
+                'Faire découvrir les axes et centres de symétrie des figures',
+                'Faire calculer l’aire d’un parallélogramme, d’un trapèze'
+            ],
+            evaluation: [
+                'Identification de polygones particuliers (triangles isocèle/équilatéral, losange, rectangle, carré, trapèze)',
+                'Reconnaissance d’axes/centres de symétrie',
+                'Calcul de l’aire d’un parallélogramme, d’un trapèze',
+                'Justification de la nature d’un polygone'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Polygones (triangles, quadrilatères), triangles particuliers, parallélogrammes particuliers, trapèze' },
+                { capacite: 'Caractériser', contenu: 'Éléments de symétrie (axe, centre) des triangles particuliers et parallélogrammes particuliers' },
+                { capacite: 'Construire/Reproduire', contenu: 'Triangles particuliers, parallélogrammes particuliers' },
+                { capacite: 'Calculer', contenu: 'Aire d’un parallélogramme, d’un trapèze' },
+                { capacite: 'Justifier', contenu: 'Nature d’un polygone (triangle isocèle/équilatéral, losange, rectangle, carré)' }
+            ],
+            prerequis: ['Parallélogrammes (6e)', 'Symétrie'],
+            materiel: ['Règle, équerre, compas, rapporteur']
+        },
+        // --- SYMÉTRIE (5e) approfondissement ---
+        'symetrie-5e': {
+            theme: 'Applications du plan',
+            titre: 'Figures symétriques – approfondissement',
+            contenusSynth: [
+                'Configurations symétriques par rapport à une droite et par rapport à un point',
+                'Éléments de symétrie (axe, centre) d’une configuration',
+                'Conservation : alignement, distances, angles, parallélisme, perpendicularité, milieu'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Construction de symétriques (points, segments, droites, angles, cercles)',
+                'Utilisation des propriétés de conservation'
+            ],
+            consignes: [
+                'Renforcer les notions de symétrie vues en 6e',
+                'S’assurer de la maîtrise du programme de construction',
+                'Faire justifier en utilisant les propriétés de conservation'
+            ],
+            evaluation: [
+                'Identification de configurations symétriques et d’éléments de symétrie (axe, centre)',
+                'Construction de points/figures symétriques',
+                'Justification de l’alignement, égalité de distances, d’angles, parallélisme, perpendicularité, milieu'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître des éléments de symétrie', contenu: 'Figures admettant un axe ou un centre de symétrie' },
+                { capacite: 'Construire', contenu: 'Points symétriques (droite/point) ; figures symétriques (segments, droites, angles, cercles) – programme de construction' },
+                { capacite: 'Justifier', contenu: 'Alignement (conservation), égalité de distances, égalité angulaire, parallélisme, perpendicularité, milieu (propriétés de conservation)' }
+            ],
+            prerequis: ['Symétrie axiale et centrale (6e)'],
+            materiel: ['Papier calque, règle, équerre, compas']
+        },
+        // --- REPÉRAGE (droite graduée, quadrillage) ---
+        'reperage': {
+            theme: 'Outils vectoriels, géométrie analytique',
+            titre: 'Repérage sur une droite et sur un quadrillage',
+            contenusSynth: [
+                'Droite graduée, abscisse (nombres décimaux relatifs)',
+                'Notion de couple, déplacement sur quadrillage (couple d’entiers relatifs)',
+                'Coordonnées d’un nœud, d’un point'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Utilisation de frises chronologiques, de plans quadrillés',
+                'Codage de déplacements (couple)'
+            ],
+            consignes: [
+                'Faire visualiser le rangement des décimaux relatifs sur une droite graduée',
+                'Faire lire le couple de coordonnées d’un nœud/point',
+                'Faire placer un point sur quadrillage connaissant ses coordonnées'
+            ],
+            evaluation: [
+                'Construction sur une droite graduée de points connaissant leurs abscisses',
+                'Lecture du couple de coordonnées d’un nœud/point',
+                'Placement sur quadrillage d’un point connaissant son couple'
+            ],
+            capacitesDetails: [
+                { capacite: 'Visualiser le rangement des nombres décimaux relatifs', contenu: 'Droite graduée' },
+                { capacite: 'Coder un déplacement', contenu: 'Notion de couple ; déplacement sur quadrillage : couple d’entiers relatifs' },
+                { capacite: 'Lire le couple de coordonnées', contenu: 'Couple de coordonnées d’un nœud, d’un point' },
+                { capacite: 'Placer un point sur un quadrillage', contenu: 'Couple de coordonnées d’un point' }
+            ],
+            prerequis: ['Nombres relatifs', 'Lecture de tableaux'],
+            materiel: ['Règle graduée', 'Quadrillages', 'Frise chronologique']
+        },
+        // --- DIVISION EUCLIDIENNE ---
+        'division-euclidienne': {
+            theme: 'Calcul numérique',
+            titre: 'Division euclidienne',
+            contenusSynth: [
+                'Expressions : a = bq + r (r < b) ; pour a non multiple de b : bq < a < b(q+1)',
+                'Vocabulaire : dividende, diviseur, quotient, reste',
+                'Encadrement d’un entier par deux multiples consécutifs'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Situations de partage, de distribution',
+                'Recours aux définitions et égalités'
+            ],
+            consignes: [
+                'Partir de situations concrètes pour donner du sens à la division euclidienne',
+                'Faire traduire les situations par des égalités',
+                'Proposer des encadrements'
+            ],
+            evaluation: [
+                'Reconnaissance de la division euclidienne',
+                'Écriture de l’égalité a = bq + r',
+                'Calcul du quotient et reste',
+                'Encadrement par deux multiples consécutifs'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître la division euclidienne', contenu: 'Expressions de la division euclidienne (quotient, reste, diviseur, dividende) : a = bq + r, r < b ; bq < a < b(q+1)' },
+                { capacite: 'Lire et écrire', contenu: 'Traduction d’une situation en écriture euclidienne' },
+                { capacite: 'Calculer', contenu: 'Quotient et reste ; encadrement par deux multiples consécutifs' },
+                { capacite: 'Justifier', contenu: 'Caractérisation de la division euclidienne' }
+            ],
+            prerequis: ['Multiples, diviseurs (6e)'],
+            materiel: ['Fiches d’exercices']
+        },
+        // --- NOMBRES PREMIERS, PPCM, PGCD ---
+        'nombres-premiers': {
+            theme: 'Calcul numérique',
+            titre: 'Nombres premiers – PPCM – PGCD',
+            contenusSynth: [
+                'Définition d’un nombre premier',
+                'Liste des nombres premiers < 100',
+                'Définition du PPCM, du PGCD',
+                'Décomposition en produit de facteurs premiers',
+                'Détermination du PGCD et PPCM (par décomposition ou divisions successives)'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Recherche de diviseurs, de multiples',
+                'Utilisation des critères de divisibilité'
+            ],
+            consignes: [
+                'Partir de situations nécessitant le calcul du PGCD ou PPCM',
+                'Le PGCD est déterminé en appliquant la définition ou en cherchant le diviseur commun rendant une fraction irréductible',
+                'Ne pas enseigner la règle utilisant la décomposition en facteurs premiers (observation uniquement)',
+                'Faire rechercher diverses procédures pour déterminer multiples et diviseurs'
+            ],
+            evaluation: [
+                'Reconnaissance de nombres premiers',
+                'Décomposition en produit de facteurs premiers',
+                'Calcul du PGCD et PPCM de deux nombres',
+                'Utilisation du PPCM/PGCD pour résoudre un problème'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître un nombre premier', contenu: 'Définition, nombres premiers < 100, définition du PPCM et PGCD' },
+                { capacite: 'Calculer', contenu: 'Décomposition en produit de facteurs premiers ; détermination du PGCD et PPCM (par nombres premiers, divisions successives, critères) ; recherche de multiples/diviseurs' },
+                { capacite: 'Justifier', contenu: 'Nombres premiers, PPCM et PGCD de deux entiers' }
+            ],
+            prerequis: ['Multiples, diviseurs, critères de divisibilité'],
+            materiel: ['Tableau de nombres']
+        },
+        // --- FRACTIONS (5e) ---
+        'fractions-5e': {
+            theme: 'Calcul numérique',
+            titre: 'Fractions – irréductible, opérations',
+            contenusSynth: [
+                'Fraction irréductible, fraction décimale',
+                'Écriture q + r/b (avec r/b < 1)',
+                'Simplification, conversion décimal ↔ fractionnaire (si possible)',
+                'Comparaison de deux fractions',
+                'Réduction au même dénominateur (utilisation possible du PPCM)',
+                'Somme, différence (dénominateurs différents), produit de deux fractions',
+                'Transformation en fraction irréductible'
+            ],
+            strategies: [
+                'Observation et manipulation de fractions',
+                'Méthode démonstrative ; faire faire',
+                'Utilisation de situations de partage'
+            ],
+            consignes: [
+                'Partir de situations de partage ou de distribution',
+                'Demander de traduire les situations par des écritures fractionnaires diverses (a/b, q + r/b, irréductible)',
+                'Proposer des problèmes nécessitant opérations sur fractions'
+            ],
+            evaluation: [
+                'Reconnaissance de fractions décimales et irréductibles',
+                'Traduction de situations en fractions',
+                'Simplification, somme, différence, produit',
+                'Comparaison, encadrement par deux décimaux'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître des fractions', contenu: 'Fraction irréductible, fraction décimale' },
+                { capacite: 'Lire et écrire', contenu: 'Écriture q + r/b (r<b) ; simplification ; conversion décimal ↔ fractionnaire (si possible)' },
+                { capacite: 'Comparer', contenu: 'Règles de comparaison, comparaison à l’unité, encadrement par deux décimaux consécutifs' },
+                { capacite: 'Calculer', contenu: 'Réduction au même dénominateur (PPCM possible), somme/différence, produit de deux fractions, transformation en fraction irréductible' },
+                { capacite: 'Justifier', contenu: 'Fraction irréductible, décomposition des fractions' }
+            ],
+            prerequis: ['Fractions (6e)', 'Diviseurs, multiples'],
+            materiel: ['Matériel de partage', 'Bandelettes fractionnées']
+        },
+        // --- NOMBRES DÉCIMAUX RELATIFS (5e) opérations ---
+        'relatifs-5e': {
+            theme: 'Calcul numérique',
+            titre: 'Nombres décimaux relatifs – addition, soustraction, multiplication',
+            contenusSynth: [
+                'Ensemble ID, signe, distance à zéro (| |), opposé',
+                'Repérage sur droite graduée, abscisse',
+                'Comparaison, rangement',
+                'Addition, soustraction, multiplication de décimaux relatifs'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Situations de gain/perte, température, etc.',
+                'Exploitation de frises graduées'
+            ],
+            consignes: [
+                'Renforcer les notions de 6e (nombres relatifs)',
+                'Présenter des situations diverses mobilisant des relatifs',
+                'Proposer des problèmes utilisant les opérations'
+            ],
+            evaluation: [
+                'Reconnaissance des nombres décimaux relatifs',
+                'Traduction de situations par des relatifs',
+                'Repérage sur droite graduée',
+                'Calculs de somme, différence, multiplication',
+                'Comparaison et rangement'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître', contenu: 'Ensemble ID des nombres décimaux relatifs' },
+                { capacite: 'Lire/Écrire/Représenter', contenu: 'Signe, distance à zéro, opposé ; repérage sur droite graduée ; abscisse' },
+                { capacite: 'Comparer', contenu: 'Règles de comparaison, rangement croissant/décroissant' },
+                { capacite: 'Calculer', contenu: 'Addition, soustraction, multiplication de décimaux relatifs' },
+                { capacite: 'Justifier', contenu: 'Nombre décimal relatif, abscisse d’un point' }
+            ],
+            prerequis: ['Nombres relatifs (6e)', 'Droite graduée'],
+            materiel: ['Frise, thermomètre', 'Règle graduée']
+        },
+        // --- PUISSANCES (exposant naturel) ---
+        'puissances': {
+            theme: 'Calcul numérique',
+            titre: 'Puissances (exposant entier naturel)',
+            contenusSynth: [
+                'Définition : a^n (n entier naturel non nul)',
+                'Produit de deux puissances d’un même nombre',
+                'Puissance d’un produit de deux nombres'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Situations utilisant des répétitions (aires, volumes)',
+                'Observation de produits particuliers'
+            ],
+            consignes: [
+                'Présenter des situations permettant de mobiliser des puissances',
+                'Faire lire et écrire des puissances',
+                'Proposer des calculs simples sur puissances'
+            ],
+            evaluation: [
+                'Reconnaissance de puissances de nombres décimaux à exposant naturel',
+                'Traduction de situations par des puissances',
+                'Calcul de produits de puissances, puissance d’un produit'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une puissance', contenu: 'Définition de la puissance d’un nombre décimal relatif à exposant entier naturel non nul' },
+                { capacite: 'Lire des puissances', contenu: 'Lecture de a^n' },
+                { capacite: 'Écrire des puissances', contenu: 'Écriture de la puissance d’un nombre décimal relatif à exposant entier naturel non nul' },
+                { capacite: 'Calculer', contenu: 'Produit de deux puissances d’un même nombre ; puissance d’un produit de deux nombres décimaux' },
+                { capacite: 'Justifier', contenu: 'Puissances d’un nombre décimal relatif' }
+            ],
+            prerequis: ['Multiplication', 'Notation'],
+            materiel: ['Fiches d’exercices']
+        },
+        // --- NOTION D'ÉQUATION (x+a=b, ax=b) ---
+        'equations': {
+            theme: 'Programmes de calcul, Calcul littéral',
+            titre: 'Notion d’équation',
+            contenusSynth: [
+                'Notion d’équation, inconnue, solution',
+                'Équations du type x + a = b (dans ID)',
+                'Équations du type a x = b (dans ID)',
+                'Liens avec des programmes de calcul'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Partir de situations concrètes débouchant sur une équation',
+                'Utiliser des programmes de calcul'
+            ],
+            consignes: [
+                'Proposer des situations simples permettant des mises en équation',
+                'Demander de traduire une situation par une équation',
+                'Faire résoudre en utilisant les propriétés des opérations sur les relatifs'
+            ],
+            evaluation: [
+                'Identification d’équations des types x+a=b ou ax=b',
+                'Traduction d’une situation concrète en équation',
+                'Résolution de problèmes par mise en équation'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une équation', contenu: 'Notion d’équation, inconnue, solution ; équations x+a=b, ax=b ; liens avec programmes de calcul' },
+                { capacite: 'Lire/écrire une équation', contenu: 'Traduction d’une situation en équation' },
+                { capacite: 'Calculer / Résoudre', contenu: 'Exemples simples de résolution d’équations x+a=b ou ax=b ; programmes de calcul' },
+                { capacite: 'Justifier', contenu: 'Équations, solutions' }
+            ],
+            prerequis: ['Opérations sur relatifs', 'Programmes de calcul'],
+            materiel: ['Fiches de situations']
+        },
+        // --- PROPORTIONNALITÉ, POURCENTAGE, ÉCHELLE (5e) ---
+        'proportionnalite-5e': {
+            theme: 'Organisation des données',
+            titre: 'Proportionnalité – pourcentage – échelle',
+            contenusSynth: [
+                'Reconnaître une situation de proportionnalité (tableau, graphique)',
+                'Coefficient de proportionnalité (vitesse, masse volumique, débit)',
+                'Pourcentage, échelle',
+                'Représentation graphique (point par point) d’un tableau de proportionnalité'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Partir de situations de la vie courante et des sciences',
+                'Utiliser des graphiques pour reconnaître la proportionnalité'
+            ],
+            consignes: [
+                'Proposer des situations (vie courante, sciences) et demander si elles relèvent de la proportionnalité',
+                'Faire vérifier par un tableau ou un graphique',
+                'Faire calculer des grandeurs (quatrième proportionnelle, pourcentage, échelle)',
+                'Faire reproduire un dessin à une échelle donnée'
+            ],
+            evaluation: [
+                'Identification de situations de proportionnalité (tableau, graphique)',
+                'Représentation graphique d’un tableau de proportionnalité',
+                'Calcul d’une quatrième proportionnelle, de pourcentages, d’échelle',
+                'Agrandissement/réduction de figures'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une situation de proportionnalité', contenu: 'À partir d’un graphique' },
+                { capacite: 'Calculer une grandeur', contenu: 'Coefficient de proportionnalité (vitesse, masse volumique, débit) ; pourcentage ; échelle' },
+                { capacite: 'Construire une représentation graphique', contenu: 'Représentation graphique (point par point) d’un tableau de proportionnalité' }
+            ],
+            prerequis: ['Proportionnalité (6e)', 'Opérations'],
+            materiel: ['Tableaux, graphiques', 'Cartes géographiques', 'Instruments de dessin']
+        }
+    };
+
+    // --- Initialisation et fonctions ---
+    const select = document.getElementById('leconSelect');
+    const dureeInput = document.getElementById('dureeField');
+    const dateInput = document.getElementById('dateField');
+    const btn = document.getElementById('btnGenerer');
+    const ficheDiv = document.getElementById('ficheGeneree');
+    const contenuFiche = document.getElementById('contenuFiche');
+
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    select.addEventListener('change', function() {
+        if (lecons[this.value]) dureeInput.value = '6 heures'; // valeur par défaut
+    });
+
+    function generer() {
+        const id = select.value;
+        if (!id || !lecons[id]) { alert('Veuillez sélectionner une leçon.'); return; }
+        const lec = lecons[id];
+        const duree = dureeInput.value || '6 heures';
+        const date = dateInput.value ? new Date(dateInput.value).toLocaleDateString('fr-FR') : 'À déterminer';
+
+        const contenuItems = lec.contenusSynth.map(c => `<li>${c}</li>`).join('');
+        const stratItems = lec.strategies.map(s => `<li>${s}</li>`).join('');
+        const consignesDiv = lec.consignes.map(c => `<div class="badge-consigne">📣 ${c}</div>`).join('');
+        const evalItems = lec.evaluation.map(e => `<li>${e}</li>`).join('');
+        const capRows = lec.capacitesDetails.map(item => 
+            `<tr><td style="font-weight:600; width:35%;">${item.capacite}</td><td>${item.contenu}</td></tr>`
+        ).join('');
+
+        const html = `
+            <div class="fiche-header">
+                <h2>${lec.titre}</h2>
+                <p style="font-size:clamp(0.9rem,2.5vw,1.15rem);">Thème : ${lec.theme} — Durée : ${duree} — Date : ${date}</p>
+            </div>
+            <div class="section-guide"><h4>📋 CONTENUS (synthèse programme)</h4><ul class="bullet-list">${contenuItems}</ul></div>
+            <div class="section-guide"><h4>🧠 STRATÉGIES PÉDAGOGIQUES</h4><ul class="bullet-list">${stratItems}</ul></div>
+            <div class="section-guide"><h4>🗣️ CONSIGNES</h4>${consignesDiv}</div>
+            <div class="section-guide"><h4>✅ ÉVALUATION</h4><ul class="bullet-list">${evalItems}</ul></div>
+            <div class="section-guide"><h4>🔎 CAPACITÉS & CONTENUS ASSOCIÉS</h4>
+                <table class="table-cap"><tr><th>Capacité</th><th>Contenu (programme officiel)</th></tr>${capRows}</table>
+            </div>
+            <div class="section-guide"><h4>📦 PRÉREQUIS & MATÉRIEL</h4>
+                <p><strong>Prérequis :</strong> ${lec.prerequis.join(', ')}</p>
+                <p><strong>Matériel :</strong> ${lec.materiel.join(' · ')}</p>
+            </div>
+        `;
+        contenuFiche.innerHTML = html;
+        ficheDiv.classList.remove('hidden');
+        ficheDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    btn.addEventListener('click', generer);
+    document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generer(); });
+
+    window.exportWord = function() {
+        if (ficheDiv.classList.contains('hidden')) return alert('Générez d’abord une fiche.');
+        const content = contenuFiche.innerHTML;
+        const style = '<style>body { font-family: Arial; margin: 2cm; } .section-guide { margin-bottom:20px; } .table-cap { border-collapse: collapse; width:100%; } .table-cap td, .table-cap th { border:1px solid #aaa; padding:8px; } .badge-consigne { background:#fef7e5; padding:10px; border-left:6px solid #f3b33d; }</style>';
+        const full = `<!DOCTYPE html><html><head><meta charset="UTF-8">${style}</head><body>${content}</body></html>`;
+        const blob = new Blob([full], {type: 'application/msword'});
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Fiche_5e_guide.doc'; link.click();
+    };
+    window.resetFiche = function() {
+        ficheDiv.classList.add('hidden');
+        select.value = '';
+        dureeInput.value = '6 heures';
+        dateInput.value = today;
+    };
+})();
+</script>
+</body>
+</html>

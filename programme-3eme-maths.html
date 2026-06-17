@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Fiche de leçon Maths 3e · Togo · Programme officiel complet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0b4d3a;
+            --primary: #1b6e54;
+            --primary-light: #d0f0e4;
+            --accent: #f3b33d;
+            --bg-light: #f0f8f5;
+            --text: #1b4637;
+            --white: #ffffff;
+            --shadow: 0 10px 20px -8px rgba(0,40,20,0.25);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* BANDEAU RESPONSIVE */
+        .bandeau {
+            background: linear-gradient(148deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(1.5rem, 5vw, 2.8rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2.8rem);
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .bandeau h1 {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            font-weight: 600;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .bandeau h2 {
+            font-size: clamp(0.95rem, 4vw, 1.3rem);
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        .badge-prog {
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 0.4rem clamp(1rem, 3vw, 2.2rem);
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            box-shadow: 0 4px 8px #b57f1a;
+            white-space: normal;
+            text-align: center;
+        }
+
+        /* CARTE GÉNÉRATEUR */
+        .card-outil {
+            background: var(--white);
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2.4rem) clamp(1.2rem, 4vw, 3rem);
+            margin-bottom: clamp(1.8rem, 5vw, 2.8rem);
+            border: 2px solid #c3e3d6;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .card-outil h3 {
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            color: var(--primary);
+            border-bottom: 4px solid #c4ecd9;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1 1 200px;
+            min-width: 160px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #c6e2d7;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            background: #f9fffd;
+            transition: 0.2s;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27,110,84,0.2);
+        }
+
+        .btn-generer {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            width: 100%;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 15px 25px -10px var(--primary);
+            white-space: normal;
+            line-height: 1.3;
+        }
+
+        .btn-generer:hover {
+            background: #0f543f;
+            transform: translateY(-2px);
+        }
+
+        /* FICHE GÉNÉRÉE */
+        .fiche-finale {
+            background: var(--white);
+            border-radius: clamp(25px, 6vw, 60px);
+            padding: clamp(1.2rem, 4vw, 3rem) clamp(1.2rem, 4vw, 3.5rem);
+            border: 4px solid #a5d7c4;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fiche-header {
+            text-align: center;
+            border-bottom: 3px dashed var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .fiche-header h2 {
+            font-size: clamp(1.6rem, 6vw, 2.6rem);
+            color: var(--primary);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        /* sections guide */
+        .section-guide {
+            background: #f6fdfa;
+            border-radius: clamp(18px, 4vw, 40px);
+            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.2rem, 4vw, 2.5rem);
+            margin-bottom: 1.8rem;
+            border-left: clamp(8px, 2vw, 16px) solid var(--primary);
+            box-shadow: 0 6px 12px #c1ddd1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .section-guide h4 {
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            color: #1a5b45;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-consigne {
+            background: #fef7e5;
+            border-left: clamp(4px, 1.5vw, 8px) solid var(--accent);
+            padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 30px;
+            font-size: clamp(0.9rem, 3vw, 1.05rem);
+            margin: 1rem 0;
+            box-shadow: 0 3px 8px #d9e6df;
+            word-break: break-word;
+        }
+
+        .bullet-list {
+            margin-left: 1.2rem;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            padding-right: 0.5rem;
+        }
+
+        .bullet-list li {
+            margin-bottom: 0.4rem;
+            word-break: break-word;
+        }
+
+        /* tableau responsive */
+        .table-cap {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px #c4ddd1;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+        }
+
+        .table-cap th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        .table-cap td {
+            border: 1px solid #b7dbc9;
+            padding: 10px 8px;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        /* actions */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .btn-print {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 120px;
+            flex: 1 0 auto;
+            max-width: 200px;
+            white-space: nowrap;
+        }
+
+        .btn-print:hover {
+            background: #e2f3eb;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 0.5rem; }
+            .btn-print { white-space: normal; min-width: unset; flex-basis: 100%; }
+            .form-group { flex-basis: 100%; }
+        }
+
+        @media print {
+            .no-print, .card-outil, .actions { display: none !important; }
+            .fiche-finale { border: none; box-shadow: none; padding: 1.2cm; }
+            .section-guide { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- BANDEAU OFFICIEL 3ème -->
+    <div class="bandeau no-print">
+        <h1>🇹🇬 MINISTÈRE DES ENSEIGNEMENTS PRIMAIRE, SECONDAIRE, TECHNIQUE ET DE L'ARTISANAT</h1>
+        <h2>RÉPUBLIQUE TOGOLAISE – Travail-Liberté-Patrie – PROGRAMME 3e (PAREC 2021-2022)</h2>
+        <div class="badge-prog">MATHÉMATIQUES 3ème – GUIDE D'EXÉCUTION INTÉGRAL</div>
+        <p style="margin-top:1rem; font-size:clamp(0.9rem,3vw,1.2rem);">Pyramide · Cône · Angles inscrits · Thalès · Trigonométrie · Symétries · Homothéties · Vecteurs · Coordonnées · Équations de droites · Nombres réels · Polynômes · Équations · Inéquations · Fonctions · Statistiques</p>
+    </div>
+
+    <!-- GÉNÉRATEUR -->
+    <div class="card-outil no-print">
+        <h3>📘 GÉNÉRATEUR DE FICHE – PROGRAMME 3ème TOGO</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>📌 Leçon</label>
+                <select id="leconSelect">
+                    <option value="">-- Choisir une leçon --</option>
+                    <optgroup label="⚙️ Configurations espace">
+                        <option value="pyramide">Pyramide (régulière)</option>
+                        <option value="cone">Cône de révolution</option>
+                    </optgroup>
+                    <optgroup label="📐 Configurations plan">
+                        <option value="angles-inscrits">Angles inscrits dans un cercle</option>
+                        <option value="thales">Propriété de Thalès</option>
+                        <option value="trigonometrie">Trigonométrie dans le triangle rectangle</option>
+                    </optgroup>
+                    <optgroup label="🔄 Applications plan">
+                        <option value="symetries-composees">Symétries (orthogonales, centrales) et translations (composées)</option>
+                        <option value="homotheties">Homothéties</option>
+                    </optgroup>
+                    <optgroup label="📐 Outil vectoriel / géométrie analytique">
+                        <option value="vecteurs-3e">Vecteurs (produit par un réel, colinéarité, orthogonalité)</option>
+                        <option value="coordonnees-3e">Coordonnées et calculs dans un repère</option>
+                        <option value="equations-droites">Équations de droites</option>
+                    </optgroup>
+                    <optgroup label="🧮 Calcul numérique">
+                        <option value="nombres-reels">Nombres réels (racines carrées, intervalles, calcul approché)</option>
+                    </optgroup>
+                    <optgroup label="📝 Calcul littéral">
+                        <option value="monomes-polynomes">Monômes, polynômes, fractions rationnelles</option>
+                        <option value="equations-3e">Équations – Inéquations (1er degré dans IR et IRxIR)</option>
+                    </optgroup>
+                    <optgroup label="📊 Organisation données">
+                        <option value="applications-lineaires-affines">Applications linéaires, applications affines</option>
+                        <option value="statistiques-3e">Statistiques (classes, effectifs cumulés, fréquences cumulées)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>⏱️ Durée</label>
+                <input type="text" id="dureeField" value="6 heures" placeholder="ex: 8h">
+            </div>
+            <div class="form-group">
+                <label>📅 Date</label>
+                <input type="date" id="dateField">
+            </div>
+        </div>
+        <button class="btn-generer" id="btnGenerer">✨ GÉNÉRER LA FICHE (contenus · stratégies · consignes · évaluation)</button>
+    </div>
+
+    <!-- FICHE GÉNÉRÉE -->
+    <div class="fiche-finale hidden" id="ficheGeneree">
+        <div id="contenuFiche"></div>
+        <div class="actions no-print">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+            <button class="btn-print" onclick="alert('Imprimer → Enregistrer en PDF')">📄 PDF</button>
+            <button class="btn-print" onclick="exportWord()">📝 Word</button>
+            <button class="btn-print" onclick="resetFiche()">🔄 Nouvelle</button>
+        </div>
+        <div style="margin-top:1.5rem; background:#fdf3da; padding:0.8rem 1.5rem; border-radius:60px; font-size:clamp(0.8rem,2.5vw,0.95rem); text-align:center;" class="no-print">
+            ⚡ Fiche conforme au programme officiel de 3ème – Guide d'exécution intégré.
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ==================== BASE DE DONNÉES COMPLÈTE CLASSE DE 3ème ====================
+    const lecons = {
+        // --- PYRAMIDE ---
+        'pyramide': {
+            theme: 'Configurations de l\'espace',
+            titre: 'Pyramide (régulière)',
+            contenusSynth: [
+                'Pyramide : définition, vocabulaire, caractéristiques',
+                'Pyramide régulière : définition, vocabulaire, caractéristiques',
+                'Patron d’une pyramide',
+                'Représentation en perspective cavalière d’une pyramide régulière à base carrée',
+                'Aire latérale, aire totale, volume d’une pyramide régulière'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes : observation et manipulation de solides (pyramides)',
+                'Découverte des différentes parties : faces (forme, nombre), arêtes, sommet, hauteur, base',
+                'Défaire le solide pour découvrir le patron ; construction individuelle',
+                'Représentation en perspective cavalière'
+            ],
+            consignes: [
+                'Mettre la classe en situation d’observation réelle de pyramides (matériel individuel/collectif)',
+                'Faire distinguer et nommer par les élèves les différentes parties du solide',
+                'Défaire le solide et faire découvrir le patron obtenu ; présenter d’autres formes de patron',
+                'Veiller à ce que chaque apprenant réalise personnellement le solide et le construise en perspective cavalière'
+            ],
+            evaluation: [
+                'Reconnaissance de la pyramide dans un groupe de solides',
+                'Désignation par leurs noms des différentes parties',
+                'Construction du patron et réalisation du solide',
+                'Représentation en perspective cavalière de la pyramide régulière à base carrée',
+                'Calcul des grandeurs par application des formules'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier un solide', contenu: 'Pyramide : définition, vocabulaire, caractéristiques – Pyramide régulière : définition, vocabulaire, caractéristiques' },
+                { capacite: 'Décrire un solide', contenu: 'Vocabulaire : faces, arêtes, sommet, hauteur, base' },
+                { capacite: 'Construire le patron d’un solide', contenu: 'Patron d’une pyramide' },
+                { capacite: 'Réaliser le solide à partir du patron', contenu: 'Pyramide' },
+                { capacite: 'Représenter en perspective cavalière', contenu: 'Pyramide régulière à base carrée' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Aire latérale, aire totale, volume d’une pyramide régulière' }
+            ],
+            prerequis: ['Solides de l\'espace (prisme, cône)', 'Patrons', 'Perspective cavalière (4e)'],
+            materiel: ['Modèles de pyramides', 'Papier cartonné, ciseaux, colle', 'Règle, équerre, compas']
+        },
+        // --- CÔNE DE RÉVOLUTION ---
+        'cone': {
+            theme: 'Configurations de l\'espace',
+            titre: 'Cône de révolution',
+            contenusSynth: [
+                'Cône de révolution : définition, vocabulaire, caractéristiques',
+                'Patron d’un cône de révolution',
+                'Représentation en perspective cavalière',
+                'Aire latérale, aire totale, volume d’un cône de révolution'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes : observation de cônes réels',
+                'Découverte des différentes parties : base circulaire, sommet, hauteur, génératrice',
+                'Défaire un cône pour découvrir le patron (secteur circulaire + cercle)',
+                'Construction individuelle'
+            ],
+            consignes: [
+                'Présenter des objets coniques (cornet, cône de signalisation)',
+                'Faire distinguer la base, le sommet, la hauteur, la génératrice',
+                'Montrer le patron en déroulant la surface latérale',
+                'Veiller à la précision du tracé'
+            ],
+            evaluation: [
+                'Reconnaissance du cône de révolution dans un groupe de solides',
+                'Désignation des différentes parties',
+                'Construction du patron et réalisation du solide',
+                'Représentation en perspective cavalière',
+                'Calcul de l’aire latérale, totale et du volume'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier un solide', contenu: 'Cône de révolution : définition, vocabulaire, caractéristiques' },
+                { capacite: 'Décrire un solide', contenu: 'Vocabulaire : base circulaire, sommet, hauteur, génératrice' },
+                { capacite: 'Construire le patron', contenu: 'Patron d’un cône de révolution' },
+                { capacite: 'Réaliser le solide à partir du patron', contenu: 'Cône de révolution' },
+                { capacite: 'Représenter en perspective cavalière', contenu: 'Cône de révolution' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Aire latérale, aire totale, volume d’un cône de révolution' }
+            ],
+            prerequis: ['Cercle, disque', 'Patrons', 'Perspective cavalière (4e)'],
+            materiel: ['Objets coniques', 'Papier cartonné, compas', 'Règle']
+        },
+        // --- ANGLES INSCRITS DANS UN CERCLE ---
+        'angles-inscrits': {
+            theme: 'Configurations du plan',
+            titre: 'Angles inscrits dans un cercle',
+            contenusSynth: [
+                'Angle au centre, angle inscrit, arc intercepté',
+                'Angle inscrit et angle au centre associé',
+                'Angles inscrits interceptant le même arc ou des arcs de même longueur',
+                'Relation entre les mesures'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Faire nommer les différentes configurations',
+                'Faire utiliser le vocabulaire approprié',
+                'Proposer des situations permettant de découvrir la relation entre angle inscrit et angle au centre'
+            ],
+            consignes: [
+                'Renforcer et clarifier les notions d’angles déjà installées en 4e',
+                'Faire nommer : angle inscrit, angle au centre, arc intercepté',
+                'Faire mobiliser les connaissances pour calculer des mesures d’angles'
+            ],
+            evaluation: [
+                'Identification : angle inscrit, angle au centre, arc intercepté',
+                'Reconnaissance de la relation angle inscrit/angle au centre',
+                'Calcul de mesures d’angles dans une configuration',
+                'Justification de l’égalité angulaire'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Angle au centre – Angle inscrit dans un cercle – Arc intercepté – Angle inscrit et angle au centre associé – Angles inscrits interceptant le même arc ou des arcs de même longueur' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : angle inscrit, angle au centre, arc' },
+                { capacite: 'Calculer', contenu: 'Relation entre la mesure de l’angle inscrit et celle de l’angle au centre – Angles inscrits interceptant le même arc ou des arcs de même longueur' },
+                { capacite: 'Justifier', contenu: 'Mesure d’un angle – Égalité angulaire' }
+            ],
+            prerequis: ['Angles (5e/4e)', 'Cercle'],
+            materiel: ['Rapporteurs, compas, règles']
+        },
+        // --- PROPRIÉTÉ DE THALÈS ---
+        'thales': {
+            theme: 'Configurations du plan',
+            titre: 'Propriété de Thalès',
+            contenusSynth: [
+                'Configurations de Thalès : cas particulier du triangle, cas général',
+                'Calcul de longueurs de segments (côtés)',
+                'Partage d’un segment selon une proportion donnée',
+                'Réciproque : parallélisme de droites'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Partir du cas particulier d’un triangle et généraliser la propriété',
+                'Méthode démonstrative ; travail individuel'
+            ],
+            consignes: [
+                'Proposer des situations nécessitant l’utilisation de la propriété de Thalès pour calculer des longueurs',
+                'Investir toute situation utile à l’entraînement à la justification'
+            ],
+            evaluation: [
+                'Identification d’une configuration de Thalès',
+                'Calcul de la longueur d’un segment, côté d’un triangle',
+                'Partage d’un segment selon une proportion donnée',
+                'Justification du parallélisme de deux droites (réciproque)'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Configurations de Thalès : cas particulier du triangle, cas général' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Longueur des segments (côtés du triangle) – cas particulier et cas général – Partage d’un segment selon une proportion donnée' },
+                { capacite: 'Justifier', contenu: 'Parallélisme de droites (propriété réciproque)' }
+            ],
+            prerequis: ['Parallélisme', 'Proportionnalité'],
+            materiel: ['Règle graduée, compas', 'Papier quadrillé']
+        },
+        // --- TRIGONOMÉTRIE DANS LE TRIANGLE RECTANGLE ---
+        'trigonometrie': {
+            theme: 'Configurations du plan',
+            titre: 'Trigonométrie dans le triangle rectangle',
+            contenusSynth: [
+                'Côté opposé, côté adjacent à un angle aigu, hypoténuse',
+                'Rapports trigonométriques : cosinus, sinus, tangente (définitions, propriétés)',
+                'tan α = sin α / cos α ; cos²α + sin²α = 1',
+                'Valeurs exactes pour 30°, 45°, 60°',
+                'Calcul de longueurs, de mesures d’angles (encadrement, valeur approchée)',
+                'Utilisation de tables ou de la calculatrice'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Faire distinguer les différents côtés par rapport à un angle',
+                'Faire découvrir les rapports trigonométriques',
+                'Partir des définitions et de Pythagore pour découvrir cos²α + sin²α = 1'
+            ],
+            consignes: [
+                'Les élèves seront entraînés à l’utilisation d’une table trigonométrique ou de la calculatrice pour déterminer un encadrement ou une valeur approchée',
+                'Faire le lien avec les situations concrètes'
+            ],
+            evaluation: [
+                'Identification du côté opposé, adjacent, hypoténuse',
+                'Calcul du cosinus, sinus, tangente d’un angle aigu',
+                'Valeurs exactes pour 30°, 45°, 60°',
+                'Calcul de longueur, mesure d’angle (encadrement)'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Triangle rectangle : côté opposé à un angle, côté adjacent, hypoténuse, rapports trigonométriques (cosinus, sinus, tangente d’un angle aigu)' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Cosinus, sinus, tangente d’un angle aigu – propriétés (tan = sin/cos, cos²+sin²=1) – valeurs exactes (30°,45°,60°) – longueur d’un segment – mesure d’un angle (encadrement, valeur approchée) – utilisation de tables ou de la calculatrice' }
+            ],
+            prerequis: ['Triangle rectangle (4e)', 'Pythagore'],
+            materiel: ['Calculatrice scientifique', 'Rapporteur, règle']
+        },
+        // --- SYMÉTRIES ORTHOGONALES, CENTRALES, TRANSLATIONS (composées) ---
+        'symetries-composees': {
+            theme: 'Applications du plan',
+            titre: 'Symétries orthogonales, centrales, translations (composées)',
+            contenusSynth: [
+                'Composée de deux symétries orthogonales d’axes parallèles ou perpendiculaires',
+                'Composée de deux translations',
+                'Image d’une figure par la composée'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Utiliser le vocabulaire : « application f suivie d’une application g » pour traduire la composée g∘f',
+                'Faire observer l’effet de la composée sur une figure simple'
+            ],
+            consignes: [
+                'Renforcer les notions de symétries et translation déjà installées en 4e',
+                'Faire identifier par les élèves l’application qui produit le même effet que la composée (il ne s’agit pas de propriétés à retenir)',
+                'La construction de l’image par chacune des applications (dont on prend la composée) constitue un prérequis incontournable'
+            ],
+            evaluation: [
+                'Identification de la composée : de deux symétries orthogonales d’axes parallèles ou perpendiculaires ; de deux translations',
+                'Construction de l’image d’une figure par la composée'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Composée de deux symétries orthogonales d’axes parallèles ou perpendiculaires – Composée de deux translations' },
+                { capacite: 'Construire', contenu: 'Image d’une figure par la composée : de deux symétries orthogonales d’axes parallèles ou perpendiculaires ; de deux translations' },
+                { capacite: 'Justifier', contenu: 'Propriété d’une configuration – Programme de construction simple' }
+            ],
+            prerequis: ['Symétries (4e)', 'Translation (4e)'],
+            materiel: ['Papier calque, règle, équerre, compas']
+        },
+        // --- HOMOTHÉTIES ---
+        'homotheties': {
+            theme: 'Applications du plan',
+            titre: 'Homothéties',
+            contenusSynth: [
+                'Définition, centre, rapport (rapport positif)',
+                'Image d’un point, d’une figure par une homothétie',
+                'Agrandissement ou réduction d’une figure',
+                'Longueur d’un segment (utilisation du rapport)',
+                'Aire d’une figure (utilisation du rapport)',
+                'Mesure d’angle (conservée)'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'S’appuyer sur des situations de réduction ou d’agrandissement d’une figure pour introduire la notion d’homothétie',
+                'Seules les homothéties à rapports positifs sont au programme'
+            ],
+            consignes: [
+                'Travailler à la maîtrise des instruments de géométrie',
+                'Proposer des situations faisant appel aux règles de calcul de longueur et d’aire en lien avec le rapport d’une homothétie'
+            ],
+            evaluation: [
+                'Reconnaissance d’une homothétie ; identification du centre et du rapport',
+                'Construction de l’image par une homothétie',
+                'Agrandissement ou réduction d’une figure simple',
+                'Calcul de longueur, d’aire, mesure d’angle'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Homothétie : définition, centre, rapport' },
+                { capacite: 'Construire', contenu: 'Image d’un point, d’une figure par une homothétie de centre et de rapport donnés – Agrandissement ou réduction d’une figure simple' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Longueur d’un segment (utilisation du rapport) – Aire d’une figure (utilisation du rapport) – Mesure d’angle' }
+            ],
+            prerequis: ['Symétrie centrale', 'Agrandissement/réduction (6e/5e)'],
+            materiel: ['Règle, compas, équerre']
+        },
+        // --- VECTEURS (3e) : produit par un réel, colinéarité, orthogonalité ---
+        'vecteurs-3e': {
+            theme: 'Outil vectoriel, géométrie analytique',
+            titre: 'Vecteurs (produit, colinéarité, orthogonalité)',
+            contenusSynth: [
+                'Somme de vecteurs (égalité de Chasles)',
+                'Vecteurs opposés',
+                'Produit d’un vecteur par un nombre réel (définition, propriétés)',
+                'Vecteur directeur d’une droite',
+                'Vecteurs colinéaires, orthogonaux'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Renforcer les notions déjà installées sur les vecteurs en 4e',
+                'Proposer des situations faisant appel au produit d’un vecteur par un nombre réel'
+            ],
+            consignes: [
+                'Matérialiser un vecteur par un représentant',
+                'Travailler à la maîtrise des instruments',
+                'Investir toute situation utile à l’entraînement à la justification'
+            ],
+            evaluation: [
+                'Identification : vecteurs opposés, produit d’un vecteur par un réel, vecteur directeur, vecteurs colinéaires/orthogonaux',
+                'Construction d’un représentant du produit d’un vecteur par un réel, de vecteurs colinéaires, orthogonaux',
+                'Justification du parallélisme, de l’alignement, de la perpendicularité'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Somme de vecteurs (égalité de Chasles) – Vecteurs opposés – Produit d’un vecteur par un nombre réel (définition, propriétés) – Vecteur directeur d’une droite – Vecteurs colinéaires, orthogonaux' },
+                { capacite: 'Représenter', contenu: 'Représentation d’un vecteur, du produit' },
+                { capacite: 'Justifier', contenu: 'Parallélisme de deux droites (vecteurs colinéaires) – Alignement de trois points (vecteurs colinéaires) – Perpendicularité de deux droites (vecteurs orthogonaux)' }
+            ],
+            prerequis: ['Vecteurs (4e)', 'Translation'],
+            materiel: ['Règle, équerre, papier quadrillé']
+        },
+        // --- COORDONNÉES ET CALCULS DANS UN REPÈRE ---
+        'coordonnees-3e': {
+            theme: 'Outil vectoriel, géométrie analytique',
+            titre: 'Coordonnées et calculs dans un repère',
+            contenusSynth: [
+                'Coordonnées d’un point, d’un vecteur',
+                'Coordonnées d’un vecteur AB connaissant celles de A et B',
+                'Coordonnées d’une somme de vecteurs, d’un produit par un réel',
+                'Coordonnées du milieu d’un segment',
+                'Distance entre deux points (repère orthonormé)',
+                'Norme d’un vecteur (repère orthonormé)'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Renforcer les notions de repérage (repère, coordonnées d’un point) déjà installées en 4e',
+                'Utiliser le déplacement d’un point A vers un point B parallèlement aux axes pour définir les coordonnées du vecteur AB'
+            ],
+            consignes: [
+                'Faire lire sur un graphique des coordonnées d’un vecteur',
+                'S’appuyer sur la condition de deux couples de nombres réels et les définitions pour faire établir les différentes règles de calcul de coordonnées'
+            ],
+            evaluation: [
+                'Détermination des coordonnées d’un vecteur',
+                'Lecture du couple de coordonnées d’un vecteur',
+                'Calculs des coordonnées : vecteur AB, somme, produit, milieu, distance, norme'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Coordonnées d’un vecteur : définition, notation – Coordonnées d’un point dans un repère' },
+                { capacite: 'Lire', contenu: 'Lecture sur un graphique des coordonnées d’un vecteur' },
+                { capacite: 'Calculer', contenu: 'Coordonnées d’un vecteur AB – Coordonnées d’une somme de vecteurs – Coordonnées d’un produit d’un vecteur par un réel – Coordonnées du milieu d’un segment – Distance entre deux points (repère orthonormé) – Norme d’un vecteur (repère orthonormé)' },
+                { capacite: 'Justifier', contenu: 'Vecteurs égaux – Vecteurs colinéaires – Vecteurs orthogonaux (repère orthonormé)' }
+            ],
+            prerequis: ['Repérage (4e)', 'Vecteurs'],
+            materiel: ['Règle graduée', 'Papier quadrillé']
+        },
+        // --- ÉQUATIONS DE DROITES ---
+        'equations-droites': {
+            theme: 'Outil vectoriel, géométrie analytique',
+            titre: 'Équations de droites',
+            contenusSynth: [
+                'Équations cartésiennes (ax + by + c = 0)',
+                'Équations de type y = px + q',
+                'Détermination de l’équation d’une droite : passant par deux points, connaissant un point et un vecteur directeur, connaissant un point et le coefficient directeur',
+                'Droite parallèle ou perpendiculaire à une droite donnée et passant par un point',
+                'Coordonnées d’un vecteur directeur connaissant une équation'
+            ],
+            strategies: [
+                'Observation et manipulation en petits groupes',
+                'Faire le lien avec la résolution d’une équation du premier degré dans IRxIR',
+                'Faire le lien avec la représentation dans le plan des solutions d’une équation du premier degré dans IRxIR'
+            ],
+            consignes: [
+                'Renforcer et clarifier les notions de repérage déjà installées',
+                'Utiliser le déplacement d’un point pour définir les coordonnées'
+            ],
+            evaluation: [
+                'Identification d’une droite par son équation',
+                'Détermination de l’équation d’une droite',
+                'Construction d’une droite dont on connaît une équation',
+                'Justification du parallélisme, de l’alignement, de la perpendicularité'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une équation de droite', contenu: 'Équations cartésiennes (ax + by + c = 0) – Équations de type y = px + q' },
+                { capacite: 'Représenter', contenu: 'Droite dont on connaît une équation' },
+                { capacite: 'Déterminer', contenu: 'Équation de droite : passant par deux points donnés ; connaissant un point et un vecteur directeur ; connaissant un point et le coefficient directeur – parallèle ou perpendiculaire à une droite donnée et passant par un point donné – Coordonnées d’un vecteur directeur connaissant une équation de la droite' },
+                { capacite: 'Justifier', contenu: 'Appartenance d’un point à une droite – Parallélisme de deux droites – Perpendicularité de deux droites – Alignement de trois points' }
+            ],
+            prerequis: ['Coordonnées', 'Vecteurs', 'Équations (4e/3e)'],
+            materiel: ['Règle graduée', 'Papier quadrillé']
+        },
+        // --- NOMBRES RÉELS ---
+        'nombres-reels': {
+            theme: 'Calcul numérique',
+            titre: 'Nombres réels (racines carrées, intervalles, calcul approché)',
+            contenusSynth: [
+                'Racine carrée d’un nombre positif (définition, notation)',
+                'Ensemble ℝ des nombres réels',
+                'Valeur absolue d’un nombre réel',
+                'Intervalles (intersection, réunion)',
+                'Calcul sur des expressions numériques contenant des radicaux : produit, quotient, expression conjuguée, √a² = |a|',
+                'Comparaison de nombres (règles)',
+                'Encadrement d’une somme, différence, produit, quotient – valeur approchée',
+                'Usage de tables numériques et calculatrices',
+                'Puissances d’exposant entier relatif (propriétés)'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Renforcer les notions sur les nombres rationnels installées en 4e',
+                'Partir de situations comme le calcul de l’hypoténuse d’un triangle rectangle pour introduire la notion de racine carrée'
+            ],
+            consignes: [
+                'Proposer des situations conduisant aux calculs sur des expressions numériques contenant des radicaux, aux comparaisons, au calcul approché, aux puissances'
+            ],
+            evaluation: [
+                'Détermination de la racine carrée (ou valeur approchée) d’un nombre',
+                'Calculs sur des expressions contenant des radicaux',
+                'Calculs sur les puissances',
+                'Comparaisons de nombres réels',
+                'Calcul approché (encadrements)'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître un nombre', contenu: 'Racine carrée d’un nombre positif : définition, vocabulaire, notation – Ensemble ℝ des nombres réels – Valeur absolue d’un nombre réel – Intervalles' },
+                { capacite: 'Calculer', contenu: 'Calcul sur expressions numériques contenant des radicaux : produit et quotient de racines carrées (propriétés), expression conjuguée, √a² = |a| – Comparaison de nombres : règles, intervalles dans ℝ (intersection et réunion) – Calcul approché : encadrement d’une somme, différence, produit, quotient – valeur approchée – usage de tables et calculatrices – Puissance d’un nombre réel d’exposant entier relatif (propriétés)' },
+                { capacite: 'Justifier', contenu: 'Égalité de nombres contenant des radicaux' }
+            ],
+            prerequis: ['Nombres rationnels (4e)', 'Puissances (4e)'],
+            materiel: ['Calculatrice', 'Tables numériques']
+        },
+        // --- MONÔMES, POLYNÔMES, FRACTIONS RATIONNELLES ---
+        'monomes-polynomes': {
+            theme: 'Programme de calcul, calcul littéral',
+            titre: 'Monômes, polynômes, fractions rationnelles',
+            contenusSynth: [
+                'Monômes et polynômes : définition, écriture (degré, coefficients, variable)',
+                'Fraction rationnelle',
+                'Développement, réduction, factorisation d’un polynôme (produits remarquables, propriétés sur les réels)',
+                'Valeur numérique d’une fraction rationnelle',
+                'Simplification d’une fraction rationnelle (cas simples)'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Renforcer les notions sur les expressions algébriques installées en 4e',
+                'Proposer des situations reposant sur des programmes de calcul'
+            ],
+            consignes: [
+                'Proposer des situations conduisant aux calculs sur les expressions algébriques'
+            ],
+            evaluation: [
+                'Reconnaissance d’un monôme, polynôme, fraction rationnelle',
+                'Développement, réduction, factorisation d’un polynôme',
+                'Calcul de valeur numérique d’une fraction rationnelle',
+                'Simplification d’une fraction rationnelle (cas simples)'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître', contenu: 'Monômes et polynômes : définition et écriture (degré, coefficients, variable) – Fraction rationnelle' },
+                { capacite: 'Calculer', contenu: 'Développement, réduction, factorisation d’un polynôme (utiliser les produits remarquables et les propriétés sur les nombres réels) – Calcul d’une valeur numérique d’une fraction rationnelle – Simplification d’une fraction rationnelle (cas simples)' },
+                { capacite: 'Justifier', contenu: 'Existence d’une valeur numérique d’une fraction rationnelle – Égalité de deux polynômes' }
+            ],
+            prerequis: ['Expressions algébriques (4e)', 'Produits remarquables (4e)'],
+            materiel: ['Fiches d’exercices']
+        },
+        // --- ÉQUATIONS – INÉQUATIONS (1er degré dans IR et IRxIR) ---
+        'equations-3e': {
+            theme: 'Programme de calcul, calcul littéral',
+            titre: 'Équations – Inéquations (1er degré dans IR et IRxIR)',
+            contenusSynth: [
+                'Équation, inéquation du premier degré dans IR',
+                'Système d’équations, d’inéquations dans IRxIR',
+                'Résolution : équation du type ax+b = cx+d ; (ax+b)(cx+d)=0 ; x² = a',
+                'Inéquation du type ax+b < cx+d',
+                'Systèmes de deux inéquations du premier degré dans IR',
+                'Équations du premier degré dans IRxIR (couples solutions)',
+                'Systèmes de deux équations du premier degré (graphique, substitution, combinaison)',
+                'Inéquations du premier degré à deux inconnues (résolution graphique, régionnement)',
+                'Systèmes d’inéquations du premier degré à deux inconnues (régionnement)',
+                'Modélisation de problèmes'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Renforcer les notions sur les expressions algébriques installées en 4e',
+                'Partir de situations pouvant déboucher sur les systèmes d’équations et d’inéquations dans IR'
+            ],
+            consignes: [
+                'Proposer des situations simples de mise en équation et demander aux élèves de les résoudre',
+                'Investir toute situation utile à l’entraînement à la modélisation'
+            ],
+            evaluation: [
+                'Identification d’équations, d’inéquations, de systèmes',
+                'Résolution dans IR : équations (ax+b=cx+d, (ax+b)(cx+d)=0, x²=a), inéquations (ax+b < cx+d), systèmes de deux inéquations',
+                'Résolution dans IRxIR : équations du premier degré, systèmes de deux équations (graphique, substitution, combinaison), inéquations (régionnement)',
+                'Résolution de problèmes modélisés'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître', contenu: 'Équation, inéquation du premier degré dans IR – Équation, inéquation du premier degré dans IRxIR – Système d’équations du premier degré dans IRxIR – Système d’inéquations du premier degré dans IR et IRxIR' },
+                { capacite: 'Résoudre', contenu: 'Équations et inéquations du premier degré dans IR : ax+b = cx+d ; (ax+b)(cx+d)=0 ; x² = a ; ax+b < cx+d ; systèmes de deux inéquations dans IR – Équations et inéquations du premier degré dans IRxIR : équations (couples solutions), systèmes de deux équations (graphique, substitution, combinaison), inéquations à deux inconnues (résolution graphique, régionnement), systèmes d’inéquations (régionnement)' },
+                { capacite: 'Modéliser un problème', contenu: 'Problèmes conduisant à une équation/inéquation dans IR, à un système d’inéquations dans IR, à une équation/inéquation dans IRxIR, à un système d’équations/inéquations dans IRxIR' }
+            ],
+            prerequis: ['Équations (4e)', 'Calcul littéral', 'Repérage'],
+            materiel: ['Fiches de problèmes', 'Papier quadrillé']
+        },
+        // --- APPLICATIONS LINÉAIRES, APPLICATIONS AFFINES ---
+        'applications-lineaires-affines': {
+            theme: 'Organisation des données et fonctions',
+            titre: 'Applications linéaires, applications affines',
+            contenusSynth: [
+                'Définition, vocabulaire, écritures (linéaire : x → ax ; affine : x → ax + b)',
+                'Tableaux, graphiques',
+                'Image, antécédent d’un nombre réel',
+                'Comparaison de nombres (sens de variation)',
+                'Modélisation de problèmes'
+            ],
+            strategies: [
+                'Travail individuel ou en petits groupes',
+                'Partir des situations de la vie courante pour introduire les applications affines',
+                'Amener les élèves à faire le lien avec les situations de proportionnalité déjà rencontrées',
+                'NB : La notion de bijection ne sera pas abordée en troisième'
+            ],
+            consignes: [
+                'Proposer des situations faisant appel au calcul d’image, d’antécédent',
+                'Investir toute situation utile à l’entraînement à la modélisation'
+            ],
+            evaluation: [
+                'Identification d’une application linéaire, affine',
+                'Représentation graphique d’une application linéaire/affine',
+                'Calcul de l’image, de l’antécédent',
+                'Comparaison de nombres (sens de variation)',
+                'Résolution de problèmes faisant appel aux applications linéaires/affines'
+            ],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Décrire', contenu: 'Application linéaire, application affine : définition, vocabulaire, écritures' },
+                { capacite: 'Représenter', contenu: 'Tableaux – Graphiques' },
+                { capacite: 'Calculer', contenu: 'Image, antécédent d’un nombre réel par une application linéaire, affine – Utilisation de la représentation graphique – Comparaison de nombres réels (sens de variation)' },
+                { capacite: 'Modéliser un problème', contenu: 'Problèmes faisant appel aux applications linéaires, affines' }
+            ],
+            prerequis: ['Fonctions (notion)', 'Proportionnalité'],
+            materiel: ['Graphiques', 'Tableaux']
+        },
+        // --- STATISTIQUES (3e) ---
+        'statistiques-3e': {
+            theme: 'Organisation des données et fonctions',
+            titre: 'Statistiques (classes, effectifs cumulés, fréquences cumulées)',
+            contenusSynth: [
+                'Vocabulaire de la statistique',
+                'Caractère quantitatif, qualitatif',
+                'Dépouillement d’enquête',
+                'Tableau des effectifs, des effectifs cumulés croissants',
+                'Tableau des fréquences, des fréquences cumulées croissantes',
+                'Regroupement en classes d’égales amplitudes',
+                'Effectifs, fréquences, moyenne'
+            ],
+            strategies: [
+                'Travail en petits groupes',
+                'Renforcer les acquis de la classe de 4e à travers diverses situations',
+                'Faire appel à des situations conduisant au regroupement des données statistiques en classes d’égale amplitude'
+            ],
+            consignes: [
+                'Proposer des situations faisant appel au calcul des effectifs, fréquences, moyenne sur des regroupements en classes'
+            ],
+            evaluation: [
+                'Reconnaissance d’une série statistique',
+                'Regroupement en classes d’égale amplitude',
+                'Construction de tableaux (effectifs, fréquences)',
+                'Calculs des effectifs, fréquences, moyenne',
+                'Construction de diagrammes (bandes, bâtons, circulaire)'
+            ],
+            capacitesDetails: [
+                { capacite: 'Présenter et organiser des données', contenu: 'Vocabulaire de la statistique – Caractère quantitatif, qualitatif – Dépouillement d’enquête – Tableau des effectifs, des effectifs cumulés croissants – Tableau des fréquences, des fréquences cumulées croissantes – Exemples de regroupement en classes (d’égales amplitudes)' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Effectifs, effectifs cumulés croissants, fréquences, fréquences cumulées croissantes, moyenne' },
+                { capacite: 'Construire des diagrammes', contenu: 'Diagrammes à bandes (histogramme), en bâtons, circulaire' }
+            ],
+            prerequis: ['Statistiques (4e)', 'Pourcentages'],
+            materiel: ['Données statistiques', 'Rapporteur (diagramme circulaire)']
+        }
+    };
+
+    // --- Initialisation et fonctions ---
+    const select = document.getElementById('leconSelect');
+    const dureeInput = document.getElementById('dureeField');
+    const dateInput = document.getElementById('dateField');
+    const btn = document.getElementById('btnGenerer');
+    const ficheDiv = document.getElementById('ficheGeneree');
+    const contenuFiche = document.getElementById('contenuFiche');
+
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    select.addEventListener('change', function() {
+        if (lecons[this.value]) dureeInput.value = '6 heures'; // valeur par défaut
+    });
+
+    function generer() {
+        const id = select.value;
+        if (!id || !lecons[id]) { alert('Veuillez sélectionner une leçon.'); return; }
+        const lec = lecons[id];
+        const duree = dureeInput.value || '6 heures';
+        const date = dateInput.value ? new Date(dateInput.value).toLocaleDateString('fr-FR') : 'À déterminer';
+
+        const contenuItems = lec.contenusSynth.map(c => `<li>${c}</li>`).join('');
+        const stratItems = lec.strategies.map(s => `<li>${s}</li>`).join('');
+        const consignesDiv = lec.consignes.map(c => `<div class="badge-consigne">📣 ${c}</div>`).join('');
+        const evalItems = lec.evaluation.map(e => `<li>${e}</li>`).join('');
+        const capRows = lec.capacitesDetails.map(item => 
+            `<tr><td style="font-weight:600; width:35%;">${item.capacite}</td><td>${item.contenu}</td></tr>`
+        ).join('');
+
+        const html = `
+            <div class="fiche-header">
+                <h2>${lec.titre}</h2>
+                <p style="font-size:clamp(0.9rem,2.5vw,1.15rem);">Thème : ${lec.theme} — Durée : ${duree} — Date : ${date}</p>
+            </div>
+            <div class="section-guide"><h4>📋 CONTENUS (synthèse programme)</h4><ul class="bullet-list">${contenuItems}</ul></div>
+            <div class="section-guide"><h4>🧠 STRATÉGIES PÉDAGOGIQUES</h4><ul class="bullet-list">${stratItems}</ul></div>
+            <div class="section-guide"><h4>🗣️ CONSIGNES</h4>${consignesDiv}</div>
+            <div class="section-guide"><h4>✅ ÉVALUATION</h4><ul class="bullet-list">${evalItems}</ul></div>
+            <div class="section-guide"><h4>🔎 CAPACITÉS & CONTENUS ASSOCIÉS</h4>
+                <table class="table-cap"><tr><th>Capacité</th><th>Contenu (programme officiel)</th></tr>${capRows}</table>
+            </div>
+            <div class="section-guide"><h4>📦 PRÉREQUIS & MATÉRIEL</h4>
+                <p><strong>Prérequis :</strong> ${lec.prerequis.join(', ')}</p>
+                <p><strong>Matériel :</strong> ${lec.materiel.join(' · ')}</p>
+            </div>
+        `;
+        contenuFiche.innerHTML = html;
+        ficheDiv.classList.remove('hidden');
+        ficheDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    btn.addEventListener('click', generer);
+    document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generer(); });
+
+    window.exportWord = function() {
+        if (ficheDiv.classList.contains('hidden')) return alert('Générez d’abord une fiche.');
+        const content = contenuFiche.innerHTML;
+        const style = '<style>body { font-family: Arial; margin: 2cm; } .section-guide { margin-bottom:20px; } .table-cap { border-collapse: collapse; width:100%; } .table-cap td, .table-cap th { border:1px solid #aaa; padding:8px; } .badge-consigne { background:#fef7e5; padding:10px; border-left:6px solid #f3b33d; }</style>';
+        const full = `<!DOCTYPE html><html><head><meta charset="UTF-8">${style}</head><body>${content}</body></html>`;
+        const blob = new Blob([full], {type: 'application/msword'});
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Fiche_3e_guide.doc'; link.click();
+    };
+    window.resetFiche = function() {
+        ficheDiv.classList.add('hidden');
+        select.value = '';
+        dureeInput.value = '6 heures';
+        dateInput.value = today;
+    };
+})();
+</script>
+</body>
+</html>

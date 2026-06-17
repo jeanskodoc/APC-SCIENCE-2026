@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Progressions annuelles · Maths Togo 6e/5e/4e/3e</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0b4d3a;
+            --primary: #1b6e54;
+            --primary-light: #d0f0e4;
+            --accent: #f3b33d;
+            --bg-light: #f0f8f5;
+            --text: #1b4637;
+            --white: #ffffff;
+            --tab-inactive: #e2f0ea;
+            --border: #b7dbc9;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 1.5rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* BANDEAU OFFICIEL */
+        .bandeau {
+            background: linear-gradient(148deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(1.5rem, 5vw, 2.8rem);
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px -8px rgba(0,40,20,0.25);
+        }
+
+        .bandeau h1 {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            font-weight: 600;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .bandeau h2 {
+            font-size: clamp(0.95rem, 4vw, 1.3rem);
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        .badge-prog {
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 0.4rem clamp(1rem, 3vw, 2.2rem);
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            box-shadow: 0 4px 8px #b57f1a;
+            white-space: normal;
+            text-align: center;
+        }
+
+        /* SYSTÈME D'ONGLETS */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-button {
+            background: var(--tab-inactive);
+            border: none;
+            border-radius: 40px 40px 0 0;
+            padding: 0.8rem 2rem;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid var(--border);
+            border-bottom: none;
+            margin-bottom: -2px;
+            flex: 0 1 auto;
+        }
+
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #c5e0d6;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--white);
+            border-radius: 30px;
+            padding: 1.8rem 1.5rem;
+            border: 4px solid var(--primary-light);
+            box-shadow: 0 15px 25px -10px rgba(0,40,20,0.2);
+            overflow-x: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TABLEAUX DE PROGRESSION */
+        .prog-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px #c4ddd1;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+        }
+
+        .prog-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .prog-table td {
+            border: 1px solid var(--border);
+            padding: 10px 8px;
+            vertical-align: top;
+        }
+
+        .prog-table tr:nth-child(even) {
+            background: #f9fdfb;
+        }
+
+        .semaine-badge {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 0.85rem;
+        }
+
+        .theme-tag {
+            background: #e6f2ef;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            background: #fef7e5;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            text-align: center;
+            border-left: 8px solid var(--accent);
+        }
+
+        /* adaptation mobile */
+        @media (max-width: 600px) {
+            .tabs {
+                justify-content: stretch;
+            }
+            .tab-button {
+                flex: 1 1 auto;
+                text-align: center;
+                padding: 0.6rem 0.5rem;
+                font-size: 0.95rem;
+            }
+            .prog-table th, .prog-table td {
+                padding: 6px 4px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- BANDEAU OFFICIEL -->
+    <div class="bandeau">
+        <h1>🇹🇬 MINISTÈRE DES ENSEIGNEMENTS PRIMAIRE, SECONDAIRE, TECHNIQUE ET DE L'ARTISANAT</h1>
+        <h2>RÉPUBLIQUE TOGOLAISE – Travail-Liberté-Patrie</h2>
+        <div class="badge-prog">PROGRESSIONS ANNUELLES · MATHÉMATIQUES 6e / 5e / 4e / 3e · PAREC</div>
+        <p style="margin-top:1rem; font-size:1.1rem;">Tableaux complets extraits des programmes officiels (6e à 3e)</p>
+    </div>
+
+    <!-- ONGLETS -->
+    <div class="tabs">
+        <button class="tab-button active" data-tab="tab6">6ème</button>
+        <button class="tab-button" data-tab="tab5">5ème</button>
+        <button class="tab-button" data-tab="tab4">4ème</button>
+        <button class="tab-button" data-tab="tab3">3ème</button>
+    </div>
+
+    <!-- CONTENU DES ONGLETS -->
+    <!-- 6ème -->
+    <div id="tab6" class="tab-content active">
+        <h3 style="color: var(--primary); margin-bottom:1rem; font-size:1.6rem;">📘 Progression annuelle – Classe de Sixième</h3>
+        <table class="prog-table">
+            <thead>
+                <tr><th>Mois</th><th>Semaines</th><th>Thèmes</th><th>Leçons</th><th>Nb heures</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sept.</td><td>1-2</td><td>Configurations du plan</td><td>Droites du plan</td><td>8 H</td></tr>
+                <tr><td>Oct.</td><td>3-5</td><td>Calcul numérique</td><td>Arithmétique</td><td>10 H</td></tr>
+                <tr><td>Oct.</td><td>5-6</td><td>Configurations du plan</td><td>Segments</td><td>6 H</td></tr>
+                <tr><td>Nov.</td><td>7-8</td><td>Calcul numérique</td><td>Nombres décimaux / Programme de calcul</td><td>8 H</td></tr>
+                <tr><td>Nov.</td><td>9</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Nov.</td><td>10</td><td>Configurations du plan</td><td>Angles</td><td>6 H</td></tr>
+                <tr><td>Déc.</td><td>11-12</td><td>Calcul numérique</td><td>Fractions</td><td>6 H</td></tr>
+                <tr><td>Janv.</td><td>13</td><td>Configurations du plan</td><td>Cercles</td><td>4 H</td></tr>
+                <tr><td>Janv.</td><td>14</td><td>Organisation des données</td><td>Situations de proportionnalité</td><td>4 H</td></tr>
+                <tr><td>Janv.</td><td>15</td><td>Configurations du plan</td><td>Triangles</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>16</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>17</td><td>Organisation des données</td><td>Pourcentages et échelles</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>18-19</td><td>Configurations du plan</td><td>Parallélogrammes</td><td>6 H</td></tr>
+                <tr><td>Fév.</td><td>19-20</td><td>Calcul numérique</td><td>Nombres décimaux relatifs</td><td>8 H</td></tr>
+                <tr><td>Mars</td><td>21</td><td>Applications du plan</td><td>Figures symétriques / droite</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>22</td><td>Applications du plan</td><td>Figures symétriques / point</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>23-24</td><td>Configurations de l'espace</td><td>Cube, Pavé droit</td><td>6 H</td></tr>
+                <tr><td>Avril</td><td>25</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem; font-style:italic;">Source : Programme 6e – PAREC 2018-2019 (total environ 102 h)</p>
+    </div>
+
+    <!-- 5ème -->
+    <div id="tab5" class="tab-content">
+        <h3 style="color: var(--primary); margin-bottom:1rem; font-size:1.6rem;">📗 Progression annuelle – Classe de Cinquième</h3>
+        <table class="prog-table">
+            <thead>
+                <tr><th>Mois</th><th>Semaines</th><th>Thèmes</th><th>Leçons</th><th>Nb heures</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sept.</td><td>1-2</td><td>Configurations du plan</td><td>Distance et segments</td><td>8 H</td></tr>
+                <tr><td>Oct.</td><td>3-4</td><td>Calcul numérique</td><td>Nombres décimaux relatifs</td><td>8 H</td></tr>
+                <tr><td>Oct.</td><td>5-6</td><td>Configurations du plan</td><td>Angles</td><td>6 H</td></tr>
+                <tr><td>Oct.</td><td>6-7</td><td>Calcul numérique</td><td>Puissances</td><td>4 H</td></tr>
+                <tr><td>Nov.</td><td>8</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Nov.</td><td>9-10</td><td>Applications du plan</td><td>Figures symétriques / droite, point</td><td>8 H</td></tr>
+                <tr><td>Nov.</td><td>10-12</td><td>Calcul numérique</td><td>Arithmétique</td><td>8 H</td></tr>
+                <tr><td>Déc.</td><td>12-13</td><td>Configurations du plan</td><td>Triangles</td><td>6 H</td></tr>
+                <tr><td>Janv.</td><td>14-15</td><td>Calcul numérique</td><td>Fractions</td><td>6 H</td></tr>
+                <tr><td>Janv.</td><td>15</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>16</td><td>Configurations du plan</td><td>Cercle</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>17-18</td><td>Programmes de calcul – Calcul littéral</td><td>Notion d'équation</td><td>6 H</td></tr>
+                <tr><td>Fév.</td><td>19-20</td><td>Configurations du plan</td><td>Polygones</td><td>6 H</td></tr>
+                <tr><td>Mars</td><td>20-21</td><td>Organisation des données</td><td>Proportionnalité</td><td>4 H</td></tr>
+                <tr><td>Mars</td><td>21-22</td><td>Outils vectoriels / géométrie analytique</td><td>Repérage (droite, quadrillage)</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>22-23</td><td>Organisation des données</td><td>Pourcentages et échelles</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>23-24</td><td>Configurations de l'espace</td><td>Prisme droit</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>24-25</td><td>Configurations de l'espace</td><td>Cylindre droit</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>25</td><td>Évaluation</td><td>Semaine d'intégration</td><td>2 H</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem; font-style:italic;">Source : Programme 5e – PAREC 2018-2019 (total environ 102 h)</p>
+    </div>
+
+    <!-- 4ème -->
+    <div id="tab4" class="tab-content">
+        <h3 style="color: var(--primary); margin-bottom:1rem; font-size:1.6rem;">📙 Progression annuelle – Classe de Quatrième</h3>
+        <table class="prog-table">
+            <thead>
+                <tr><th>Mois</th><th>Semaines</th><th>Thèmes</th><th>Leçons</th><th>Nb heures</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sept.</td><td>1</td><td>Applications du plan</td><td>Symétrie orthogonale, centrale</td><td>4 H</td></tr>
+                <tr><td>Sept.</td><td>2-3</td><td>Programme de calcul – Calcul littéral</td><td>Calcul sur expressions algébriques</td><td>6 H</td></tr>
+                <tr><td>Oct.</td><td>3-4</td><td>Configurations du plan</td><td>Distance et droites</td><td>6 H</td></tr>
+                <tr><td>Oct.</td><td>5-6</td><td>Calcul numérique</td><td>Nombres rationnels</td><td>6 H</td></tr>
+                <tr><td>Oct.-Nov.</td><td>6-8</td><td>Configurations du plan</td><td>Triangles – Polygones réguliers</td><td>8 H</td></tr>
+                <tr><td>Nov.</td><td>8</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Nov.</td><td>9-11</td><td>Programme de calcul – Calcul littéral</td><td>Équations – Inéquations</td><td>8 H</td></tr>
+                <tr><td>Déc.</td><td>11-12</td><td>Configurations de l'espace</td><td>Perspective cavalière</td><td>4 H</td></tr>
+                <tr><td>Déc.</td><td>12-13</td><td>Calcul numérique</td><td>Nombres décimaux, calcul approché</td><td>6 H</td></tr>
+                <tr><td>Janv.</td><td>14-15</td><td>Configurations de l'espace</td><td>Droites et plans, positions relatives</td><td>8 H</td></tr>
+                <tr><td>Fév.</td><td>16</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>17</td><td>Organisation des données</td><td>Proportionnalité</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>18-20</td><td>Configurations du plan</td><td>Angles – Cercles</td><td>10 H</td></tr>
+                <tr><td>Mars</td><td>20-21</td><td>Applications du plan</td><td>Projection</td><td>4 H</td></tr>
+                <tr><td>Mars</td><td>21-22</td><td>Organisation des données</td><td>Statistiques</td><td>4 H</td></tr>
+                <tr><td>Mars</td><td>22-23</td><td>Applications du plan</td><td>Translation</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>23-24</td><td>Outil vectoriel – géométrie analytique</td><td>Vecteurs – Repérage</td><td>5 H</td></tr>
+                <tr><td>Avril</td><td>24-25</td><td>Configurations de l'espace</td><td>Sphère</td><td>3 H</td></tr>
+                <tr><td>Avril</td><td>25-26</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem; font-style:italic;">Source : Programme 4e – PAREC (total environ 102 h)</p>
+    </div>
+
+    <!-- 3ème -->
+    <div id="tab3" class="tab-content">
+        <h3 style="color: var(--primary); margin-bottom:1rem; font-size:1.6rem;">📕 Progression annuelle – Classe de Troisième</h3>
+        <table class="prog-table">
+            <thead>
+                <tr><th>Mois</th><th>Semaines</th><th>Thèmes</th><th>Leçons</th><th>Nb heures</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sept.</td><td>1-2</td><td>Programme de calcul – Calcul littéral</td><td>Monômes, polynômes, fractions rationnelles</td><td>6 H</td></tr>
+                <tr><td>Sept.-Oct.</td><td>2-4</td><td>Configurations du plan</td><td>Propriété de Thalès</td><td>8 H</td></tr>
+                <tr><td>Oct.</td><td>4-5</td><td>Calcul numérique</td><td>Nombres réels – Racines carrées</td><td>6 H</td></tr>
+                <tr><td>Oct.-Nov.</td><td>6-7</td><td>Configurations du plan</td><td>Trigonométrie dans le triangle rectangle</td><td>8 H</td></tr>
+                <tr><td>Nov.</td><td>8</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Nov.</td><td>9-10</td><td>Outil vectoriel – géométrie analytique</td><td>Vecteurs</td><td>5 H</td></tr>
+                <tr><td>Nov.-Déc.</td><td>10-11</td><td>Calcul numérique</td><td>Nombres réels : intervalle, calcul approché</td><td>6 H</td></tr>
+                <tr><td>Déc.</td><td>11-12</td><td>Outil vectoriel – géométrie analytique</td><td>Coordonnées et calculs dans un repère</td><td>5 H</td></tr>
+                <tr><td>Janv.</td><td>13-14</td><td>Programme de calcul – Calcul littéral</td><td>Équations – Inéquations dans IR</td><td>6 H</td></tr>
+                <tr><td>Janv.</td><td>14-15</td><td>Configurations de l'espace</td><td>Pyramide, Cône de révolution</td><td>8 H</td></tr>
+                <tr><td>Fév.</td><td>16</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+                <tr><td>Fév.</td><td>17</td><td>Configurations de l'espace</td><td>Pyramide, Cône (suite)</td><td>–</td></tr>
+                <tr><td>Fév.</td><td>17-18</td><td>Programme de calcul – Calcul littéral</td><td>Équations – Inéquations dans IR x IR</td><td>6 H</td></tr>
+                <tr><td>Fév.-Mars</td><td>19-20</td><td>Outil vectoriel – géométrie analytique</td><td>Équations de droites</td><td>6 H</td></tr>
+                <tr><td>Mars</td><td>20-21</td><td>Organisation des données</td><td>Applications linéaires, affines</td><td>5 H</td></tr>
+                <tr><td>Mars</td><td>21-22</td><td>Configurations du plan</td><td>Angles inscrits dans un cercle</td><td>4 H</td></tr>
+                <tr><td>Mars-Avr.</td><td>22-23</td><td>Organisation des données</td><td>Statistiques</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>23-24</td><td>Applications du plan</td><td>Symétries, translations (composées)</td><td>4 H</td></tr>
+                <tr><td>Avril</td><td>24-25</td><td>Applications du plan</td><td>Homothéties</td><td>3 H</td></tr>
+                <tr><td>Avril-Mai</td><td>25-26</td><td>Évaluation</td><td>Semaine d'intégration</td><td>4 H</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:1rem; font-style:italic;">Source : Programme 3e – PAREC 2021-2022 (total environ 102 h)</p>
+    </div>
+
+    <div class="footer-note">
+        ⚡ Progressions annuelles extraites des programmes officiels togolais (PAREC).<br>
+        Les durées sont indicatives (total ~102h par année, hors évaluations).
+    </div>
+</div>
+
+<script>
+    // GESTION DES ONGLETS
+    const tabs = document.querySelectorAll('.tab-button');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(button => {
+        button.addEventListener('click', () => {
+            // Désactiver tous les onglets
+            tabs.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Activer l'onglet cliqué
+            button.classList.add('active');
+            const tabId = button.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+</body>
+</html>

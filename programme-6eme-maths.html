@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Fiche de leçon Maths 6e · Togo · responsive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0b4d3a;
+            --primary: #1b6e54;
+            --primary-light: #d0f0e4;
+            --accent: #f3b33d;
+            --bg-light: #f0f8f5;
+            --text: #1b4637;
+            --white: #ffffff;
+            --shadow: 0 10px 20px -8px rgba(0,40,20,0.25);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== BANDEAU RESPONSIVE ===== */
+        .bandeau {
+            background: linear-gradient(148deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(1.5rem, 5vw, 2.8rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2.8rem);
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .bandeau h1 {
+            font-size: clamp(1.1rem, 5vw, 1.9rem);
+            font-weight: 600;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .bandeau h2 {
+            font-size: clamp(0.95rem, 4vw, 1.3rem);
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        .badge-prog {
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 0.4rem clamp(1rem, 3vw, 2.2rem);
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            box-shadow: 0 4px 8px #b57f1a;
+            white-space: normal;
+            text-align: center;
+        }
+
+        /* ===== CARTE GÉNÉRATEUR RESPONSIVE ===== */
+        .card-outil {
+            background: var(--white);
+            border-radius: clamp(20px, 5vw, 40px);
+            padding: clamp(1.2rem, 4vw, 2.4rem) clamp(1.2rem, 4vw, 3rem);
+            margin-bottom: clamp(1.8rem, 5vw, 2.8rem);
+            border: 2px solid #c3e3d6;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .card-outil h3 {
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            color: var(--primary);
+            border-bottom: 4px solid #c4ecd9;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1 1 200px;
+            min-width: 160px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #c6e2d7;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            background: #f9fffd;
+            transition: 0.2s;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27,110,84,0.2);
+        }
+
+        .btn-generer {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            width: 100%;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 15px 25px -10px var(--primary);
+            white-space: normal;
+            line-height: 1.3;
+        }
+
+        .btn-generer:hover {
+            background: #0f543f;
+            transform: translateY(-2px);
+        }
+
+        /* ===== FICHE GÉNÉRÉE RESPONSIVE ===== */
+        .fiche-finale {
+            background: var(--white);
+            border-radius: clamp(25px, 6vw, 60px);
+            padding: clamp(1.2rem, 4vw, 3rem) clamp(1.2rem, 4vw, 3.5rem);
+            border: 4px solid #a5d7c4;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fiche-header {
+            text-align: center;
+            border-bottom: 3px dashed var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .fiche-header h2 {
+            font-size: clamp(1.6rem, 6vw, 2.6rem);
+            color: var(--primary);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        /* sections guide */
+        .section-guide {
+            background: #f6fdfa;
+            border-radius: clamp(18px, 4vw, 40px);
+            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.2rem, 4vw, 2.5rem);
+            margin-bottom: 1.8rem;
+            border-left: clamp(8px, 2vw, 16px) solid var(--primary);
+            box-shadow: 0 6px 12px #c1ddd1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .section-guide h4 {
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            color: #1a5b45;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-consigne {
+            background: #fef7e5;
+            border-left: clamp(4px, 1.5vw, 8px) solid var(--accent);
+            padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 30px;
+            font-size: clamp(0.9rem, 3vw, 1.05rem);
+            margin: 1rem 0;
+            box-shadow: 0 3px 8px #d9e6df;
+            word-break: break-word;
+        }
+
+        .bullet-list {
+            margin-left: 1.2rem;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            padding-right: 0.5rem;
+        }
+
+        .bullet-list li {
+            margin-bottom: 0.4rem;
+            word-break: break-word;
+        }
+
+        /* tableau responsive */
+        .table-cap {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px #c4ddd1;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+        }
+
+        .table-cap th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        .table-cap td {
+            border: 1px solid #b7dbc9;
+            padding: 10px 8px;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        /* actions */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .btn-print {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 120px;
+            flex: 1 0 auto;
+            max-width: 200px;
+            white-space: nowrap;
+        }
+
+        .btn-print:hover {
+            background: #e2f3eb;
+        }
+
+        /* petite astuce pour les très petits écrans */
+        @media (max-width: 480px) {
+            body { padding: 0.5rem; }
+            .btn-print { white-space: normal; min-width: unset; flex-basis: 100%; }
+            .form-group { flex-basis: 100%; }
+        }
+
+        @media print {
+            .no-print, .card-outil, .actions { display: none !important; }
+            .fiche-finale { border: none; box-shadow: none; padding: 1.2cm; }
+            .section-guide { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- BANDEAU OFFICIEL (responsive) -->
+    <div class="bandeau no-print">
+        <h1>🇹🇬 MINISTÈRE DES ENSEIGNEMENTS PRIMAIRE ET SECONDAIRE</h1>
+        <h2>RÉPUBLIQUE TOGOLAISE – Travail-Liberté-Patrie</h2>
+        <div class="badge-prog">PROGRAMME MATHÉMATIQUES 6e – GUIDE EXÉCUTION INTÉGRAL</div>
+        <p style="margin-top:1rem; font-size:clamp(0.9rem,3vw,1.2rem);">Stratégies · Consignes · Évaluation (conforme programme)</p>
+    </div>
+
+    <!-- GÉNÉRATEUR RESPONSIVE -->
+    <div class="card-outil no-print">
+        <h3>📘 GÉNÉRATEUR DE FICHE – GUIDE EXÉCUTION</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>📌 Leçon</label>
+                <select id="leconSelect">
+                    <option value="">-- Sélectionner --</option>
+                    <optgroup label="⚙️ Configurations espace">
+                        <option value="cube-pave-droit">Cube, pavé droit</option>
+                    </optgroup>
+                    <optgroup label="📐 Configurations plan">
+                        <option value="droites">Droites</option>
+                        <option value="segments">Segments</option>
+                        <option value="angles">Angles</option>
+                        <option value="triangles">Triangles</option>
+                        <option value="cercles-disques">Cercles et disques</option>
+                        <option value="parallelogrammes">Parallélogrammes</option>
+                    </optgroup>
+                    <optgroup label="🔄 Applications plan">
+                        <option value="symetrie-droite">Symétrie / droite</option>
+                        <option value="symetrie-point">Symétrie / point</option>
+                    </optgroup>
+                    <optgroup label="🧮 Calcul numérique">
+                        <option value="arithmetique">Arithmétique (entiers)</option>
+                        <option value="nombres-decimaux">Nombres décimaux</option>
+                        <option value="programme-calcul">Programme de calcul</option>
+                        <option value="fractions">Fractions</option>
+                        <option value="nombres-relatifs">Nombres relatifs</option>
+                    </optgroup>
+                    <optgroup label="📊 Organisation données">
+                        <option value="proportionnalite">Proportionnalité</option>
+                        <option value="pourcentage-echelle">Pourcentage & échelle</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>⏱️ Durée</label>
+                <input type="text" id="dureeField" value="6 heures" placeholder="ex: 6h">
+            </div>
+            <div class="form-group">
+                <label>📅 Date</label>
+                <input type="date" id="dateField">
+            </div>
+        </div>
+        <button class="btn-generer" id="btnGenerer">✨ GÉNÉRER LA FICHE</button>
+    </div>
+
+    <!-- FICHE GÉNÉRÉE (contenu inchangé) -->
+    <div class="fiche-finale hidden" id="ficheGeneree">
+        <div id="contenuFiche"></div>
+        <div class="actions no-print">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+            <button class="btn-print" onclick="alert('Imprimer → Enregistrer en PDF')">📄 PDF</button>
+            <button class="btn-print" onclick="exportWord()">📝 Word</button>
+            <button class="btn-print" onclick="resetFiche()">🔄 Nouvelle</button>
+        </div>
+        <div style="margin-top:1.5rem; background:#fdf3da; padding:0.8rem 1.5rem; border-radius:60px; font-size:clamp(0.8rem,2.5vw,0.95rem); text-align:center;" class="no-print">
+            ⚡ Guide d'exécution complet : stratégies, consignes, évaluation.
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ==================== CONTENU PÉDAGOGIQUE INTÉGRAL (STRICTEMENT IDENTIQUE) ====================
+    const lecons = {
+        'cube-pave-droit': {
+            theme: 'Configurations de l\'espace',
+            titre: 'Cube – Pavé droit',
+            contenusSynth: ['Cube, pavé droit : définitions, vocabulaire (face, arête, sommet)', 'Patron d’un cube, d’un pavé droit', 'Aire latérale, aire totale, volume'],
+            strategies: ['Travail individuel ou en petits groupes – observation réelle du solide', 'Découverte des différentes parties du cube et du pavé droit : face (forme, nombre), arête (nombre), sommet (nombre), surface latérale, bases', 'Travail en petits groupes : découverte du patron (défaire le solide) ; puis construction individuelle à partir du patron'],
+            consignes: ['Mettre la classe en situation d’observation réelle du solide (prévoir le matériel individuel et collectif)', 'Faire distinguer et nommer par les élèves les différentes parties du solide', 'Défaire le solide et faire découvrir le patron obtenu ; présenter éventuellement d’autres formes de patron', 'Veiller à ce que chaque apprenant réalise personnellement le solide'],
+            evaluation: ['Reconnaissance du cube, du pavé droit dans un groupe de solides', 'Désignation par leurs noms des différentes parties du solide', 'Construction du patron et réalisation du solide', 'Calcul des grandeurs (aire latérale, aire totale, volume) par application des formules'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier un solide', contenu: 'Cube, Pavé droit : définitions, vocabulaire, caractéristiques' },
+                { capacite: 'Décrire un solide', contenu: 'Vocabulaire : face, arête, sommet, surface latérale, bases' },
+                { capacite: 'Construire le patron d’un solide', contenu: 'Patron d’un cube, d’un pavé droit' },
+                { capacite: 'Réaliser le solide à partir du patron', contenu: 'Cube, pavé droit, patrons' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Aire latérale, aire totale, volume d’un cube, d’un pavé droit' }
+            ],
+            prerequis: ['Formes géométriques de base', 'Notions de géométrie dans l’espace'],
+            materiel: ['Modèles de cubes et pavés droits en 3D', 'Papier cartonné, ciseaux, colle', 'Règle, équerre, compas']
+        },
+        'droites': {
+            theme: 'Configurations du plan',
+            titre: 'Droites',
+            contenusSynth: ['Droites et points alignés, demi-droites', 'Droites sécantes, perpendiculaires, parallèles', 'Notation : droites, demi-droites, droites perpendiculaires, parallèles'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire', 'Renforcement et clarification des notions déjà installées au primaire'],
+            consignes: ['Renforcer et clarifier les notions déjà installées au primaire', 'Faire nommer des configurations', 'Travailler à la maîtrise des instruments de géométrie par les apprenants'],
+            evaluation: ['Identification d’une configuration : droites et points alignés, demi-droites, droites sécantes, perpendiculaires, parallèles', 'Reconnaissance de la position relative d’une droite par rapport à une autre', 'Utilisation du vocabulaire approprié pour décrire des configurations', 'Construction/reproduction de configurations (prévues dans les contenus)'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Droites et points alignés, demi-droites, droites sécantes, perpendiculaires, parallèles' },
+                { capacite: 'Nommer', contenu: 'Notation : droites, demi-droites, droites perpendiculaires, parallèles' },
+                { capacite: 'Construire/Reproduire', contenu: 'Droites et points alignés, demi-droites, droites sécantes, perpendiculaires, parallèles' },
+                { capacite: 'Justifier', contenu: 'Appartenance (∈,∉), perpendicularité, parallélisme – propriétés' }
+            ],
+            prerequis: ['Notions de base en géométrie', 'Utilisation des instruments'],
+            materiel: ['Règles, équerres, compas', 'Papier quadrillé']
+        },
+        'segments': {
+            theme: 'Configurations du plan',
+            titre: 'Segments',
+            contenusSynth: ['Définition : segment, support, milieu, longueur, distance de deux points, médiatrice'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire', 'Recours aux définitions et propriétés pour justifier'],
+            consignes: ['Renforcer et clarifier les notions déjà installées au primaire', 'Faire nommer des segments, le support d’un segment', 'Faire découvrir la propriété de la médiatrice : « Les deux segments liant un point de la médiatrice à ses extrémités ont même longueur »', 'Travailler à la maîtrise des instruments (règle graduée, équerre, compas)'],
+            evaluation: ['Identification : segments, support d’un segment, milieu, médiatrice', 'Utilisation du vocabulaire approprié pour décrire des configurations', 'Mesure et comparaison de grandeurs (longueur d’un segment, distance de deux points)', 'Construction du milieu (règle graduée) et de la médiatrice (règle + équerre)'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Segments, support d’un segment, milieu, longueur, distance de deux points, médiatrice' },
+                { capacite: 'Nommer', contenu: 'Segments et notations' },
+                { capacite: 'Mesurer/Comparer', contenu: 'Longueur d’un segment, distance de deux points' },
+                { capacite: 'Construire/Reproduire', contenu: 'Segments, support, milieu (règle graduée), médiatrice (règle+équerre)' },
+                { capacite: 'Justifier', contenu: 'Égalité de distances (point de la médiatrice équidistant), point milieu, droite médiatrice' }
+            ],
+            prerequis: ['Droites, points'],
+            materiel: ['Règles graduées, équerres, compas']
+        },
+        'angles': {
+            theme: 'Configurations du plan',
+            titre: 'Angles',
+            contenusSynth: ['Angle, angles particuliers (plat, droit, nul), angles adjacents', 'Bissectrice d’un angle'],
+            strategies: ['Observation et manipulation en petits groupes', 'Travail individuel (mesure avec rapporteur)', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions d’angles déjà installées au primaire', 'Faire nommer des angles', 'Travailler à la maîtrise du rapporteur'],
+            evaluation: ['Identification d’angles, d’angles adjacents, de la bissectrice', 'Mesure et comparaison des grandeurs', 'Calcul de mesures d’angles dans une configuration d’angles adjacents', 'Construction/reproduction d’angles, d’angles particuliers, de la bissectrice'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Angle, angles particuliers (plat, droit, nul), angles adjacents, bissectrice' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire et notation : angle, angles particuliers' },
+                { capacite: 'Mesurer/Comparer', contenu: 'Mesure d’un angle, utilisation du rapporteur ; angles aigu, obtus, plat, droit, nul' },
+                { capacite: 'Calculer', contenu: 'Mesures d’angles dans une configuration d’angles adjacents' },
+                { capacite: 'Construire/Reproduire', contenu: 'Angles, angles particuliers, adjacents, bissectrice' },
+                { capacite: 'Justifier', contenu: 'Droite bissectrice d’un angle (utilisation de la définition)' }
+            ],
+            prerequis: ['Segments', 'Utilisation du rapporteur'],
+            materiel: ['Rapporteurs, règles, compas']
+        },
+        'triangles': {
+            theme: 'Configurations du plan',
+            titre: 'Triangles',
+            contenusSynth: ['Triangles : côté opposé, sommet', 'Triangles particuliers : rectangle, isocèle, équilatéral', 'Droites particulières : hauteur, médiatrice, bissectrice, médiane'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions de triangles déjà installées au primaire', 'Faire nommer des triangles et des droites particulières d’un triangle'],
+            evaluation: ['Identification de triangles, côtés opposés, sommets', 'Identification de droites particulières d’un triangle', 'Calcul de grandeurs : périmètre, aire d’un triangle', 'Construction/reproduction de triangles, triangles particuliers, droites particulières'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Triangles : côté opposé, sommet ; triangles particuliers (rectangle, isocèle, équilatéral) ; hauteur, médiatrice, bissectrice, médiane' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : triangles, triangles particuliers, droites particulières' },
+                { capacite: 'Construire/Reproduire', contenu: 'Triangles (connaissant mesures de côtés/angles sans somme des angles), triangles particuliers, droites particulières' },
+                { capacite: 'Calculer', contenu: 'Périmètre, aire d’un triangle' },
+                { capacite: 'Justifier', contenu: 'Nature d’un triangle (rectangle, isocèle, équilatéral) ; nature d’une droite (hauteur, médiatrice, bissectrice, médiane)' }
+            ],
+            prerequis: ['Angles, segments'],
+            materiel: ['Règle, équerre, compas, rapporteur']
+        },
+        'cercles-disques': {
+            theme: 'Configurations du plan',
+            titre: 'Cercles et disques',
+            contenusSynth: ['Cercle : présentation, vocabulaire, éléments caractéristiques (centre, rayon, diamètre)', 'Cordes, arcs de cercle, demi-cercles', 'Disque'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions relatives au cercle déjà installées au primaire', 'Faire nommer : cercles, demi-cercles, disques, centres, rayons, cordes, arcs'],
+            evaluation: ['Identification : cercles, disques, éléments caractéristiques, cordes, arcs', 'Calcul de grandeurs : périmètre du cercle, aire du disque', 'Construction/reproduction de cercles, disques, cordes, arcs, demi-cercles'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Cercle : présentation, vocabulaire, éléments caractéristiques ; cordes, arcs, demi-cercles ; disque' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : cercle, disque, cordes, arcs, demi-cercles' },
+                { capacite: 'Calculer', contenu: 'Périmètre (longueur) du cercle, aire du disque' },
+                { capacite: 'Construire/Reproduire', contenu: 'Cercle (connaissant centre/rayon, diamètre), disque, cordes, arcs, demi-cercles' },
+                { capacite: 'Justifier', contenu: 'Appartenance d’un point à un cercle, propriétés' }
+            ],
+            prerequis: ['Compas, longueurs'],
+            materiel: ['Compas, règle']
+        },
+        'parallelogrammes': {
+            theme: 'Configurations du plan',
+            titre: 'Parallélogrammes',
+            contenusSynth: ['Parallélogramme : définitions, vocabulaire (côté, diagonale, sommet, centre)', 'Parallélogrammes particuliers : losange, rectangle, carré'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions relatives au parallélogramme déjà installées au primaire', 'Faire nommer les éléments'],
+            evaluation: ['Identification de parallélogrammes et parallélogrammes particuliers', 'Utilisation du vocabulaire (côté, diagonale, centre)', 'Calcul de grandeurs : périmètre, aire', 'Construction du parallélogramme, diagonale, centre, quatrième sommet'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître/Identifier', contenu: 'Parallélogramme : définitions, vocabulaire (côté, diagonale, sommet, centre) ; parallélogrammes particuliers : losange, rectangle, carré' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : parallélogramme, côté, diagonale, sommet, centre ; losange, rectangle, carré' },
+                { capacite: 'Construire/Reproduire', contenu: 'Parallélogramme, diagonale, centre ; parallélogrammes particuliers ; quatrième sommet (règle+équerre ou compas)' },
+                { capacite: 'Calculer', contenu: 'Périmètre et aire d’un parallélogramme' },
+                { capacite: 'Justifier', contenu: 'La nature d’un quadrilatère (parallélogramme, parallélogrammes particuliers), propriétés' }
+            ],
+            prerequis: ['Parallélisme'],
+            materiel: ['Règle, équerre, compas']
+        },
+        'symetrie-droite': {
+            theme: 'Applications du plan',
+            titre: 'Symétrie par rapport à une droite',
+            contenusSynth: ['Figures symétriques par rapport à une droite', 'Points symétriques, axe de symétrie'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions relatives aux figures symétriques vues au primaire'],
+            evaluation: ['Identification de points et figures symétriques par rapport à une droite', 'Identification d’axes de symétrie', 'Mesure et comparaison : propriétés de conservation des distances et des mesures d’angles', 'Construction de points symétriques, de figures symétriques (segments, droites, angles, cercles)'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître des figures ou points symétriques', contenu: 'Figures symétriques par rapport à une droite ; points symétriques' },
+                { capacite: 'Reconnaître un axe de symétrie', contenu: 'Axe de symétrie' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : figures symétriques, axe de symétrie' },
+                { capacite: 'Construire des figures ou points symétriques', contenu: 'Points symétriques par rapport à une droite ; figures symétriques (segments, droites, angles, cercles)' },
+                { capacite: 'Construire un axe de symétrie', contenu: 'Axe de symétrie' },
+                { capacite: 'Comparer des grandeurs', contenu: 'Propriétés de conservation des distances et des mesures d’angles' },
+                { capacite: 'Justifier', contenu: 'Alignement, égalité de distances, égalité angulaire (conservation)' }
+            ],
+            prerequis: ['Perpendicularité, milieu'],
+            materiel: ['Papier calque, règle, équerre, compas']
+        },
+        'symetrie-point': {
+            theme: 'Applications du plan',
+            titre: 'Symétrie par rapport à un point',
+            contenusSynth: ['Figures symétriques par rapport à un point', 'Points symétriques, centre de symétrie'],
+            strategies: ['Observation et manipulation en petits groupes', 'Méthode démonstrative ; faire faire'],
+            consignes: ['Renforcer et clarifier les notions relatives aux figures symétriques par rapport à un point'],
+            evaluation: ['Reconnaissance de points et figures symétriques par rapport à un point', 'Identification de centre de symétrie', 'Construction de points symétriques, de figures symétriques (segments, droites, angles, cercles)', 'Conservation des distances et des angles'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître des figures ou points symétriques', contenu: 'Figures symétriques par rapport à un point ; points symétriques' },
+                { capacite: 'Reconnaître un centre de symétrie', contenu: 'Centre de symétrie' },
+                { capacite: 'Nommer', contenu: 'Vocabulaire : figures symétriques, centre de symétrie' },
+                { capacite: 'Construire des figures ou points symétriques', contenu: 'Points symétriques par rapport à un point ; figures symétriques (segments, droites, angles, cercles)' },
+                { capacite: 'Construire un centre de symétrie', contenu: 'Centre de symétrie' },
+                { capacite: 'Comparer des grandeurs', contenu: 'Propriétés de conservation des distances et des mesures d’angles' },
+                { capacite: 'Justifier', contenu: 'Alignement, égalité de distances, égalité angulaire (conservation)' }
+            ],
+            prerequis: ['Milieu d’un segment'],
+            materiel: ['Règle, compas, papier calque']
+        },
+        'arithmetique': {
+            theme: 'Calcul numérique',
+            titre: 'Arithmétique – Nombres entiers naturels',
+            contenusSynth: ['Ensemble IN, numération, écritures en chiffres/lettres', 'Comparaison, ordre de grandeur', 'Opérations (+, –, ×, ÷), vocabulaire : somme, terme, différence, produit, facteur', 'Multiples, diviseurs, critères de divisibilité (2,5,3,9,10,100…)'],
+            strategies: ['Observation et manipulation de nombres (petits groupes)', 'Méthode démonstrative ; faire faire', 'Création de situations faisant appel aux opérations sur les nombres entiers'],
+            consignes: ['Présenter une liste de nombres ou une situation faisant appel aux nombres et y faire identifier les nombres entiers naturels', 'Introduire la notion d’ensemble : IN, symbole d’appartenance (∈, ∉)', 'Faire lire et écrire individuellement des nombres entiers naturels', 'Faire utiliser le vocabulaire approprié'],
+            evaluation: ['Identification de nombres entiers naturels', 'Écritures en chiffres et en lettres de nombres entiers naturels', 'Comparaison, rangement par ordre croissant/décroissant', 'Détermination de l’ordre de grandeur', 'Opérations sur les nombres entiers naturels (addition, soustraction, multiplication, division)', 'Détermination de multiples / diviseurs, utilisation des critères de divisibilité'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître un nombre entier naturel', contenu: 'Ensemble IN des entiers naturels : vocabulaire et notations' },
+                { capacite: 'Lire des nombres', contenu: 'Règles de numération, tableau de numération ; écritures en chiffres, en lettres' },
+                { capacite: 'Écrire des nombres', contenu: 'Écritures en chiffres, en lettres d’un nombre entier naturel' },
+                { capacite: 'Comparer des nombres', contenu: 'Règles de comparaison, ordre croissant/décroissant, ordre de grandeur' },
+                { capacite: 'Calculer', contenu: 'Opérations (+, –, ×, ÷) sur les entiers naturels ; vocabulaire : somme, terme, différence, produit, facteur ; multiples, diviseurs ; critères de divisibilité par 2,5,3,9,10,100…' },
+                { capacite: 'Justifier', contenu: 'Multiples, diviseurs d’un nombre entier naturel' }
+            ],
+            prerequis: ['Tables de multiplication'],
+            materiel: ['Tableau de numération', 'Fiches d’exercices']
+        },
+        'nombres-decimaux': {
+            theme: 'Calcul numérique',
+            titre: 'Nombres décimaux',
+            contenusSynth: ['Ensemble D, partie entière/décimale, dixième, centième, millième…', 'Demi-droite graduée, abscisse', 'Comparaison, encadrement, ordre de grandeur', 'Opérations (+, –, ×, ÷) sur les nombres décimaux'],
+            strategies: ['Observation et manipulation de nombres (petits groupes)', 'Méthode démonstrative ; faire faire', 'Création de situations faisant appel aux opérations sur les nombres décimaux'],
+            consignes: ['Présenter une liste de nombres ou une situation et y faire identifier les nombres décimaux', 'Faire correspondre des nombres écrits en chiffres et en lettres (appariement)', 'Faire lire et écrire individuellement des nombres décimaux'],
+            evaluation: ['Identification de nombres décimaux', 'Écritures en lettres et en chiffres', 'Comparaison, encadrement, repérage sur demi-droite graduée', 'Opérations sur les nombres décimaux'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître un nombre décimal', contenu: 'Ensemble D des nombres décimaux arithmétiques' },
+                { capacite: 'Lire des nombres', contenu: 'Partie entière, partie décimale ; unités, dixième, centième, millième ; nombre de dixièmes/centièmes…' },
+                { capacite: 'Écrire des nombres', contenu: 'Écritures en chiffres, en lettres d’un nombre décimal' },
+                { capacite: 'Repérer un point sur une demi-droite', contenu: 'Demi-droite graduée, abscisse' },
+                { capacite: 'Comparer / Encadrer', contenu: 'Règles de comparaison, ordre croissant/décroissant ; encadrement par deux entiers consécutifs, par deux décimaux d’ordre 1,2,3 ; ordre de grandeur' },
+                { capacite: 'Calculer', contenu: 'Opérations (+, –, ×, ÷) sur les nombres décimaux' }
+            ],
+            prerequis: ['Fractions décimales'],
+            materiel: ['Règle graduée']
+        },
+        'programme-calcul': {
+            theme: 'Calcul numérique',
+            titre: 'Programme de calcul',
+            contenusSynth: ['Propriétés de l’addition/multiplication, règles de priorité, parenthèses', 'Initiation au calcul littéral (aires, volumes)'],
+            strategies: ['Travail en petits groupes', 'Création de situations faisant appel aux opérations'],
+            consignes: ['Faire appliquer les propriétés d’addition et de multiplication (règles de priorité, utilisation des parenthèses)'],
+            evaluation: ['Respect des priorités opératoires', 'Utilisation correcte des parenthèses'],
+            capacitesDetails: [
+                { capacite: 'Calculer en utilisant les propriétés', contenu: 'Propriétés de l’addition, multiplication, règles de priorité, utilisation des parenthèses' },
+                { capacite: 'Effectuer du calcul littéral', contenu: 'Initiation au calcul littéral : calculs d’aires, de volumes' }
+            ],
+            prerequis: ['Opérations'],
+            materiel: ['Fiches d’exercices']
+        },
+        'fractions': {
+            theme: 'Calcul numérique',
+            titre: 'Fractions',
+            contenusSynth: ['Écriture a/b (a,b entiers naturels, b≠0)', 'Fractions décimales (b=10,100…)', 'Fractions égales', 'Comparaison de fractions de même dénominateur', 'Simplification, somme/différence (même dénominateur ou dénominateurs distincts), produit d’un entier par une fraction'],
+            strategies: ['Observation et manipulation de nombres (petits groupes)', 'Méthode démonstrative ; faire faire', 'Création de situations faisant appel aux fractions'],
+            consignes: ['Présenter une situation faisant appel aux fractions', 'Faire découvrir les règles de comparaison (fractions ayant même dénominateur)'],
+            evaluation: ['Identification de fractions', 'Comparaison de fractions de même dénominateur', 'Simplification, somme, différence, produit d’un entier par une fraction'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une fraction', contenu: 'Écriture a/b (a,b entiers naturels, b≠0) ; écriture fractionnaire d’un nombre décimal (b=10,100…) ; fractions égales' },
+                { capacite: 'Lire et écrire une fraction', contenu: 'Numérateur, dénominateur' },
+                { capacite: 'Comparer des nombres', contenu: 'Comparaison de deux fractions de même dénominateur' },
+                { capacite: 'Calculer', contenu: 'Simplification ; somme/différence (même dénominateur ou dénominateurs distincts) ; produit d’un entier par une fraction' }
+            ],
+            prerequis: ['Division'],
+            materiel: ['Matériel de partage (bandes fractionnées)']
+        },
+        'nombres-relatifs': {
+            theme: 'Calcul numérique',
+            titre: 'Nombres décimaux relatifs',
+            contenusSynth: ['Ensemble ID des décimaux relatifs, ensemble ℤ des entiers relatifs', 'Vocabulaire, conventions d’écriture', 'Droite graduée, abscisse', 'Somme de deux relatifs (entiers ou décimaux)'],
+            strategies: ['Observation et manipulation de nombres (petits groupes)', 'Exploitation de frises chronologiques (axe du temps)', 'Création de situations faisant appel à l’addition des nombres décimaux'],
+            consignes: ['Partir de situations de la vie courante (température, dette) pour introduire les nombres décimaux relatifs', 'Faire lire et écrire individuellement des nombres décimaux relatifs', 'Éviter la formalisation par des règles de calcul (sera vu en 5e)'],
+            evaluation: ['Identification de nombres décimaux relatifs', 'Lecture d’abscisse sur une droite graduée', 'Somme de deux nombres décimaux relatifs (utilisation concrète)'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître un nombre décimal relatif', contenu: 'Ensemble ID des décimaux relatifs, ensemble ℤ des entiers relatifs' },
+                { capacite: 'Lire et écrire des nombres', contenu: 'Vocabulaire et notations ; convention d’écritures' },
+                { capacite: 'Repérer un point sur une droite', contenu: 'Droite graduée, abscisse' },
+                { capacite: 'Calculer', contenu: 'Somme de deux entiers relatifs, de deux décimaux relatifs ; utilisation des propriétés' },
+                { capacite: 'Justifier', contenu: 'Appartenance d’un nombre à un ensemble (IN, ℤ, D, ID)' }
+            ],
+            prerequis: ['Repérage sur une droite'],
+            materiel: ['Frise chronologique', 'Thermomètre']
+        },
+        'proportionnalite': {
+            theme: 'Organisation des données',
+            titre: 'Situations de proportionnalité',
+            contenusSynth: ['Tableau de proportionnalité, coefficient', 'Propriétés de linéarité'],
+            strategies: ['Observation et manipulation de situations et tableaux de proportionnalité', 'Mise en évidence de différentes méthodes à travers la résolution d’exercices'],
+            consignes: ['Partir de situations de la vie courante pour introduire des situations et tableaux de proportionnalité', 'Renforcer et clarifier la notion de pourcentage déjà abordée au primaire'],
+            evaluation: ['Identification de situations et tableaux de proportionnalité', 'Détermination d’un tableau de proportionnalité', 'Détermination du coefficient', 'Calcul d’une quatrième proportionnelle par diverses méthodes'],
+            capacitesDetails: [
+                { capacite: 'Reconnaître une situation de proportionnalité', contenu: 'Tableau de proportionnalité, coefficient' },
+                { capacite: 'Reconnaître un tableau de proportionnalité', contenu: 'Propriétés de linéarité' },
+                { capacite: 'Calculer des grandeurs', contenu: 'Utilisation du coefficient, propriétés de linéarité' },
+                { capacite: 'Traduire un problème', contenu: 'Situations de proportionnalité de la vie courante' }
+            ],
+            prerequis: ['Opérations'],
+            materiel: ['Tableaux à double entrée']
+        },
+        'pourcentage-echelle': {
+            theme: 'Organisation des données',
+            titre: 'Pourcentage et échelle',
+            contenusSynth: ['Notion de pourcentage, calcul de pourcentages', 'Agrandissement/réduction à l’aide d’une échelle'],
+            strategies: ['Observation et manipulation de situations utilisant les pourcentages, les échelles'],
+            consignes: ['Partir de situations de la vie courante pour calculer ou utiliser des pourcentages, des échelles'],
+            evaluation: ['Calcul de pourcentages', 'Détermination d’échelle', 'Reproduction de figures à une échelle donnée'],
+            capacitesDetails: [
+                { capacite: 'Calculer des grandeurs à l’aide des pourcentages', contenu: 'Propriétés des tableaux, pourcentages' },
+                { capacite: 'Déterminer l’échelle utilisée', contenu: 'Agrandissement/réduction à l’aide d’une échelle' },
+                { capacite: 'Reproduire un dessin à une échelle donnée', contenu: 'Utilisation de l’échelle' }
+            ],
+            prerequis: ['Proportionnalité'],
+            materiel: ['Cartes géographiques, plans']
+        }
+    };
+
+    // -------------------- LOGIQUE D'AFFICHAGE (inchangée) --------------------
+    const select = document.getElementById('leconSelect');
+    const dureeInput = document.getElementById('dureeField');
+    const dateInput = document.getElementById('dateField');
+    const btn = document.getElementById('btnGenerer');
+    const ficheDiv = document.getElementById('ficheGeneree');
+    const contenuFiche = document.getElementById('contenuFiche');
+
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    select.addEventListener('change', function() {
+        if (lecons[this.value]) dureeInput.value = '6 heures';
+    });
+
+    function generer() {
+        const id = select.value;
+        if (!id || !lecons[id]) { alert('Veuillez sélectionner une leçon.'); return; }
+        const lec = lecons[id];
+        const duree = dureeInput.value || '6 heures';
+        const date = dateInput.value ? new Date(dateInput.value).toLocaleDateString('fr-FR') : 'À déterminer';
+
+        const contenuItems = lec.contenusSynth.map(c => `<li>${c}</li>`).join('');
+        const stratItems = lec.strategies.map(s => `<li>${s}</li>`).join('');
+        const consignesDiv = lec.consignes.map(c => `<div class="badge-consigne">📣 ${c}</div>`).join('');
+        const evalItems = lec.evaluation.map(e => `<li>${e}</li>`).join('');
+        const capRows = lec.capacitesDetails.map(item => 
+            `<tr><td style="font-weight:600; width:35%;">${item.capacite}</td><td>${item.contenu}</td></tr>`
+        ).join('');
+
+        const html = `
+            <div class="fiche-header">
+                <h2>${lec.titre}</h2>
+                <p style="font-size:clamp(0.9rem,2.5vw,1.15rem);">Thème : ${lec.theme} — Durée : ${duree} — Date : ${date}</p>
+            </div>
+            <div class="section-guide"><h4>📋 CONTENUS (synthèse)</h4><ul class="bullet-list">${contenuItems}</ul></div>
+            <div class="section-guide"><h4>🧠 STRATÉGIES</h4><ul class="bullet-list">${stratItems}</ul></div>
+            <div class="section-guide"><h4>🗣️ CONSIGNES</h4>${consignesDiv}</div>
+            <div class="section-guide"><h4>✅ ÉVALUATION</h4><ul class="bullet-list">${evalItems}</ul></div>
+            <div class="section-guide"><h4>🔎 CAPACITÉS & CONTENUS</h4>
+                <table class="table-cap"><tr><th>Capacité</th><th>Contenu</th></tr>${capRows}</table>
+            </div>
+            <div class="section-guide"><h4>📦 PRÉREQUIS & MATÉRIEL</h4>
+                <p><strong>Prérequis :</strong> ${lec.prerequis.join(', ')}</p>
+                <p><strong>Matériel :</strong> ${lec.materiel.join(' · ')}</p>
+            </div>
+        `;
+        contenuFiche.innerHTML = html;
+        ficheDiv.classList.remove('hidden');
+        ficheDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    btn.addEventListener('click', generer);
+    document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generer(); });
+
+    window.exportWord = function() {
+        if (ficheDiv.classList.contains('hidden')) return alert('Générez d’abord une fiche.');
+        const content = contenuFiche.innerHTML;
+        const style = '<style>body { font-family: Arial; margin: 2cm; } .section-guide { margin-bottom:20px; } .table-cap { border-collapse: collapse; width:100%; } .table-cap td, .table-cap th { border:1px solid #aaa; padding:8px; } .badge-consigne { background:#fef7e5; padding:10px; border-left:6px solid #f3b33d; }</style>';
+        const full = `<!DOCTYPE html><html><head><meta charset="UTF-8">${style}</head><body>${content}</body></html>`;
+        const blob = new Blob([full], {type: 'application/msword'});
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Fiche_guide_6e.doc'; link.click();
+    };
+    window.resetFiche = function() {
+        ficheDiv.classList.add('hidden');
+        select.value = '';
+        dureeInput.value = '6 heures';
+        dateInput.value = today;
+    };
+})();
+</script>
+</body>
+</html>
