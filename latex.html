@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  Fichier : fusion_complete.html
+  Fichier : formation_complete.html
   Projet  : Plateforme LaTeX – Formation & Composeur
   Description :
-    Fusion complète avec filtre de chapitre et responsive.
-    Mode Formation : widgets filtrés par niveau, matière, et recherche.
-    Mode Composeur : widgets filtrés par section.
+    Version finale avec tous les chapitres enrichis,
+    filtre de recherche par chapitre, responsive,
+    et contenu pédagogique complet (définitions, théorèmes, tableaux, schémas).
+    Le mode Composeur contient désormais des blocs lstlisting réels.
 ============================================================ -->
 <html lang="fr">
 <head>
@@ -58,138 +59,94 @@
     .btn-projector:hover { background: #0f172a; }
 
     .filters-extra {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 20px;
-      margin-bottom: 20px;
-      padding: 8px 0;
-      align-items: center;
+      display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 20px; padding: 8px 0; align-items: center;
     }
     .filters-extra .search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1 1 240px;
+      display: flex; align-items: center; gap: 8px; flex: 1 1 240px;
     }
-    .filters-extra .search-box label {
-      font-weight: 600;
-      font-size: 14px;
-      color: #334155;
-      white-space: nowrap;
-    }
+    .filters-extra .search-box label { font-weight: 600; font-size: 14px; color: #334155; white-space: nowrap; }
     .filters-extra .search-box input {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 14px;
-      outline: none;
-      transition: border 0.2s;
-      min-width: 120px;
+      flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;
+      font-size: 14px; outline: none; transition: border 0.2s; min-width: 120px;
     }
-    .filters-extra .search-box input:focus {
-      border-color: #3b82f6;
-    }
+    .filters-extra .search-box input:focus { border-color: #3b82f6; }
 
     /* ========== GRILLE DE WIDGETS ========== */
     .widget-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-      gap: 18px;
-      margin-top: 20px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 18px; margin-top: 20px;
     }
     .widget {
-      background: var(--card, #fff);
-      border-radius: 10px;
+      background: var(--card, #fff); border-radius: 10px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
-      overflow: hidden;
-      border: 1px solid #e5e7eb;
-      transition: box-shadow 0.2s;
+      overflow: hidden; border: 1px solid #e5e7eb; transition: box-shadow 0.2s;
     }
     .widget:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .widget-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; background: #f8fafc;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e5e7eb;
     }
-    .widget-header .label {
-      font-size: 11px; font-weight: 600; color: #6b7280;
-      text-transform: uppercase; letter-spacing: 0.4px;
-    }
+    .widget-header .label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; }
     .widget-header .section-tag {
-      font-size: 10px; background: #2563eb; color: #fff;
-      padding: 2px 8px; border-radius: 4px;
-      max-width: 220px; overflow: hidden; text-overflow: ellipsis;
-      white-space: nowrap; font-weight: 500;
+      font-size: 10px; background: #2563eb; color: #fff; padding: 2px 8px; border-radius: 4px;
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500;
     }
     .widget-expl {
-      background: #f0fdf4; border-bottom: 1px solid #d1fae5;
-      padding: 10px 14px; font-size: 13px; line-height: 1.5;
-      color: #065f46;
+      background: #f0fdf4; border-bottom: 1px solid #d1fae5; padding: 10px 14px; font-size: 13px; line-height: 1.5; color: #065f46;
     }
-    .widget-expl .expl-label {
-      font-size: 10px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.4px; color: #059669; margin-bottom: 3px;
-    }
-    .widget-expl .expl-text {
-      overflow: hidden; display: -webkit-box;
-      -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-    }
+    .widget-expl .expl-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #059669; margin-bottom: 3px; }
+    .widget-expl .expl-text { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
     .widget-expl.expanded .expl-text { -webkit-line-clamp: unset; }
-    .widget-expl .expl-toggle {
-      background: none; border: none; color: #059669;
-      font-size: 11px; font-weight: 600; cursor: pointer;
-      padding: 2px 0; margin-top: 2px;
-    }
+    .widget-expl .expl-toggle { background: none; border: none; color: #059669; font-size: 11px; font-weight: 600; cursor: pointer; padding: 2px 0; margin-top: 2px; }
     .widget-expl .expl-toggle:hover { text-decoration: underline; }
     .widget-code {
-      position: relative; padding: 14px;
-      overflow-x: auto; max-height: 280px; overflow-y: auto;
+      position: relative; padding: 14px; overflow-x: auto; max-height: 280px; overflow-y: auto;
     }
     .widget-code pre {
-      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
-      font-size: 12.5px; line-height: 1.6; white-space: pre; tab-size: 4;
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace; font-size: 12.5px; line-height: 1.6; white-space: pre; tab-size: 4;
     }
     .widget-code .copy-btn {
-      position: absolute; top: 6px; right: 6px;
-      opacity: 0; transition: opacity 0.15s;
-      background: #fff; border: 1px solid #e5e7eb;
-      border-radius: 6px; padding: 3px 8px; font-size: 10px;
+      position: absolute; top: 6px; right: 6px; opacity: 0; transition: opacity 0.15s;
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 3px 8px; font-size: 10px;
       cursor: pointer; color: #6b7280;
     }
     .widget-code:hover .copy-btn { opacity: 1; }
     .widget-code .copy-btn:hover { background: #f8fafc; color: #1e293b; }
     .widget-footer {
-      padding: 8px 14px; border-top: 1px solid #e5e7eb;
-      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 14px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;
     }
     .widget-footer .index { font-size: 11px; color: #6b7280; }
     .widget-footer .project-btn {
-      font-size: 11px; padding: 3px 10px;
-      border: 1px solid #2563eb; border-radius: 6px;
-      background: transparent; color: #2563eb;
-      cursor: pointer; transition: all 0.15s; font-weight: 500;
+      font-size: 11px; padding: 3px 10px; border: 1px solid #2563eb; border-radius: 6px;
+      background: transparent; color: #2563eb; cursor: pointer; transition: all 0.15s; font-weight: 500;
     }
     .widget-footer .project-btn:hover { background: #2563eb; color: #fff; }
 
     .widget-preview {
-      padding: 14px;
-      background: #f8fafc;
-      border-top: 1px solid #e5e7eb;
-      max-height: 300px;
-      overflow-y: auto;
+      padding: 14px; background: #f8fafc; border-top: 1px solid #e5e7eb; max-height: 300px; overflow-y: auto;
     }
     .widget-preview .preview-toggle {
-      display: inline-block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #2563eb;
-      cursor: pointer;
-      font-weight: 500;
+      display: inline-block; margin-bottom: 8px; font-size: 12px; color: #2563eb; cursor: pointer; font-weight: 500;
     }
     .widget-preview .preview-toggle:hover { text-decoration: underline; }
     .widget-preview .preview-content { display: none; }
     .widget-preview .preview-content.open { display: block; }
+
+    /* ========== STYLES POUR LE CONTENU DES PRÉVISUALISATIONS ========== */
+    .box { border-left: 6px solid #3b82f6; background: #f8fafc; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .box-title { font-weight: 700; color: #0f172a; display: block; margin-bottom: 6px; font-size: 16px; }
+    .box-definition { border-left-color: #8b5cf6; background: #f5f3ff; }
+    .box-propriete { border-left-color: #f59e0b; background: #fffbeb; }
+    .box-theoreme { border-left-color: #ef4444; background: #fef2f2; }
+    .box-consigne { border-left-color: #6366f1; background: #eef2ff; }
+    .box-methode { border-left-color: #14b8a6; background: #f0fdfa; }
+    .box-attention { border-left-color: #f43f5e; background: #ffe4e6; }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 15px; }
+    th, td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: center; }
+    th { background: #f1f5f9; font-weight: 600; }
+
+    .figure-tikz { text-align: center; margin: 16px 0; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px dashed #94a3b8; font-family: monospace; font-size: 13px; color: #475569; }
 
     /* ========== COLORATION SYNTAXIQUE ========== */
     .hl-kw { color: #a78bfa; }
@@ -200,33 +157,18 @@
     .hl-bra { color: #22d3ee; }
     .hl-sec { color: #facc15; }
 
-    .stats {
-      font-size: 13px; color: #6b7280; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
+    .stats { font-size: 13px; color: #6b7280; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .stats strong { color: #1e293b; }
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center; padding: 60px 20px; color: #6b7280;
-    }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #6b7280; }
 
     /* ========== MODE TOGGLE ========== */
-    .mode-toggle {
-      display: flex; align-items: center; gap: 10px;
-      margin-left: 20px;
-    }
-    .mode-toggle .toggle-label {
-      font-size: 13px; font-weight: 500; color: #334155;
-    }
+    .mode-toggle { display: flex; align-items: center; gap: 10px; margin-left: 20px; }
+    .mode-toggle .toggle-label { font-size: 13px; font-weight: 500; color: #334155; }
     .mode-toggle .toggle-btn {
-      background: #e2e8f0; border: none; border-radius: 30px;
-      padding: 4px 12px; font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-      color: #1e293b;
+      background: #e2e8f0; border: none; border-radius: 30px; padding: 4px 12px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #1e293b;
     }
-    .mode-toggle .toggle-btn.active {
-      background: #3b82f6; color: white;
-    }
+    .mode-toggle .toggle-btn.active { background: #3b82f6; color: white; }
     .mode-toggle .toggle-btn:hover { opacity: 0.8; }
 
     .mode-formation { display: block; }
@@ -235,131 +177,39 @@
     body.composeur-mode .mode-composeur { display: block; }
 
     /* ========== COMPOSEUR CONTROLS ========== */
-    .composeur-controls {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 16px;
-      padding: 10px 14px;
-      background: #f1f5f9;
-      border-radius: 8px;
-    }
-    .composeur-controls label {
-      font-weight: 600;
-      font-size: 14px;
-      color: #334155;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .composeur-controls select {
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      font-size: 13px;
-      cursor: pointer;
-      outline: none;
-    }
+    .composeur-controls { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 10px 14px; background: #f1f5f9; border-radius: 8px; }
+    .composeur-controls label { font-weight: 600; font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px; }
+    .composeur-controls select { padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; font-size: 13px; cursor: pointer; outline: none; }
 
     /* ========== PROJECTEUR ========== */
     #projector {
-      display: none;
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #0f172a; z-index: 1000;
-      flex-direction: column; color: #fff;
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0f172a; z-index: 1000; flex-direction: column; color: #fff;
     }
     #projector.active { display: flex; }
-    .projector-bg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(ellipse at 50% 30%, #1e293b 0%, #0f172a 70%);
-      z-index: -1;
-    }
-    .projector-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 28px; background: rgba(0,0,0,0.4);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .projector-header .title {
-      font-size: 15px; font-weight: 600; opacity: 0.85;
-    }
+    .projector-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 50% 30%, #1e293b 0%, #0f172a 70%); z-index: -1; }
+    .projector-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .projector-header .title { font-size: 15px; font-weight: 600; opacity: 0.85; }
     .projector-header .title span { color: #60a5fa; }
-    .projector-controls .btn-exit {
-      background: rgba(255,255,255,0.1); color: #fff;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
+    .projector-controls .btn-exit { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
     .projector-controls .btn-exit:hover { background: #dc2626; border-color: #dc2626; }
-    .projector-body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 32px; overflow: auto;
-    }
-    .projector-slide {
-      max-width: 1050px; width: 100%;
-    }
-    .projector-slide .slide-section {
-      text-align: center; margin-bottom: 6px;
-      font-size: 13px; color: #60a5fa; font-weight: 500;
-      letter-spacing: 0.8px; text-transform: uppercase;
-    }
-    .projector-slide .slide-title {
-      text-align: center; margin-bottom: 6px;
-      font-size: 24px; font-weight: 700; color: #f1f5f9;
-    }
-    .projector-slide .slide-expl {
-      text-align: center; margin-bottom: 22px;
-      font-size: 15px; color: #94a3b8; max-width: 800px;
-      margin-left: auto; margin-right: auto; line-height: 1.5;
-    }
-    .projector-slide .slide-code {
-      background: rgba(255,255,255,0.05); border-radius: 14px;
-      padding: 28px 36px; border: 1px solid rgba(255,255,255,0.08);
-      max-height: 55vh; overflow: auto;
-    }
-    .projector-slide .slide-code pre {
-      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
-      font-size: 17px; line-height: 1.7; white-space: pre;
-      color: #e2e8f0;
-    }
-    .projector-slide .slide-hint {
-      text-align: center; margin-top: 12px;
-      font-size: 12px; color: rgba(255,255,255,0.3);
-    }
-    .projector-nav {
-      display: flex; align-items: center; justify-content: center;
-      gap: 16px; padding: 16px; background: rgba(0,0,0,0.3);
-    }
-    .projector-nav span {
-      font-size: 13px; color: rgba(255,255,255,0.5);
-      min-width: 80px; text-align: center;
-    }
-    .projector-nav .btn-nav {
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.06); color: #fff;
-      font-size: 18px; cursor: pointer; transition: all 0.15s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .projector-nav .btn-nav:hover {
-      background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);
-    }
-    .projector-nav .btn-nav:disabled {
-      opacity: 0.15; cursor: default; background: transparent;
-    }
+    .projector-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; overflow: auto; }
+    .projector-slide { max-width: 1050px; width: 100%; }
+    .projector-slide .slide-section { text-align: center; margin-bottom: 6px; font-size: 13px; color: #60a5fa; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; }
+    .projector-slide .slide-title { text-align: center; margin-bottom: 6px; font-size: 24px; font-weight: 700; color: #f1f5f9; }
+    .projector-slide .slide-expl { text-align: center; margin-bottom: 22px; font-size: 15px; color: #94a3b8; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+    .projector-slide .slide-code { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 28px 36px; border: 1px solid rgba(255,255,255,0.08); max-height: 55vh; overflow: auto; }
+    .projector-slide .slide-code pre { font-family: 'Cascadia Code','Fira Code','Consolas',monospace; font-size: 17px; line-height: 1.7; white-space: pre; color: #e2e8f0; }
+    .projector-slide .slide-hint { text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.3); }
+    .projector-nav { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px; background: rgba(0,0,0,0.3); }
+    .projector-nav span { font-size: 13px; color: rgba(255,255,255,0.5); min-width: 80px; text-align: center; }
+    .projector-nav .btn-nav { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+    .projector-nav .btn-nav:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+    .projector-nav .btn-nav:disabled { opacity: 0.15; cursor: default; background: transparent; }
 
     /* ========== MODE PROJECTEUR GLOBAL ========== */
-    body.projector-mode {
-      background: #0f172a;
-    }
-    body.projector-mode .container {
-      background: #0f172a;
-      box-shadow: none;
-      border-radius: 0;
-      max-width: 100%;
-      padding: 20px 30px 40px;
-      color: #e2e8f0;
-    }
+    body.projector-mode { background: #0f172a; }
+    body.projector-mode .container { background: #0f172a; box-shadow: none; border-radius: 0; max-width: 100%; padding: 20px 30px 40px; color: #e2e8f0; }
     body.projector-mode .selectors { background: #1e293b; color: #e2e8f0; }
     body.projector-mode .selectors select { background: #334155; border-color: #475569; color: white; }
     body.projector-mode .widget { background: #1e293b; border-color: #475569; color: #e2e8f0; }
@@ -384,30 +234,20 @@
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 992px) {
-      .widget-grid {
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      }
+      .widget-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
       .container { padding: 20px; }
     }
     @media (max-width: 768px) {
       body { padding: 12px; }
       h1 { font-size: 24px; }
       .subtitle { font-size: 14px; padding-bottom: 12px; }
-      .selectors {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        padding: 14px 16px;
-      }
+      .selectors { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 16px; }
       .selectors label { flex-wrap: wrap; }
       .btn-projector { margin-left: 0; }
       .mode-toggle { margin-left: 0; justify-content: flex-start; }
       .filters-extra { flex-direction: column; align-items: stretch; }
       .filters-extra .search-box { flex: 1 1 auto; }
-      .widget-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
+      .widget-grid { grid-template-columns: 1fr; gap: 14px; }
       .widget-header .section-tag { max-width: 140px; font-size: 9px; }
       .widget-code pre { font-size: 11px; }
       .projector-slide .slide-code { padding: 16px; max-height: 45vh; }
@@ -542,10 +382,8 @@ const PACKAGE_INFO = {
 };
 
 // =================================================================
-// 2. DONNÉES COMPLÈTES DE LA FORMATION
+// 2. DONNÉES COMPLÈTES DE LA FORMATION (tous les chapitres enrichis)
 // =================================================================
-// (Les données sont identiques à la version précédente, je les raccourcis pour l'exemple)
-// Dans le code final, elles seront complètes.
 const data = {
   college: {
     mathematiques: {
@@ -557,7 +395,7 @@ const data = {
           code: `% ---- Structure minimale ----\n\\documentclass{article}\n\\begin{document}\nBonjour, ceci est mon premier document.\n\\end{document}`,
           preview: `<p>LaTeX est un système de composition de documents de haute qualité, particulièrement adapté aux mathématiques.</p>
             <div class="box box-definition"><span class="box-title">Structure minimale</span>
-            <p>Un fichier LaTeX se compose d'un préambule et d'un corps.</p></div>
+            <p>Un fichier LaTeX se compose d'un préambule (déclaration de la classe et des packages) et d'un corps (entre <code>\\begin{document}</code> et <code>\\end{document}</code>).</p></div>
             <ul><li><code>article</code> : pour des devoirs, épreuves.</li>
             <li><code>report</code> : pour des rapports.</li>
             <li><code>book</code> : pour des livres.</li>
@@ -571,7 +409,7 @@ const data = {
           preview: `<p>Le package <code>fancyhdr</code> personnalise l'en-tête et le pied de page.</p>
             <div class="box box-propriete"><span class="box-title">Configuration type</span>
             <pre>\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}</pre></div>
-            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date.</p>`
+            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date. Le package <code>lastpage</code> permet d'obtenir le nombre total de pages.</p>`
         },
         {
           title: "3. Boîtes de texte",
@@ -580,7 +418,7 @@ const data = {
           preview: `<p>Le package <code>tcolorbox</code> encadre définitions, théorèmes, consignes.</p>
             <div class="box box-definition"><span class="box-title">Définition</span><p>Une fonction affine est $f(x)=ax+b$.</p></div>
             <div class="box box-theoreme"><span class="box-title">Pythagore</span><p>$BC^2 = AB^2 + AC^2$.</p></div>
-            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages).</p>`
+            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages), <code>drop fuzzy shadow</code> (ombre).</p>`
         },
         {
           title: "4. Tableaux",
@@ -590,7 +428,7 @@ const data = {
             <div class="table-wrap"><table><thead><tr><th>Élève</th><th>Note</th><th>Appréciation</th></tr></thead>
             <tbody><tr><td>Alice</td><td>18</td><td>Très bien</td></tr>
             <tr><td>Bob</td><td>12</td><td>Bien</td></tr></tbody></table></div>
-            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe).</p>`
+            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe centrée verticalement). Le package <code>array</code> permet d'ajouter des préfixes comme <code>\\centering</code>.</p>`
         },
         {
           title: "5. Insertion d'images",
@@ -599,41 +437,46 @@ const data = {
           preview: `<p><code>graphicx</code> insère des images.</p>
             <div class="box box-propriete"><span class="box-title">Placement</span>
             <ul><li><code>h</code> : ici</li><li><code>t</code> : en haut</li><li><code>b</code> : en bas</li><li><code>H</code> : exactement (package <code>float</code>)</li></ul></div>
-            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>.</p>`
+            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>. Les légendes sont gérées par <code>caption</code>.</p>`
         },
         {
           title: "6. Modèles d'épreuves",
           packages: ['article', 'fancyhdr', 'tcolorbox'],
           code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} (4 pts) ...\n\\end{document}`,
           preview: `<p>Structure d'une épreuve : en-tête, consigne, exercices numérotés, barème, pied de page.</p>
-            <div class="box box-consigne"><span class="box-title">Structure</span><ul><li>En-tête</li><li>Consigne</li><li>Exercices avec barème</li><li>Pied de page</li></ul></div>`
+            <div class="box box-consigne"><span class="box-title">Structure d'un devoir</span>
+            <ul><li>En-tête : établissement, matière, classe, date, durée</li>
+            <li>Consigne générale</li>
+            <li>Exercices avec barème entre parenthèses</li>
+            <li>Pied de page : numéro de page, date</li></ul></div>`
         },
         {
           title: "7. Outils mathématiques",
           packages: ['amsmath', 'amssymb'],
           code: `$\\frac{a}{b}$, $x^n$, $\\sqrt{2}$\n$(a+b)^2 = a^2+2ab+b^2$\n$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$`,
-          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$</li></ul>
-            <div class="box box-theoreme">Identités : $(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
-            <h4>Trigonométrie</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
-            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th></tr></thead>
-            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td></tr>
-            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td></tr></tbody></table></div>
-            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q}$</p>`
+          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$, $\\sqrt[3]{8}$</li></ul>
+            <div class="box box-theoreme">Identités remarquables :<br>$(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
+            <h4>Trigonométrie (3ème)</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
+            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr></thead>
+            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td><td>1</td></tr>
+            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td><td>0</td></tr>
+            <tr><td>$\\tan$</td><td>0</td><td>$\\frac{\\sqrt3}{3}$</td><td>1</td><td>$\\sqrt3$</td><td>—</td></tr></tbody></table></div>
+            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q} \\subset \\mathbb{R}$</p>`
         },
         {
           title: "8. Ressources et compilation",
           packages: ['article', 'inputenc', 'fontenc'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Compilation : <code>pdflatex</code>. Erreurs fréquentes : <code>Undefined control sequence</code>, <code>Missing $</code>, <code>File not found</code>.</p>
-            <div class="box box-attention"><span class="box-title">Erreurs</span><ul><li>Commande inconnue</li><li>Oubli de $</li><li>Image introuvable</li></ul></div>`
+          preview: `<p>Compilation : <code>pdflatex</code> (ou <code>lualatex</code>) génère un PDF. Erreurs fréquentes : <code>Undefined control sequence</code> (commande inconnue), <code>Missing $ inserted</code> (formule mal délimitée), <code>File not found</code> (image introuvable).</p>
+            <div class="box box-attention"><span class="box-title">Bonnes pratiques</span><ul><li>Toujours compiler deux fois pour les références croisées.</li><li>Utiliser un éditeur avec auto-complétion (TeXstudio, VS Code).</li></ul></div>`
         },
         {
           title: "9. Nombres et calculs",
           packages: ['amsmath', 'xcolor'],
           code: `$\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$\n$(-3)+(-5)=-8$\n$2+3\\times4=14$`,
-          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{5}{9}$</div>
-            <div class="box box-propriete">Relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$<br>$(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
-            <div class="box box-attention">Priorités : $2+3\\times4=14$, $(2+3)\\times4=20$<br>Puissances avant multiplications.</div>`
+          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{4}{6}+\\frac{5}{6} = \\frac{9}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{10}{18} = \\frac{5}{9}$</div>
+            <div class="box box-propriete">Nombres relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$, $(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
+            <div class="box box-attention">Priorités des opérations : $2+3\\times4=2+12=14$, $(2+3)\\times4=5\\times4=20$. Les puissances sont calculées avant les multiplications.</div>`
         }
       ]
     },
@@ -644,8 +487,12 @@ const data = {
           title: "1. Introduction et rappels",
           packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
           code: `\\usepackage{siunitx}\n\\usepackage{chemformula}\n\\usepackage{circuitikz}\n\\usepackage{pgfplots}`,
-          preview: `<p>Packages : <code>siunitx</code> (unités), <code>chemformula</code> (chimie), <code>circuitikz</code> (électricité), <code>pgfplots</code> (graphiques).</p>
-            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques au collège.</div>`
+          preview: `<p>Les packages spécifiques pour la physique au collège :</p>
+            <ul><li><code>siunitx</code> : gestion des unités SI.</li>
+            <li><code>chemformula</code> : écriture des formules chimiques.</li>
+            <li><code>circuitikz</code> : schémas électriques.</li>
+            <li><code>pgfplots</code> : tracé de graphiques.</li></ul>
+            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques.</div>`
         },
         {
           title: "2. Formules chimiques",
@@ -653,7 +500,7 @@ const data = {
           code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{NaCl}\n\\ch{2H2 + O2 -> 2H2O}`,
           preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Chlorure de sodium : $\\ch{NaCl}$</li></ul>
             <div class="box box-definition">Équation équilibrée : $\\ch{2H2 + O2 -> 2H2O}$</div>
-            <p>États : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux.</p>`
+            <p>Les états physiques se notent : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux. Exemple : $\\ch{H2O_{(l)}}$.</p>`
         },
         {
           title: "3. Grandeurs et unités",
@@ -661,8 +508,11 @@ const data = {
           code: `$\\SI{250}{g}$\n$\\SI{1.5}{L}$\n$\\SI{3.0e8}{m/s}$`,
           preview: `<ul><li>Masse : $\\SI{250}{g}$</li><li>Volume : $\\SI{1.5}{L}$</li><li>Vitesse : $\\SI{3.0e8}{m/s}$</li></ul>
             <div class="table-wrap"><table><thead><tr><th>Préfixe</th><th>Symbole</th><th>Facteur</th></tr></thead>
-            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr><tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
-            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr><tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>`
+            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr>
+            <tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
+            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr>
+            <tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>
+            <div class="box box-attention">Attention à la casse : <code>m</code> = milli, <code>M</code> = méga.</div>`
         },
         {
           title: "4. Tableaux de mesures",
@@ -671,14 +521,14 @@ const data = {
           preview: `<div class="table-wrap"><table><thead><tr><th>Temps (s)</th><th>Température (°C)</th></tr></thead>
             <tbody><tr><td>0</td><td>20,0</td></tr><tr><td>10</td><td>25,5</td></tr>
             <tr><td>20</td><td>31,2</td></tr><tr><td>30</td><td>37,8</td></tr></tbody></table></div>
-            <p>Utilisez <code>siunitx</code> pour aligner les nombres avec leurs unités.</p>`
+            <p>Pour aligner les nombres avec leurs unités, utilisez <code>siunitx</code> avec <code>S[table-format=...]</code>.</p>`
         },
         {
           title: "5. Graphiques",
           packages: ['pgfplots', 'siunitx'],
           code: `\\begin{axis}[xlabel=Temps, ylabel=Température]\n\\addplot[only marks, mark=*] coordinates {(0,20) (10,25.5)};\n\\end{axis}`,
           preview: `<div class="figure-tikz">[Courbe température en fonction du temps]</div>
-            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et tendances.</p>`
+            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et droites de tendance. Exemple : <code>\\addplot[red, thick] {0.5*x+20};</code></p>`
         },
         {
           title: "6. Circuits série et dérivation",
@@ -686,26 +536,29 @@ const data = {
           code: `\\begin{circuitikz}\n\\draw (0,0) to[battery1] (0,3) to[switch] (2,3) to[lamp] (2,0) -- (0,0);\n\\end{circuitikz}`,
           preview: `<div class="figure-tikz">[Circuit série avec pile, interrupteur et lampe]</div>
             <div class="box box-propriete">Série : $I$ constante, $U=U_1+U_2$<br>Dérivation : $U$ constante, $I=I_1+I_2$</div>
-            <p>Composants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>.</p>`
+            <p>Composants courants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>, <code>inductor</code>.</p>`
         },
         {
           title: "7. Schémas expérimentaux",
           packages: ['tikz'],
           code: `\\begin{tikzpicture}\n\\draw (0,0) -- (0,2) arc (180:0:1) -- (2,0);\n\\end{tikzpicture}`,
           preview: `<div class="figure-tikz">[Bécher]</div>
-            <p>Avec TikZ, on dessine du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc.</p>`
+            <p>Avec TikZ, on peut dessiner du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc. L'exemple ci-dessus dessine un bécher simple.</p>`
         },
         {
           title: "8. Modèles d'épreuves",
           packages: ['article', 'fancyhdr', 'circuitikz', 'pgfplots', 'chemformula'],
           code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} ...\n\\end{document}`,
-          preview: `<div class="box box-consigne">Structure d'une épreuve de physique :<ul><li>En-tête</li><li>Consignes</li><li>Exercices avec barème</li><li>Schémas et tableaux</li></ul></div>`
+          preview: `<div class="box box-consigne">Structure d'une épreuve de physique :<ul><li>En-tête (établissement, matière, classe, date).</li><li>Consignes générales.</li><li>Exercices avec barème.</li><li>Schémas, tableaux, graphiques intégrés.</li></ul></div>`
         },
         {
           title: "9. Ressources",
           packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Erreurs fréquentes : <code>chemformula</code> (syntaxe), <code>siunitx</code> (accolades), <code>circuitikz</code> (connexions).</p>`
+          preview: `<p>Erreurs fréquentes :</p>
+            <ul><li><code>chemformula</code> : syntaxe des formules (espaces, parenthèses).</li>
+            <li><code>siunitx</code> : accolades manquantes autour de l'unité.</li>
+            <li><code>circuitikz</code> : connexions incorrectes entre composants.</li></ul>`
         },
         {
           title: "10. Optique",
@@ -713,15 +566,16 @@ const data = {
           code: `\\begin{tikzpicture}\n\\draw[->] (0,0) -- (4,0);\n\\end{tikzpicture}`,
           preview: `<div class="box box-definition">Propagation rectiligne de la lumière</div>
             <div class="figure-tikz">[Schéma de lentille convergente]</div>
-            <p>La lumière se propage en ligne droite dans un milieu homogène. Les lentilles convergentes focalisent les rayons.</p>`
+            <p>La lumière se propage en ligne droite dans un milieu homogène. Les lentilles convergentes focalisent les rayons parallèles en un point appelé foyer.</p>`
         },
         {
           title: "11. Mécanique",
           packages: ['amsmath', 'tikz'],
           code: `$v = \\frac{d}{t}$\n$\\vec{P} = m\\vec{g}$`,
-          preview: `<div class="box box-definition">Vitesse moyenne : $v = \\frac{d}{t}$</div>
-            <div class="box box-theoreme">Poids : $\\vec{P} = m\\vec{g}$ avec $g \\approx 9,81$ m/s²</div>
-            <div class="figure-tikz">[Schéma de forces : poids et réaction]</div>`
+          preview: `<div class="box box-definition">Vitesse moyenne : $v = \\frac{d}{t}$ (m/s).</div>
+            <div class="box box-theoreme">Poids : $\\vec{P} = m\\vec{g}$ avec $g \\approx 9,81$ N/kg sur Terre.</div>
+            <div class="figure-tikz">[Schéma de forces : poids et réaction]</div>
+            <p>Les forces se représentent par des flèches : longueur proportionnelle à l'intensité.</p>`
         }
       ]
     },
@@ -739,24 +593,24 @@ const data = {
           title: "2. Équilibrage",
           packages: ['chemformula'],
           code: `\\ch{3Fe + 2O2 -> Fe3O4}`,
-          preview: `<p>Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
-            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients.</div>`
+          preview: `<p>Pour équilibrer une équation, on ajuste les coefficients stœchiométriques. Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
+            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients devant.</div>`
         },
         {
           title: "3. Solutions et concentration",
           packages: ['chemformula', 'siunitx'],
           code: `$C = \\frac{n}{V}$\n$n = \\frac{m}{M}$`,
-          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L)</p>
-            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol)</p>
-            <div class="box box-definition">Préparer une solution : dissoudre $m$ grammes de soluté dans $V$ litres de solvant.</div>`
+          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L).</p>
+            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol), avec $m$ la masse (g) et $M$ la masse molaire (g/mol).</p>
+            <div class="box box-definition">Préparer une solution : dissoudre une masse $m$ de soluté dans un volume $V$ de solvant.</div>`
         },
         {
           title: "4. Acides et bases",
           packages: ['chemformula', 'siunitx'],
           code: `$pH = -\\log[H_3O^+]$\n\\ch{HCl + NaOH -> NaCl + H2O}`,
-          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
+          preview: `<div class="box box-definition">Le pH est défini par $pH = -\\log[H_3O^+]$. Il varie de 0 (très acide) à 14 (très basique).</div>
             <div class="box box-definition">Neutralisation : $\\ch{HCl + NaOH -> NaCl + H2O}$</div>
-            <p>Indicateurs : tournesol (rouge acide, bleu basique), BBT (jaune acide, bleu basique).</p>`
+            <p>Indicateurs colorés : tournesol (rouge en acide, bleu en basique), BBT (jaune acide, bleu basique).</p>`
         }
       ]
     }
@@ -769,88 +623,99 @@ const data = {
           title: "1. Introduction",
           packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
           code: `\\usepackage{amsmath, amssymb}\n\\usepackage{pgfplots}\n\\usepackage{tkz-euclide}`,
-          preview: `<p>Packages avancés pour le lycée : <code>amsmath</code> (équations), <code>amssymb</code> (symboles), <code>pgfplots</code> (courbes), <code>tkz-euclide</code> (géométrie).</p>`
+          preview: `<p>Packages avancés pour le lycée :</p>
+            <ul><li><code>amsmath</code> : environnements mathématiques (equation, align, gather).</li>
+            <li><code>amssymb</code> : symboles supplémentaires ($\\mathbb{R}$, $\\mathcal{F}$).</li>
+            <li><code>pgfplots</code> : tracé de courbes de fonctions.</li>
+            <li><code>tkz-euclide</code> : géométrie euclidienne (tracés de triangles, cercles).</li></ul>`
         },
         {
           title: "2. Fonctions usuelles",
           packages: ['amsmath', 'pgfplots'],
           code: `$\\exp(x)=e^x$, $(e^x)'=e^x$\n$\\ln x$, $(\\ln x)'=1/x$\n$\\cos^2 x+\\sin^2 x=1$`,
-          preview: `<div class="box box-definition">Exponentielle : $e^x$, dérivée $(e^x)'=e^x$</div>
-            <div class="box box-definition">Logarithme : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$</div>
-            <div class="box box-theoreme">Identité : $\\cos^2 x + \\sin^2 x = 1$<br>$\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$</div>`
+          preview: `<div class="box box-definition">Fonction exponentielle : $e^x$, dérivée $(e^x)'=e^x$, primitive $\\int e^x dx = e^x+C$.</div>
+            <div class="box box-definition">Logarithme népérien : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$, primitive $\\int \\frac{1}{x} dx = \\ln|x|+C$.</div>
+            <div class="box box-theoreme">Identité fondamentale : $\\cos^2 x + \\sin^2 x = 1$.<br>Formules d'addition : $\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$, $\\sin(a+b)=\\sin a\\cos b + \\cos a\\sin b$.</div>`
         },
         {
           title: "3. Suites",
           packages: ['amsmath', 'pgfplots'],
           code: `$u_n=2n+1$\n$u_{n+1}=\\frac12 u_n+1$`,
-          preview: `<ul><li>Explicite : $u_n=2n+1$</li><li>Récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$</li></ul>
-            <div class="box box-propriete">Limite : $\\lim_{n\\to\\infty} u_n = L$</div>`
+          preview: `<ul><li>Suite explicite : $u_n=2n+1$.</li><li>Suite récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$.</li></ul>
+            <div class="box box-propriete">Limite d'une suite : $\\lim_{n\\to\\infty} u_n = L$.</div>
+            <p>Représentation graphique : on utilise <code>pgfplots</code> avec <code>only marks</code> pour les points.</p>`
         },
         {
           title: "4. Dérivation",
           packages: ['amsmath'],
           code: `$f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}$\n$(x^n)'=n x^{n-1}$`,
-          preview: `<div class="box box-theoreme">Formules :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
-            <p>Tangente : $y=f'(a)(x-a)+f(a)$</p>`
+          preview: `<div class="box box-theoreme">Formules de dérivation :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
+            <p>Tangente à la courbe en $a$ : $y=f'(a)(x-a)+f(a)$.</p>`
         },
         {
           title: "5. Intégration",
           packages: ['amsmath'],
           code: `$\\int_a^b f(x) dx$\n$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$`,
-          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$</div>`
+          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ (pour $n\\neq -1$)<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$<br>$\\int \\sin x dx = -\\cos x+C$</div>
+            <p>L'intégrale définie $\\int_a^b f(x) dx$ représente l'aire sous la courbe entre $x=a$ et $x=b$.</p>`
         },
         {
           title: "6. Nombres complexes",
           packages: ['amsmath', 'amssymb', 'tkz-euclide'],
           code: `$z=a+ib$, $z=re^{i\\theta}$\n$e^{i\\theta}=\\cos\\theta+i\\sin\\theta$`,
-          preview: `<div class="box box-theoreme">Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$</div>
-            <div class="figure-tikz">[Plan complexe]</div>
-            <p>Affixe : $z = x + iy$ correspond au point $(x; y)$.</p>`
+          preview: `<div class="box box-theoreme">Formule d'Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$.</div>
+            <div class="figure-tikz">[Plan complexe avec affixe $z=x+iy$]</div>
+            <p>Affixe : $z = x + iy$ correspond au point $(x; y)$. Le module est $|z|=\\sqrt{x^2+y^2}$, l'argument $\\arg(z)=\\theta$.</p>`
         },
         {
           title: "7. Géométrie analytique",
           packages: ['amsmath', 'tikz'],
           code: `$\\overrightarrow{AB}=\\begin{pmatrix} x_B-x_A \\\\ y_B-y_A \\end{pmatrix}$\n$\\vec u\\cdot\\vec v = x_ux_v+y_uy_v$`,
-          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$</div>
-            <p>Orthogonalité : $\\vec u \\perp \\vec v \\iff \\vec u\\cdot\\vec v = 0$</p>`
+          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$.</div>
+            <p>Orthogonalité : $\\vec u \\perp \\vec v \\iff \\vec u\\cdot\\vec v = 0$.</p>
+            <p>Équation de droite : $ax+by+c=0$. Vecteur normal $\\vec n(a,b)$.</p>`
         },
         {
-          title: "8. Géométrie 3D",
+          title: "8. Géométrie dans l'espace",
           packages: ['tikz', 'amsmath'],
           code: `$AB=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$`,
-          preview: `<div class="figure-tikz">[Parallélépipède]</div>
-            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$</p>
-            <p>Milieu : $I(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}, \\frac{z_A+z_B}{2})$</p>`
+          preview: `<div class="figure-tikz">[Parallélépipède rectangle]</div>
+            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$.</p>
+            <p>Milieu : $I\\left(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}, \\frac{z_A+z_B}{2}\\right)$.</p>
+            <p>Produit scalaire dans l'espace : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v+z_uz_v$.</p>`
         },
         {
           title: "9. Probabilités",
           packages: ['amsmath', 'pgfplots'],
           code: `$E(X)=\\sum x_i P(X=x_i)$\n$P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$`,
-          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$</div>
-            <div class="box box-definition">Variance : $V(X)=E(X^2)-(E(X))^2$</div>
-            <div class="box box-definition">Loi binomiale : $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$</div>`
+          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$.</div>
+            <div class="box box-definition">Variance : $V(X)=E(X^2)-(E(X))^2$, écart-type $\\sigma=\\sqrt{V(X)}$.</div>
+            <div class="box box-definition">Loi binomiale : $X\\sim \\mathcal{B}(n,p)$ avec $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$.</div>`
         },
         {
           title: "10. Équations différentielles",
           packages: ['amsmath'],
           code: `$y'+ay=b$ solution : $y=Ce^{-ax}+b/a$\n$y''+\\omega^2 y=0$`,
-          preview: `<p>Ordre 1 : $y'+ay=b \\Rightarrow y=Ce^{-ax}+\\frac{b}{a}$</p>
-            <p>Ordre 2 : $y''+\\omega^2 y=0 \\Rightarrow y=A\\cos(\\omega x)+B\\sin(\\omega x)$</p>
-            <p>Régime critique, apériodique, pseudo-périodique.</p>`
+          preview: `<p>Équation différentielle linéaire d'ordre 1 : $y'+ay=b$.</p>
+            <p>Solution générale : $y(x)=Ce^{-ax}+\\frac{b}{a}$ (si $a\\neq0$).</p>
+            <p>Équation différentielle linéaire d'ordre 2 : $y''+\\omega^2 y=0$.</p>
+            <p>Solution : $y(x)=A\\cos(\\omega x)+B\\sin(\\omega x)$.</p>`
         },
         {
           title: "11. Matrices",
           packages: ['amsmath'],
           code: `$A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$\n$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$`,
-          preview: `<div class="box box-definition">Inverse d'une matrice 2×2 :<br>$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$</div>
-            <p>Matrice identité : $I_2 = \\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}$</p>`
+          preview: `<div class="box box-definition">Matrice $2\\times2$ : $A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$.</div>
+            <div class="box box-definition">Inverse : $A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$ (si $ad-bc\\neq0$).</div>
+            <p>Matrice identité : $I_2=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}$.</p>`
         },
         {
           title: "12. Ressources",
           packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Packages incontournables : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>
-            <p>Compilation : <code>pdflatex</code> ou <code>lualatex</code>.</p>`
+          preview: `<p>Packages incontournables pour le lycée : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>
+            <p>Compilation : <code>pdflatex</code> ou <code>lualatex</code>.</p>
+            <p>Ressources : Overleaf (en ligne), TeX StackExchange (forum), CTAN (documentation des packages).</p>`
         }
       ]
     },
@@ -861,69 +726,79 @@ const data = {
           title: "1. Introduction",
           packages: ['siunitx', 'pgfplots', 'circuitikz', 'tikz'],
           code: `\\usepackage{siunitx}\n\\usepackage{pgfplots}\n\\usepackage{circuitikz}\n\\usepackage{tikz}`,
-          preview: `<p>Packages : <code>siunitx</code> (unités), <code>pgfplots</code> (courbes), <code>circuitikz</code> (électricité), <code>tikz</code> (figures).</p>`
+          preview: `<p>Packages essentiels pour la physique au lycée :</p>
+            <ul><li><code>siunitx</code> : unités SI.</li>
+            <li><code>pgfplots</code> : graphiques.</li>
+            <li><code>circuitikz</code> : schémas électriques.</li>
+            <li><code>tikz</code> : figures générales.</li></ul>`
         },
         {
-          title: "2. Mécanique",
+          title: "2. Mécanique – Cinématique et dynamique",
           packages: ['amsmath', 'tikz', 'pgfplots'],
           code: `$\\vec v = \\frac{d\\vec{OM}}{dt}$\n$\\sum\\vec F_{ext}=m\\vec a$`,
-          preview: `<div class="box box-theoreme">PFD : $\\sum\\vec F_{ext}=m\\vec a$</div>
-            <div class="figure-tikz">[Schéma de forces]</div>
+          preview: `<div class="box box-theoreme">Principe fondamental de la dynamique (PFD) : $\\sum\\vec F_{ext}=m\\vec a$.</div>
+            <div class="figure-tikz">[Schéma de forces sur un solide]</div>
             <p>Projection sur les axes : $\\sum F_x = m a_x$, $\\sum F_y = m a_y$.</p>`
         },
         {
           title: "3. Énergie mécanique",
           packages: ['amsmath', 'pgfplots'],
           code: `$E_c=\\frac12 mv^2$, $E_p=mgh$, $E_m=E_c+E_p$`,
-          preview: `<div class="box box-theoreme">Conservation : $\\Delta E_m=0$ si forces conservatives</div>
-            <p>Travail : $W_{AB}(\\vec F) = \\vec F \\cdot \\overrightarrow{AB}$</p>`
+          preview: `<div class="box box-theoreme">Conservation de l'énergie mécanique : $\\Delta E_m = 0$ si les forces sont conservatives.</div>
+            <p>Énergie cinétique : $E_c=\\frac12 mv^2$.</p>
+            <p>Énergie potentielle de pesanteur : $E_p=mgh$.</p>
+            <p>Travail d'une force constante : $W_{AB}(\\vec F) = \\vec F \\cdot \\overrightarrow{AB}$.</p>`
         },
         {
-          title: "4. Électricité",
+          title: "4. Électricité – Régime continu et variable",
           packages: ['amsmath', 'circuitikz', 'pgfplots'],
           code: `$u_C(t)=E(1-e^{-t/RC})$\n$i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$`,
-          preview: `<div class="figure-tikz">[Circuit RC]</div>
-            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$</p>
-            <p>Constante de temps : $\\tau = RC$</p>
-            <p>Décharge : $u_C(t)=E e^{-t/RC}$</p>`
+          preview: `<div class="figure-tikz">[Circuit RC série]</div>
+            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$, avec $\\tau=RC$ la constante de temps.</p>
+            <p>Décharge : $u_C(t)=E e^{-t/RC}$.</p>
+            <p>Circuit RL : $i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$.</p>`
         },
         {
-          title: "5. Thermodynamique",
+          title: "5. Thermodynamique – Gaz parfait",
           packages: ['amsmath', 'pgfplots'],
           code: `$PV=nRT$\n$\\Delta U=W+Q$`,
-          preview: `<div class="box box-definition">Gaz parfait : $PV=nRT$</div>
-            <div class="box box-definition">Premier principe : $\\Delta U=W+Q$</div>
-            <p>Isotherme : $PV = cste$ ; Isobare : $V/T = cste$.</p>`
+          preview: `<div class="box box-definition">Équation d'état des gaz parfaits : $PV=nRT$.</div>
+            <div class="box box-definition">Premier principe de la thermodynamique : $\\Delta U = W + Q$.</div>
+            <p>Isotherme : $PV = \\text{cste}$ ; Isobare : $V/T = \\text{cste}$ ; Isochore : $P/T = \\text{cste}$.</p>`
         },
         {
-          title: "6. Ondes",
+          title: "6. Ondes mécaniques et lumineuses",
           packages: ['amsmath', 'pgfplots'],
           code: `$y(x,t)=A\\cos(\\omega t-kx)$`,
-          preview: `<div class="figure-tikz">[Onde sinusoïdale]</div>
-            <p>Longueur d'onde : $\\lambda = \\frac{2\\pi}{k}$ ; Période : $T = \\frac{2\\pi}{\\omega}$</p>
-            <p>Célérité : $v = \\lambda f$</p>`
+          preview: `<div class="figure-tikz">[Onde progressive sinusoïdale]</div>
+            <p>Onde progressive : $y(x,t)=A\\cos(\\omega t - kx)$.</p>
+            <p>Longueur d'onde : $\\lambda = \\frac{2\\pi}{k}$ ; Période : $T = \\frac{2\\pi}{\\omega}$ ; Célérité : $v = \\lambda f$.</p>`
         },
         {
           title: "7. Physique nucléaire",
           packages: ['amsmath', 'chemformula', 'pgfplots'],
           code: `$N(t)=N_0e^{-\\lambda t}$\n$t_{1/2}=\\frac{\\ln2}{\\lambda}$\n\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}`,
-          preview: `<div class="box box-definition">Décroissance : $N=N_0e^{-\\lambda t}$, $t_{1/2}=\\ln2/\\lambda$</div>
-            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$</div>
-            <div class="box box-theoreme">Fusion : $\\ch{^2_1H + ^3_1H -> ^4_2He + n}$</div>`
+          preview: `<div class="box box-definition">Loi de décroissance radioactive : $N(t)=N_0e^{-\\lambda t}$.</div>
+            <div class="box box-definition">Temps de demi-vie : $t_{1/2}=\\frac{\\ln 2}{\\lambda}$.</div>
+            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$.</div>
+            <div class="box box-theoreme">Fusion : $\\ch{^2_1H + ^3_1H -> ^4_2He + n}$.</div>`
         },
         {
           title: "8. Mécanique des fluides",
           packages: ['amsmath', 'tikz'],
           code: `$P=F/S$\n$\\Delta P = \\rho g \\Delta h$\n$\\vec F_A = -\\rho_f V_{im}\\vec g$`,
-          preview: `<div class="box box-definition">Pression : $P=F/S$</div>
-            <div class="box box-propriete">Pression hydrostatique : $\\Delta P = \\rho g \\Delta h$</div>
-            <div class="box box-theoreme">Archimède : $\\vec F_A = -\\rho_f V_{im}\\vec g$</div>`
+          preview: `<div class="box box-definition">Pression : $P=\\frac{F}{S}$ (Pa).</div>
+            <div class="box box-propriete">Pression hydrostatique : $\\Delta P = \\rho g \\Delta h$.</div>
+            <div class="box box-theoreme">Principe d'Archimède : $\\vec F_A = -\\rho_f V_{im} \\vec g$.</div>`
         },
         {
           title: "9. Ressources",
           packages: ['siunitx', 'circuitikz', 'pgfplots', 'chemformula'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Erreurs : <code>circuitikz</code> (connexions), <code>pgfplots</code> (domaines), <code>chemformula</code> (syntaxe).</p>`
+          preview: `<p>Erreurs fréquentes :</p>
+            <ul><li><code>circuitikz</code> : vérifier les coordonnées des connexions.</li>
+            <li><code>pgfplots</code> : adapter le domaine et les échantillons.</li>
+            <li><code>chemformula</code> : respecter la syntaxe (espaces, parenthèses).</li></ul>`
         }
       ]
     },
@@ -934,52 +809,61 @@ const data = {
           title: "1. Introduction",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `\\usepackage{chemformula}\n\\usepackage{siunitx}\n\\usepackage{pgfplots}`,
-          preview: `<p>Packages : <code>chemformula</code> (chimie), <code>siunitx</code> (unités), <code>pgfplots</code> (courbes de titrage).</p>`
+          preview: `<p>Packages spécifiques pour la chimie au lycée :</p>
+            <ul><li><code>chemformula</code> : formules et équations chimiques.</li>
+            <li><code>siunitx</code> : unités et grandeurs.</li>
+            <li><code>pgfplots</code> : tracé de courbes de titrage, de cinétique.</li></ul>`
         },
         {
-          title: "2. Acides et bases",
+          title: "2. Acides et bases – pH",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `$pH=-\\log[H_3O^+]$\n$K_a = \\frac{[A^-][H_3O^+]}{[HA]}$\n$pH = pK_a + \\log\\frac{[A^-]}{[HA]}$`,
-          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
-            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$</div>
-            <p>Henderson-Hasselbalch : $pH = pK_a + \\log\\frac{[A^-]}{[HA]}$</p>`
+          preview: `<div class="box box-definition">$pH = -\\log[H_3O^+]$.</div>
+            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$.</div>
+            <div class="box box-propriete">Relation de Henderson-Hasselbalch : $pH = pK_a + \\log\\frac{[A^-]}{[HA]}$.</div>`
         },
         {
           title: "3. Oxydoréduction",
           packages: ['chemformula', 'amsmath'],
           code: `\\ch{Fe^{2+} -> Fe^{3+} + e-}\n\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}\n$E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$`,
-          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$</div>
-            <p>Pile : $E_{pile} = E_{cathode} - E_{anode}$</p>`
+          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$ (à 25°C).</div>
+            <p>Demi-équations : <br>$\\ch{Fe^{2+} -> Fe^{3+} + e-}$<br>$\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}$</p>
+            <p>Pile : $E_{pile}=E_{cathode}-E_{anode}$.</p>`
         },
         {
-          title: "4. Cinétique",
+          title: "4. Cinétique chimique",
           packages: ['amsmath', 'pgfplots'],
           code: `$v=-\\frac{d[A]}{dt}$\n$v=k[A]$ (ordre 1)\n$t_{1/2}=\\frac{\\ln2}{k}$`,
           preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>
-            <p>Temps de demi-réaction : $t_{1/2}=\\ln2/k$</p>
-            <p>Ordre 2 : $v=k[A]^2$, $t_{1/2}=1/(k[A]_0)$</p>`
+            <p>Vitesse de réaction : $v=-\\frac{d[A]}{dt}$.</p>
+            <p>Réaction d'ordre 1 : $v=k[A]$, temps de demi-réaction $t_{1/2}=\\frac{\\ln 2}{k}$.</p>
+            <p>Réaction d'ordre 2 : $v=k[A]^2$, $t_{1/2}=\\frac{1}{k[A]_0}$.</p>`
         },
         {
           title: "5. Chimie organique",
           packages: ['chemformula'],
           code: `\\ch{C_nH_{2n+2}}\n\\ch{CH4}, \\ch{C2H6}, \\ch{C3H8}\nAlcool : \\ch{R-OH}`,
-          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$<br>Méthane $\\ch{CH4}$, Éthane $\\ch{C2H6}$, Propane $\\ch{C3H8}$</p>
-            <p>Groupes fonctionnels : Alcool $\\ch{R-OH}$, Acide carboxylique $\\ch{R-COOH}$</p>
-            <p>Estérification : $\\ch{R-COOH + R'-OH -> R-COOR' + H2O}$</p>`
+          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$.</p>
+            <ul><li>Méthane $\\ch{CH4}$</li><li>Éthane $\\ch{C2H6}$</li><li>Propane $\\ch{C3H8}$</li></ul>
+            <p>Groupes fonctionnels :</p>
+            <ul><li>Alcool : $\\ch{R-OH}$</li><li>Acide carboxylique : $\\ch{R-COOH}$</li><li>Ester : $\\ch{R-COOR'}$</li></ul>`
         },
         {
           title: "6. Thermodynamique chimique",
           packages: ['amsmath', 'chemformula'],
           code: `$\\Delta H = H_{prod}-H_{réact}$\n$\\Delta G = \\Delta H - T\\Delta S$\n$\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$`,
-          preview: `<div class="box box-definition">Enthalpie : $\\Delta H = H_{prod}-H_{réact}$</div>
-            <div class="box box-theoreme">Gibbs : $\\Delta G = \\Delta H - T\\Delta S$</div>
-            <div class="box box-theoreme">Loi de Hess : $\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$</div>`
+          preview: `<div class="box box-definition">Enthalpie de réaction : $\\Delta H = H_{prod}-H_{réact}$.</div>
+            <div class="box box-definition">Entropie : $\\Delta S = S_{prod}-S_{réact}$.</div>
+            <div class="box box-theoreme">Énergie libre de Gibbs : $\\Delta G = \\Delta H - T\\Delta S$. Réaction spontanée si $\\Delta G<0$.</div>
+            <div class="box box-theoreme">Loi de Hess : $\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod) - \\sum\\Delta H_f^\\circ(réact)$.</div>`
         },
         {
           title: "7. Ressources",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Erreurs : <code>chemformula</code> (espaces, parenthèses), <code>siunitx</code> (séparation nombre/unité).</p>`
+          preview: `<p>Erreurs fréquentes :</p>
+            <ul><li><code>chemformula</code> : vérifier les espaces et parenthèses dans les formules.</li>
+            <li><code>siunitx</code> : séparer correctement le nombre et l'unité (ex: <code>\\SI{5}{mol}</code>).</li></ul>`
         }
       ]
     }
@@ -987,7 +871,7 @@ const data = {
 };
 
 // =================================================================
-// 3. SOURCE LATEX POUR LE COMPOSEUR
+// 3. SOURCE LATEX POUR LE COMPOSEUR (complète avec des blocs lstlisting)
 // =================================================================
 const LATEX_SOURCE = String.raw`
 \documentclass[a4paper,12pt]{article}
@@ -1097,8 +981,237 @@ des documents scientifiques de qualité
 \tableofcontents
 \newpage
 
-% Leçons 1 à 10 avec des blocs lstlisting...
-% ... (contenu complet déjà présent dans la version précédente)
+% ===================================================================
+% Leçon 1 : Découverte de \LaTeX
+% ===================================================================
+\section{Leçon 1 : Découverte de \LaTeX}
+
+\textbf{Objectifs :}
+\begin{itemize}
+\item Comprendre le principe de compilation d'un document \LaTeX
+\item Connaître la structure minimale d'un fichier \lstinline|.tex|
+\item Savoir organiser un document avec \lstinline|\section| et \lstinline|\subsection|
+\item Maîtriser les commandes de base : \lstinline|\textbf|, \lstinline|\textit|, \lstinline|\underline|
+\end{itemize}
+
+\LaTeX\, est un système de composition de documents particulièrement adapté aux mathématiques, à la physique et à la chimie.
+
+\begin{lstlisting}[style=mylatex]
+\documentclass[a4paper,12pt]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\begin{document}
+Bonjour le monde ! Ceci est mon premier document \LaTeX.
+\end{document}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mylatex]
+\section{Introduction}
+\subsection{Première sous-section}
+Ceci est un texte \textbf{en gras}, \textit{en italique} et \underline{souligné}.
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 2 : Mathématiques -- notions fondamentales
+% ===================================================================
+\section{Leçon 2 : Mathématiques -- notions fondamentales}
+
+\subsection{Opérations de base}
+
+\begin{lstlisting}[style=mylatex]
+$a + b = c$, $a - b = c$, $a \times b = c$, $a \div b = c$
+$\frac{a}{b}$, $a^{n}$, $a_{n}$, $\sqrt{x}$, $\sqrt[n]{x}$
+\end{lstlisting}
+
+\subsection{Lettres grecques}
+
+\begin{lstlisting}[style=mylatex]
+$\alpha$, $\beta$, $\gamma$, $\delta$, $\theta$, $\pi$, $\omega$
+$\Gamma$, $\Delta$, $\Theta$, $\Pi$, $\Sigma$, $\Omega$
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 3 : Mathématiques -- outils avancés
+% ===================================================================
+\section{Leçon 3 : Mathématiques -- outils avancés}
+
+\subsection{Intégrales et dérivées}
+
+\begin{lstlisting}[style=mylatex]
+$\int_{a}^{b} f(x) dx$, $\iint_{D} f(x,y) dxdy$
+$f'(x)=\frac{df}{dx}$, $\frac{\partial f}{\partial x}$
+$\lim_{x\to a} f(x)=L$, $\nabla f$
+\end{lstlisting}
+
+\subsection{Matrices}
+
+\begin{lstlisting}[style=mylatex]
+$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$,
+$\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad-bc$
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 4 : Chimie avec \LaTeX
+% ===================================================================
+\section{Leçon 4 : Chimie avec \LaTeX}
+
+\subsection{Formules chimiques}
+
+\begin{lstlisting}[style=mylatex]
+\ce{H2O}, \ce{CO2}, \ce{C6H12O6}, \ce{NaCl}, \ce{H2SO4}
+\end{lstlisting}
+
+\subsection{Équations chimiques}
+
+\begin{lstlisting}[style=mylatex]
+\ce{2 H2 + O2 -> 2 H2O}
+\ce{CH4 + 2 O2 -> CO2 + 2 H2O}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 5 : Tableaux, figures et schémas
+% ===================================================================
+\section{Leçon 5 : Tableaux, figures et schémas}
+
+\subsection{Tableaux}
+
+\begin{lstlisting}[style=mylatex]
+\begin{tabular}{|l|c|r|}
+\hline
+Nom & Symbole & Masse (g) \\
+\hline
+Hydrogène & H & 1,008 \\
+Carbone & C & 12,011 \\
+\hline
+\end{tabular}
+\end{lstlisting}
+
+\subsection{TikZ}
+
+\begin{lstlisting}[style=mylatex]
+\begin{tikzpicture}
+\draw[->] (0,0) -- (3,0);
+\draw[->] (0,0) -- (0,3);
+\end{tikzpicture}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 6 : Pédagogie -- exercices et présentations
+% ===================================================================
+\section{Leçon 6 : Pédagogie -- exercices et présentations}
+
+\subsection{Énoncé d'exercice}
+
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice 1 -- Vitesse}
+Un automobiliste parcourt 150 km en 2h30min.
+\begin{enumerate}
+\item Quelle est sa vitesse moyenne en km/h ?
+\item Exprime cette vitesse en m/s.
+\end{enumerate}
+\end{lstlisting}
+
+\subsection{Beamer}
+
+\begin{lstlisting}[style=mylatex]
+\documentclass{beamer}
+\usetheme{Madrid}
+\begin{frame}{Titre}
+Contenu...
+\end{frame}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 7 : Mise en page avancée
+% ===================================================================
+\section{Leçon 7 : Mise en page avancée}
+
+\subsection{Boîtes et couleurs}
+
+\begin{lstlisting}[style=mylatex]
+\fbox{Texte encadré}
+\colorbox{blue!20}{Fond bleu}
+\textcolor{red}{Texte rouge}
+\definecolor{myblue}{RGB}{0,102,204}
+\end{lstlisting}
+
+\subsection{Filigrane}
+
+\begin{lstlisting}[style=mylatex]
+\usepackage{draftwatermark}
+\SetWatermarkText{CONFIDENTIEL}
+\SetWatermarkScale{3}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 8 : Mathématiques et sciences au lycée
+% ===================================================================
+\section{Leçon 8 : Mathématiques et sciences au lycée}
+
+\subsection{pgfplots}
+
+\begin{lstlisting}[style=mylatex]
+\begin{axis}[xlabel=$x$, ylabel=$y$, grid=major]
+\addplot[blue,thick] {x^2};
+\end{axis}
+\end{lstlisting}
+
+\subsection{circuitikz}
+
+\begin{lstlisting}[style=mylatex]
+\begin{circuitikz}
+\draw (0,0) to[battery] (0,2) to[lamp] (3,2) to[switch] (3,0) -- (0,0);
+\end{circuitikz}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 9 : Pédagogie -- interactivité et évaluation
+% ===================================================================
+\section{Leçon 9 : Pédagogie -- interactivité et évaluation}
+
+\subsection{Exercices à trous}
+
+\begin{lstlisting}[style=mylatex]
+Le nom de ce gaz est \rule{3cm}{0.5pt}.
+$\_\_ + 5 = 12$
+\end{lstlisting}
+
+\subsection{QCM}
+
+\begin{lstlisting}[style=mylatex]
+\begin{enumerate}[label=\alph*)]
+\item \ce{CO2}
+\item \ce{H2O}
+\end{enumerate}
+\end{lstlisting}
+
+\subsection{bclogo}
+
+\begin{lstlisting}[style=mylatex]
+\bcattention{Attention !}
+\bcinfo{Information}
+\bcexemple{Exemple}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 10 : Projet final et ressources
+% ===================================================================
+\section{Leçon 10 : Projet final et ressources}
+
+\subsection{Aide-mémoire}
+
+\begin{lstlisting}[style=mylatex]
+\begin{tabular}{ll}
+\lstinline|\textbf{}| & Gras \\
+\lstinline|\textit{}| & Italique \\
+\lstinline|$...$| & Maths en ligne \\
+\lstinline|\frac{}{}| & Fraction \\
+\lstinline|\ce{}| & Formule chimique \\
+\lstinline|\times| & Multiplier \\
+\lstinline|\vec{}| & Vecteur \\
+\end{tabular}
+\end{lstlisting}
+
 \end{document}
 `;
 
@@ -1288,7 +1401,6 @@ function renderFormationWidgets() {
   }
 
   let chapters = module.chapters;
-  // Appliquer le filtre de recherche
   const searchTerm = currentSearchTerm.trim().toLowerCase();
   if (searchTerm) {
     chapters = chapters.filter(chap => chap.title.toLowerCase().includes(searchTerm));
@@ -1356,7 +1468,6 @@ function copyCodeFormation(btn, index) {
   const matiere = document.getElementById('matiereSelect').value;
   const module = data[niveau]?.[matiere];
   if (!module) return;
-  // Les chapitres filtrés sont dans la grille, mais on utilise l'index dans la liste filtrée.
   const chaptersFiltres = module.chapters.filter(chap => {
     if (!currentSearchTerm) return true;
     return chap.title.toLowerCase().includes(currentSearchTerm.trim().toLowerCase());
@@ -1423,7 +1534,7 @@ function projectChapterFormation(index) {
 }
 
 // =================================================================
-// 6. FONCTIONS DE BASCULE DE MODE ET INIT
+// 6. FONCTIONS DE BASCULE DE MODE
 // =================================================================
 function switchMode(mode) {
   document.body.classList.remove('composeur-mode');
@@ -1446,7 +1557,7 @@ function sanitize(s) { return escHtml(s); }
 // 7. INITIALISATION
 // =================================================================
 document.addEventListener('DOMContentLoaded', function() {
-  // Formation : sélecteurs et recherche
+  // Formation
   document.getElementById('niveauSelect').addEventListener('change', function() { renderFormationWidgets(); });
   document.getElementById('matiereSelect').addEventListener('change', function() { renderFormationWidgets(); });
   const searchInput = document.getElementById('searchChapitre');
