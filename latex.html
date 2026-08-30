@@ -1,5 +1,2437 @@
 <!DOCTYPE html>
+<!-- =============<!DOCTYPE html>
 <!-- ============================================================
+  Fichier : formation_complete.html
+  Projet  : Plateforme LaTeX – Formation & Composeur
+  Description :
+    Version finale avec tous les chapitres enrichis,
+    filtre de recherche par chapitre, responsive,
+    contenu pédagogique complet avec exemples et exercices.
+    Le mode Composeur contient des blocs lstlisting réels.
+============================================================ -->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>LaTeX – Formation & Composeur</title>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
+
+  <style>
+    /* ========== RESET & VARIABLES ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f7fa;
+      --card: #fff;
+      --text: #1e293b;
+      --text2: #6b7280;
+      --primary: #2563eb;
+      --primary2: #3b82f6;
+      --border: #e5e7eb;
+      --radius: 10px;
+      --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 20px 30px 40px;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    h1 { font-size: 28px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .subtitle { color: #475569; margin-bottom: 24px; font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; }
+
+    /* ========== SÉLECTEURS ET FILTRES ========== */
+    .selectors {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
+      background: #f1f5f9; padding: 16px 20px; border-radius: 12px;
+      align-items: center; transition: background 0.3s;
+    }
+    .selectors label { font-weight: 600; font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .selectors select {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1;
+      background: white; font-size: 14px; font-weight: 500; cursor: pointer;
+      outline: none; transition: border 0.2s;
+      min-width: 120px;
+    }
+    .selectors select:focus { border-color: #3b82f6; }
+    .btn-projector {
+      margin-left: auto; background: #1e293b; color: white; border: none;
+      padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-projector:hover { background: #0f172a; }
+
+    .filters-extra {
+      display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 20px; padding: 8px 0; align-items: center;
+    }
+    .filters-extra .search-box {
+      display: flex; align-items: center; gap: 8px; flex: 1 1 240px;
+      min-width: 160px;
+    }
+    .filters-extra .search-box label { font-weight: 600; font-size: 14px; color: #334155; white-space: nowrap; }
+    .filters-extra .search-box input {
+      flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;
+      font-size: 14px; outline: none; transition: border 0.2s; min-width: 100px;
+      width: 100%;
+    }
+    .filters-extra .search-box input:focus { border-color: #3b82f6; }
+
+    /* ========== GRILLE DE WIDGETS ========== */
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .widget {
+      background: var(--card, #fff);
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .widget:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .widget-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .widget-header .label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; }
+    .widget-header .section-tag {
+      font-size: 10px; background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 4px;
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500;
+    }
+
+    /* ---- Introduction (aperçu) ---- */
+    .widget-intro {
+      padding: 14px 16px;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .widget-intro .intro-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .widget-intro .intro-content p:first-child { margin-top: 0; }
+    .widget-intro .intro-content p:last-child { margin-bottom: 0; }
+    .widget-intro .intro-toggle {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .widget-intro .intro-toggle:hover { text-decoration: underline; }
+
+    /* ---- Packages ---- */
+    .widget-packages {
+      background: #eef2ff;
+      border-bottom: 1px solid #c7d2fe;
+      padding: 10px 14px;
+    }
+    .widget-packages .packages-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #4338ca;
+      margin-bottom: 4px;
+    }
+    .widget-packages .pkg-item {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      padding: 3px 0;
+      border-bottom: 1px solid #e0e7ff;
+      font-size: 13px;
+    }
+    .widget-packages .pkg-item:last-child { border-bottom: none; }
+    .widget-packages .pkg-name { font-weight: 700; color: #4338ca; min-width: 100px; }
+    .widget-packages .pkg-role { color: #1e293b; }
+    .widget-packages .pkg-importance { color: #b45309; font-size: 0.9em; }
+    .widget-packages .pkg-importance strong { color: #92400e; }
+
+    /* ---- Code ---- */
+    .widget-code {
+      position: relative; padding: 14px; overflow-x: auto; max-height: 280px; overflow-y: auto;
+      flex: 1;
+      background: #f8fafc;
+    }
+    .widget-code pre {
+      font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre; tab-size: 4;
+      margin: 0;
+      min-width: 0;
+    }
+    .widget-code .copy-btn {
+      position: absolute; top: 6px; right: 6px; opacity: 0; transition: opacity 0.15s;
+      background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 10px;
+      cursor: pointer; color: #6b7280;
+    }
+    .widget-code:hover .copy-btn { opacity: 1; }
+    .widget-code .copy-btn:hover { background: #f8fafc; color: var(--text); }
+
+    /* ---- Footer ---- */
+    .widget-footer {
+      padding: 8px 14px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: #fafbfc;
+    }
+    .widget-footer .index { font-size: 11px; color: #6b7280; }
+    .widget-footer .project-btn {
+      font-size: 11px; padding: 3px 10px; border: 1px solid var(--primary); border-radius: 6px;
+      background: transparent; color: var(--primary); cursor: pointer; transition: all 0.15s; font-weight: 500;
+    }
+    .widget-footer .project-btn:hover { background: var(--primary); color: #fff; }
+
+    /* ========== STYLES POUR LE CONTENU DES INTRODUCTIONS ========== */
+    .box { border-left: 6px solid #3b82f6; background: #f8fafc; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow-x: auto; }
+    .box-title { font-weight: 700; color: #0f172a; display: block; margin-bottom: 6px; font-size: 16px; }
+    .box-definition { border-left-color: #8b5cf6; background: #f5f3ff; }
+    .box-propriete { border-left-color: #f59e0b; background: #fffbeb; }
+    .box-theoreme { border-left-color: #ef4444; background: #fef2f2; }
+    .box-consigne { border-left-color: #6366f1; background: #eef2ff; }
+    .box-methode { border-left-color: #14b8a6; background: #f0fdfa; }
+    .box-attention { border-left-color: #f43f5e; background: #ffe4e6; }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 280px; }
+    th, td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: center; }
+    th { background: #f1f5f9; font-weight: 600; }
+
+    .figure-tikz { text-align: center; margin: 16px 0; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px dashed #94a3b8; font-family: var(--mono); font-size: 13px; color: #475569; overflow-x: auto; }
+
+    /* ========== COLORATION SYNTAXIQUE ========== */
+    .hl-kw { color: #a78bfa; }
+    .hl-cmt { color: #64748b; font-style: italic; }
+    .hl-str { color: #4ade80; }
+    .hl-fn { color: #818cf8; }
+    .hl-num { color: #fb923c; }
+    .hl-bra { color: #22d3ee; }
+    .hl-sec { color: #facc15; }
+
+    .stats { font-size: 13px; color: #6b7280; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .stats strong { color: #1e293b; }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #6b7280; }
+
+    /* ========== MODE TOGGLE ========== */
+    .mode-toggle { display: flex; align-items: center; gap: 10px; margin-left: 20px; flex-wrap: wrap; }
+    .mode-toggle .toggle-label { font-size: 13px; font-weight: 500; color: #334155; }
+    .mode-toggle .toggle-btn {
+      background: #e2e8f0; border: none; border-radius: 30px; padding: 4px 12px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #1e293b;
+    }
+    .mode-toggle .toggle-btn.active { background: #3b82f6; color: white; }
+    .mode-toggle .toggle-btn:hover { opacity: 0.8; }
+
+    .mode-formation { display: block; }
+    .mode-composeur { display: none; }
+    body.composeur-mode .mode-formation { display: none; }
+    body.composeur-mode .mode-composeur { display: block; }
+
+    /* ========== COMPOSEUR CONTROLS ========== */
+    .composeur-controls { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 10px 14px; background: #f1f5f9; border-radius: 8px; }
+    .composeur-controls label { font-weight: 600; font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .composeur-controls select { padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; font-size: 13px; cursor: pointer; outline: none; flex: 1; min-width: 100px; }
+
+    /* ========== PROJECTEUR ========== */
+    #projector {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0f172a; z-index: 1000; flex-direction: column; color: #fff;
+    }
+    #projector.active { display: flex; }
+    .projector-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 50% 30%, #1e293b 0%, #0f172a 70%); z-index: -1; }
+    .projector-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; gap: 12px; }
+    .projector-header .title { font-size: 15px; font-weight: 600; opacity: 0.85; }
+    .projector-header .title span { color: #60a5fa; }
+    .projector-controls .btn-exit { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+    .projector-controls .btn-exit:hover { background: #dc2626; border-color: #dc2626; }
+    .projector-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow: auto; }
+    .projector-slide { max-width: 1050px; width: 100%; }
+    .projector-slide .slide-section { text-align: center; margin-bottom: 6px; font-size: 13px; color: #60a5fa; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; }
+    .projector-slide .slide-title { text-align: center; margin-bottom: 6px; font-size: 24px; font-weight: 700; color: #f1f5f9; }
+    .projector-slide .slide-expl { text-align: center; margin-bottom: 22px; font-size: 15px; color: #94a3b8; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+    .projector-slide .slide-code { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 28px 36px; border: 1px solid rgba(255,255,255,0.08); max-height: 55vh; overflow: auto; }
+    .projector-slide .slide-code pre { font-family: var(--mono); font-size: 17px; line-height: 1.7; white-space: pre; color: #e2e8f0; margin: 0; }
+    .projector-slide .slide-hint { text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.3); }
+    .projector-nav { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px; background: rgba(0,0,0,0.3); flex-wrap: wrap; }
+    .projector-nav span { font-size: 13px; color: rgba(255,255,255,0.5); min-width: 80px; text-align: center; }
+    .projector-nav .btn-nav { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-size: 18px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+    .projector-nav .btn-nav:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+    .projector-nav .btn-nav:disabled { opacity: 0.15; cursor: default; background: transparent; }
+
+    /* ========== MODE PROJECTEUR GLOBAL ========== */
+    body.projector-mode { background: #0f172a; }
+    body.projector-mode .container { background: #0f172a; box-shadow: none; border-radius: 0; max-width: 100%; padding: 20px 30px 40px; color: #e2e8f0; }
+    body.projector-mode .selectors { background: #1e293b; color: #e2e8f0; }
+    body.projector-mode .selectors select { background: #334155; border-color: #475569; color: white; }
+    body.projector-mode .widget { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+    body.projector-mode .widget-header { background: #0f172a; border-bottom-color: #334155; }
+    body.projector-mode .widget-header .label { color: #94a3b8; }
+    body.projector-mode .widget-header .section-tag { background: #3b82f6; }
+    body.projector-mode .widget-intro { background: #0f172a; border-bottom-color: #334155; color: #e2e8f0; }
+    body.projector-mode .widget-intro .intro-label { color: #94a3b8; }
+    body.projector-mode .widget-packages { background: #1e293b; border-bottom-color: #475569; }
+    body.projector-mode .widget-packages .packages-label { color: #818cf8; }
+    body.projector-mode .widget-packages .pkg-item { border-bottom-color: #334155; }
+    body.projector-mode .widget-packages .pkg-name { color: #818cf8; }
+    body.projector-mode .widget-packages .pkg-role { color: #cbd5e1; }
+    body.projector-mode .widget-packages .pkg-importance { color: #fbbf24; }
+    body.projector-mode .widget-packages .pkg-importance strong { color: #f59e0b; }
+    body.projector-mode .widget-footer { border-top-color: #334155; background: #0f172a; }
+    body.projector-mode .widget-footer .index { color: #94a3b8; }
+    body.projector-mode .widget-footer .project-btn { border-color: #60a5fa; color: #60a5fa; }
+    body.projector-mode .widget-footer .project-btn:hover { background: #3b82f6; color: #fff; }
+    body.projector-mode .btn-projector { background: #3b82f6; }
+    body.projector-mode .btn-projector:hover { background: #2563eb; }
+    body.projector-mode .subtitle { border-bottom-color: #334155; }
+    body.projector-mode .filters-extra .search-box label { color: #e2e8f0; }
+    body.projector-mode .filters-extra .search-box input { background: #334155; border-color: #475569; color: white; }
+    body.projector-mode .composeur-controls { background: #1e293b; }
+    body.projector-mode .composeur-controls label { color: #e2e8f0; }
+    body.projector-mode .composeur-controls select { background: #334155; border-color: #475569; color: white; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1200px) {
+      .widget-grid { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
+      .container { padding: 20px 25px 35px; }
+    }
+    @media (max-width: 992px) {
+      .widget-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+      .container { padding: 18px 20px 30px; }
+      .projector-slide .slide-code { padding: 20px 24px; }
+      .projector-slide .slide-code pre { font-size: 15px; }
+    }
+    @media (max-width: 768px) {
+      body { padding: 12px; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 14px; padding-bottom: 12px; }
+      .container { padding: 16px; }
+      .selectors { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 16px; }
+      .selectors label { flex-wrap: wrap; }
+      .selectors select { width: 100%; }
+      .btn-projector { margin-left: 0; width: 100%; text-align: center; }
+      .mode-toggle { margin-left: 0; justify-content: flex-start; flex-wrap: wrap; }
+      .filters-extra { flex-direction: column; align-items: stretch; }
+      .filters-extra .search-box { flex: 1 1 auto; flex-direction: column; align-items: stretch; }
+      .filters-extra .search-box label { white-space: normal; }
+      .widget-grid { grid-template-columns: 1fr; gap: 16px; }
+      .widget-header .section-tag { max-width: 140px; font-size: 9px; }
+      .widget-code pre { font-size: 11px; }
+      .widget-code { max-height: 220px; }
+      .projector-slide .slide-code { padding: 16px; max-height: 45vh; }
+      .projector-slide .slide-code pre { font-size: 14px; }
+      .projector-slide .slide-title { font-size: 20px; }
+      .projector-nav .btn-nav { width: 40px; height: 40px; font-size: 16px; }
+      .composeur-controls { flex-direction: column; align-items: stretch; }
+      .composeur-controls select { width: 100%; }
+      .projector-header { padding: 12px 16px; flex-direction: column; align-items: stretch; text-align: center; }
+      .projector-body { padding: 12px; }
+    }
+    @media (max-width: 480px) {
+      body { padding: 8px; }
+      .container { padding: 12px; border-radius: 12px; }
+      h1 { font-size: 20px; }
+      .subtitle { font-size: 13px; }
+      .selectors { padding: 10px 12px; gap: 10px; }
+      .selectors label { font-size: 13px; }
+      .selectors select { font-size: 13px; padding: 6px 10px; min-width: auto; }
+      .btn-projector { font-size: 13px; padding: 6px 14px; }
+      .widget-header .section-tag { max-width: 100px; font-size: 8px; }
+      .widget-code { max-height: 180px; }
+      .widget-code pre { font-size: 10px; }
+      .widget-intro { max-height: 220px; font-size: 13px; }
+      .stats { font-size: 12px; flex-wrap: wrap; }
+      .mode-toggle .toggle-btn { font-size: 11px; padding: 3px 10px; }
+      .projector-slide .slide-title { font-size: 18px; }
+      .projector-slide .slide-expl { font-size: 13px; margin-bottom: 12px; }
+      .projector-slide .slide-code { padding: 12px; }
+      .projector-slide .slide-code pre { font-size: 12px; }
+      .projector-nav .btn-nav { width: 36px; height: 36px; font-size: 14px; }
+      .projector-nav span { font-size: 12px; min-width: 60px; }
+      .box { padding: 12px 14px; margin: 12px 0; }
+      .box-title { font-size: 14px; }
+      table { font-size: 13px; }
+      th, td { padding: 6px 8px; }
+    }
+    @media (max-width: 360px) {
+      .container { padding: 8px; }
+      h1 { font-size: 18px; }
+      .widget-header .section-tag { max-width: 70px; font-size: 7px; }
+      .widget-code pre { font-size: 9px; }
+      .projector-slide .slide-code pre { font-size: 10px; }
+      .projector-header .title { font-size: 13px; }
+    }
+
+    /* ========== EXERCICES ET CORRIGÉS ========== */
+    .exercise-box {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin: 16px 0;
+    }
+    .exercise-box .ex-title {
+      font-weight: 700;
+      color: #0369a1;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+    .exercise-box .ex-correction {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      border-radius: 0 6px 6px 0;
+      display: none;
+    }
+    .exercise-box .ex-correction.show { display: block; }
+    .exercise-box .ex-toggle {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #2563eb;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .exercise-box .ex-toggle:hover { text-decoration: underline; }
+    .example-box {
+      background: #fefce8;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 14px 0;
+    }
+    .example-box .ex-title {
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <h1>📘 Plateforme LaTeX – Formation &amp; Composeur</h1>
+  <div class="subtitle">Navigation par niveau/matière &bull; Filtre de recherche par chapitre</div>
+
+  <div class="selectors">
+    <label>Niveau
+      <select id="niveauSelect">
+        <option value="college">Collège</option>
+        <option value="lycee">Lycée</option>
+      </select>
+    </label>
+    <label>Matière
+      <select id="matiereSelect">
+        <option value="mathematiques">Mathématiques</option>
+        <option value="physique">Physique</option>
+        <option value="chimie">Chimie</option>
+      </select>
+    </label>
+    <button class="btn-projector" id="projectorBtn">🔲 Mode projecteur</button>
+    <div class="mode-toggle">
+      <span class="toggle-label">Mode :</span>
+      <button class="toggle-btn active" id="modeFormationBtn" onclick="switchMode('formation')">Formation</button>
+      <button class="toggle-btn" id="modeComposeurBtn" onclick="switchMode('composeur')">Composeur</button>
+    </div>
+  </div>
+
+  <!-- ========== MODE FORMATION ========== -->
+  <div class="mode-formation" id="modeFormation">
+    <div class="filters-extra">
+      <div class="search-box">
+        <label for="searchChapitre">🔍 Filtrer les chapitres</label>
+        <input type="text" id="searchChapitre" placeholder="Rechercher un titre..." aria-label="Filtrer les chapitres">
+      </div>
+    </div>
+    <div class="stats" id="statsFormation">Chargement...</div>
+    <div class="widget-grid" id="widgetGridFormation"></div>
+  </div>
+
+  <!-- ========== MODE COMPOSEUR ========== -->
+  <div class="mode-composeur" id="modeComposeur">
+    <div class="composeur-controls">
+      <label>Filtrer par section
+        <select id="sectionFilterComposeur">
+          <option value="">Toutes les sections</option>
+        </select>
+      </label>
+    </div>
+    <div class="stats" id="statsComposeur">Chargement...</div>
+    <div class="widget-grid" id="widgetGridComposeur"></div>
+  </div>
+</div>
+
+<!-- ========== PROJECTEUR ========== -->
+<div id="projector">
+  <div class="projector-bg"></div>
+  <div class="projector-header">
+    <div class="title">&#9881; Composeur <span>LaTeX</span> &mdash; Mode Projection</div>
+    <div class="projector-controls">
+      <button class="btn btn-exit" onclick="toggleProjection()">&#10005; Quitter</button>
+    </div>
+  </div>
+  <div class="projector-body" id="projectorBody">
+    <div class="projector-slide" id="projectorSlide"></div>
+  </div>
+  <div class="projector-nav">
+    <button class="btn-nav" id="prevBtn" onclick="projectorPrev()">&#9664;</button>
+    <span id="projectorCounter">0 / 0</span>
+    <button class="btn-nav" id="nextBtn" onclick="projectorNext()">&#9654;</button>
+  </div>
+</div>
+
+<script>
+// =================================================================
+// 1. INFORMATION SUR LES PACKAGES (commentaires détaillés)
+// =================================================================
+const PACKAGE_INFO = {
+  'article': { role: 'Classe de document de base pour les articles, devoirs et épreuves', importance: 'Essentielle – toute épreuve commence par \\documentclass{article}' },
+  'babel': { role: 'Gestion des règles typographiques et des césures en français', importance: 'Indispensable pour un document en français' },
+  'inputenc': { role: 'Encodage des caractères (accents, symboles)', importance: 'Nécessaire pour utiliser les accents correctement' },
+  'fontenc': { role: 'Encodage des polices pour une meilleure qualité d\'affichage', importance: 'Améliore la qualité des polices dans le PDF' },
+  'geometry': { role: 'Gestion des marges et de la mise en page', importance: 'Permet de personnaliser les marges facilement' },
+  'xcolor': { role: 'Définition et utilisation de couleurs', importance: 'Essentiel pour colorer les boîtes, le texte, les tableaux' },
+  'fancyhdr': { role: 'Personnalisation des en-têtes et pieds de page', importance: 'Indispensable pour les épreuves officielles (établissement, matière, numéro de page)' },
+  'tcolorbox': { role: 'Création de boîtes de texte décoratives (définitions, théorèmes, consignes)', importance: 'Permet de structurer visuellement le cours et de mettre en valeur les points clés' },
+  'array': { role: 'Étend les fonctionnalités des tableaux (colonnes de largeur fixe, alignement personnalisé)', importance: 'Très utile pour créer des tableaux de notes, de mesures ou de résultats' },
+  'multirow': { role: 'Fusion de cellules verticalement dans les tableaux', importance: 'Utile pour les tableaux complexes avec des en-têtes sur plusieurs lignes' },
+  'makecell': { role: 'Permet de formater du texte dans les cellules de tableaux', importance: 'Facilite la mise en forme des cellules' },
+  'graphicx': { role: 'Insertion d\'images (PNG, JPG, PDF, EPS)', importance: 'Indispensable pour intégrer des schémas, graphiques ou photos' },
+  'float': { role: 'Placement précis des figures avec l\'option [H]', importance: 'Utile pour forcer l\'image à rester exactement à l\'endroit du code' },
+  'amsmath': { role: 'Environnements mathématiques avancés (equation, align, gather, etc.)', importance: 'Indispensable pour les mathématiques au lycée (équations, dérivées, intégrales)' },
+  'amssymb': { role: 'Symboles mathématiques supplémentaires (\\mathbb, \\mathcal, etc.)', importance: 'Essentiel pour les ensembles de nombres et les notations avancées' },
+  'systeme': { role: 'Écriture et alignement des systèmes d\'équations', importance: 'Facilite l\'écriture des systèmes avec un alignement parfait' },
+  'tikz': { role: 'Dessin vectoriel pour les figures géométriques, graphiques, schémas', importance: 'Permet de créer des figures de haute qualité directement dans le document' },
+  'tkz-euclide': { role: 'Géométrie euclidienne avec TikZ (tracés de triangles, cercles, angles)', importance: 'Simplifie grandement la création de figures géométriques' },
+  'pgfplots': { role: 'Tracé de courbes de fonctions, graphiques et histogrammes', importance: 'Indispensable pour représenter des données expérimentales ou des fonctions' },
+  'caption': { role: 'Personnalisation des légendes des figures et tableaux', importance: 'Permet de gérer les légendes proprement' },
+  'subcaption': { role: 'Création de sous-figures (images côte à côte)', importance: 'Utile pour comparer plusieurs images ou graphiques' },
+  'enumitem': { role: 'Personnalisation des listes (espaces, symboles, numérotation)', importance: 'Permet d\'adapter les listes aux besoins du document' },
+  'parskip': { role: 'Espacement automatique entre les paragraphes', importance: 'Améliore la lisibilité des textes longs' },
+  'longtable': { role: 'Tableaux sur plusieurs pages avec en-tête répété', importance: 'Indispensable pour les tableaux de données volumineux' },
+  'lastpage': { role: 'Permet d\'obtenir le nombre total de pages avec \\pageref{LastPage}', importance: 'Utile pour afficher "Page X sur Y" dans les en-têtes/pieds' },
+  'eso-pic': { role: 'Ajout d\'éléments en arrière-plan (filigranes, logos)', importance: 'Permet d\'ajouter des filigranes ou des fonds personnalisés' },
+  'siunitx': { role: 'Gestion des unités du Système International (SI) et des nombres', importance: 'Indispensable pour la physique et la chimie (affichage des unités)' },
+  'chemformula': { role: 'Écriture des formules chimiques (H2O, CO2, etc.)', importance: 'Essentiel pour la chimie (formules et équations)' },
+  'mhchem': { role: 'Écriture des formules chimiques (alternative à chemformula)', importance: 'Alternative pour les formules chimiques et les équations' },
+  'circuitikz': { role: 'Schémas électriques (résistances, condensateurs, générateurs, etc.)', importance: 'Indispensable pour l\'électricité (collège et lycée)' },
+};
+
+// =================================================================
+// 2. DONNÉES COMPLÈTES DE LA FORMATION (avec exemples et exercices)
+// =================================================================
+const data = {
+  college: {
+    mathematiques: {
+      title: "Mathématiques – Collège",
+      chapters: [
+        {
+          title: "1. Introduction à LaTeX",
+          packages: ['article', 'babel', 'inputenc', 'fontenc'],
+          code: `% ---- Structure minimale ----\n\\documentclass{article}\n\\begin{document}\nBonjour, ceci est mon premier document.\n\\end{document}`,
+          preview: `<p>LaTeX est un système de composition de documents de haute qualité, particulièrement adapté aux mathématiques.</p>
+            <div class="box box-definition"><span class="box-title">Structure minimale</span>
+            <p>Un fichier LaTeX se compose d'un préambule (déclaration de la classe et des packages) et d'un corps (entre <code>\\begin{document}</code> et <code>\\end{document}</code>).</p></div>
+            <ul><li><code>article</code> : pour des devoirs, épreuves.</li>
+            <li><code>report</code> : pour des rapports.</li>
+            <li><code>book</code> : pour des livres.</li>
+            <li><code>beamer</code> : pour des présentations.</li></ul>
+            <div class="box box-attention"><span class="box-title">Astuce</span><p>Pour compiler : <code>pdflatex mon_fichier.tex</code></p></div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Voici un exemple de document minimal :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\documentclass{article}
+\\begin{document}
+Bonjour, ceci est mon premier document LaTeX.
+\\end{document}</pre>
+            <p>Ce code produit un PDF avec le texte "Bonjour, ceci est mon premier document LaTeX."</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 1.1</div>
+              <p>Modifiez le code ci-dessus pour afficher votre nom et la date du jour.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\documentclass{article}
+\\begin{document}
+KOLA Maniwah Essohouna, 30 août 2026.
+J'apprends LaTeX.
+\\end{document}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 1.2</div>
+              <p>Ajoutez un deuxième paragraphe contenant : <em>J'apprends les bases de LaTeX.</em></p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\documentclass{article}
+\\begin{document}
+Bonjour, ceci est mon premier document LaTeX.
+
+J'apprends les bases de LaTeX.
+\\end{document}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "2. En-têtes et pieds de page",
+          packages: ['fancyhdr', 'lastpage'],
+          code: `\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}\n\\fancyfoot[L]{\\textit{Page \\thepage}}\n\\fancyfoot[C]{\\textit{Classe}}\n\\fancyfoot[R]{\\textit{Année}}`,
+          preview: `<p>Le package <code>fancyhdr</code> personnalise l'en-tête et le pied de page.</p>
+            <div class="box box-propriete"><span class="box-title">Configuration type</span>
+            <pre>\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}</pre></div>
+            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date. Le package <code>lastpage</code> permet d'obtenir le nombre total de pages.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Configuration complète pour un devoir :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\usepackage{fancyhdr,lastpage}
+\\pagestyle{fancy}
+\\fancyhf{}
+\\fancyhead[L]{\\textbf{Lycée Moderne}}
+\\fancyhead[C]{\\textbf{Devoir de Mathématiques}}
+\\fancyhead[R]{\\textbf{Classe : 3ème}}
+\\fancyfoot[L]{\\textit{Page \\thepage/\\pageref{LastPage}}}
+\\fancyfoot[C]{\\textit{Année 2024}}
+\\fancyfoot[R]{\\today}
+\\renewcommand{\\headrulewidth}{0.5pt}
+\\renewcommand{\\footrulewidth}{0.2pt}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 2.1</div>
+              <p>Créez un en-tête avec "Lycée Moderne" à gauche, "Devoir Surveillé" au centre, et "NOM : \ldots" à droite.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\fancyhead[L]{\\textbf{Lycée Moderne}}
+\\fancyhead[C]{\\textbf{Devoir Surveillé}}
+\\fancyhead[R]{\\textbf{NOM : \\ldots}}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 2.2</div>
+              <p>Modifiez le pied de page pour afficher le numéro de page au centre et la date à droite.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\fancyfoot[C]{\\thepage}
+\\fancyfoot[R]{\\today}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Boîtes de texte",
+          packages: ['tcolorbox', 'xcolor'],
+          code: `\\usepackage{tcolorbox}\n\\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=Définition]\nUne fonction affine est $f(x)=ax+b$.\n\\end{tcolorbox}`,
+          preview: `<p>Le package <code>tcolorbox</code> encadre définitions, théorèmes, consignes.</p>
+            <div class="box box-definition"><span class="box-title">Définition</span><p>Une fonction affine est $f(x)=ax+b$.</p></div>
+            <div class="box box-theoreme"><span class="box-title">Pythagore</span><p>$BC^2 = AB^2 + AC^2$.</p></div>
+            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages), <code>drop fuzzy shadow</code> (ombre).</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Boîte avec ombre et coins arrondis :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,
+  title=Propriété, drop fuzzy shadow, rounded corners]
+$a^2 - b^2 = (a-b)(a+b)$
+\\end{tcolorbox}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 3.1</div>
+              <p>Créez une boîte rouge intitulée "Attention" contenant : <em>Ne pas confondre $2x$ et $x^2$.</em></p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Attention]
+Ne pas confondre $2x$ et $x^2$.
+\\end{tcolorbox}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 3.2</div>
+              <p>Créez une boîte verte intitulée "Méthode" pour résoudre une équation du premier degré.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Méthode]
+Pour résoudre $ax+b=0$ :
+1. Isoler le terme en $x$ : $ax = -b$
+2. Diviser par $a$ : $x = -\\frac{b}{a}$
+\\end{tcolorbox}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Tableaux",
+          packages: ['array', 'multirow', 'makecell'],
+          code: `\\begin{tabular}{|c|c|c|}\\hline\n\\textbf{Élève} & \\textbf{Note} & \\textbf{Appréciation}\\\\\\hline\nAlice & 18 & Très bien \\\\\nBob & 12 & Bien \\\\\\hline\n\\end{tabular}`,
+          preview: `<p>Les tableaux avec <code>tabular</code>.</p>
+            <div class="table-wrap"><table><thead><tr><th>Élève</th><th>Note</th><th>Appréciation</th></tr></thead>
+            <tbody><tr><td>Alice</td><td>18</td><td>Très bien</td></tr>
+            <tr><td>Bob</td><td>12</td><td>Bien</td></tr></tbody></table></div>
+            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe centrée verticalement). Le package <code>array</code> permet d'ajouter des préfixes comme <code>\\centering</code>.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Tableau des carrés parfaits :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tabular}{|c|c|}
+\\hline
+$n$ & $n^2$ \\\\
+\\hline
+1 & 1 \\\\
+2 & 4 \\\\
+3 & 9 \\\\
+4 & 16 \\\\
+5 & 25 \\\\
+\\hline
+\\end{tabular}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 4.1</div>
+              <p>Créez un tableau des carrés parfaits de 1 à 10.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tabular}{|c|c|}
+\\hline
+$n$ & $n^2$ \\\\
+\\hline
+1 & 1 \\\\ 2 & 4 \\\\ 3 & 9 \\\\
+4 & 16 \\\\ 5 & 25 \\\\ 6 & 36 \\\\
+7 & 49 \\\\ 8 & 64 \\\\ 9 & 81 \\\\ 10 & 100 \\\\
+\\hline
+\\end{tabular}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 4.2</div>
+              <p>Créez un tableau de proportionnalité avec 4 colonnes (valeurs de $x$, valeurs de $y$, rapport $y/x$, et le produit en croix).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tabular}{|c|c|c|c|}
+\\hline
+$x$ & $y$ & $y/x$ & $x \\times y$ \\\\
+\\hline
+1 & 2 & 2 & 2 \\\\
+2 & 4 & 2 & 8 \\\\
+3 & 6 & 2 & 18 \\\\
+\\hline
+\\end{tabular}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "5. Insertion d'images",
+          packages: ['graphicx', 'float', 'caption'],
+          code: `\\usepackage{graphicx}\n\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.5\\textwidth]{image.png}\n  \\caption{Légende}\n\\end{figure}`,
+          preview: `<p><code>graphicx</code> insère des images.</p>
+            <div class="box box-propriete"><span class="box-title">Placement</span>
+            <ul><li><code>h</code> : ici</li><li><code>t</code> : en haut</li><li><code>b</code> : en bas</li><li><code>H</code> : exactement (package <code>float</code>)</li></ul></div>
+            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>. Les légendes sont gérées par <code>caption</code>.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{figure}[h]
+  \\centering
+  \\includegraphics[width=0.3\\textwidth]{logo.png}
+  \\caption{Logo de l'établissement}
+  \\label{fig:logo}
+\\end{figure}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 5.1</div>
+              <p>Insérez une image avec une largeur de 5cm et une légende "Mon image".</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{figure}[h]
+  \\centering
+  \\includegraphics[width=5cm]{mon_image.png}
+  \\caption{Mon image}
+  \\label{fig:monimage}
+\\end{figure}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 5.2</div>
+              <p>Insérez la même image avec trois largeurs différentes (2cm, 0.3\\textwidth, 5cm).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\includegraphics[width=2cm]{image.png}
+\\includegraphics[width=0.3\\textwidth]{image.png}
+\\includegraphics[width=5cm]{image.png}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "6. Modèles d'épreuves",
+          packages: ['article', 'fancyhdr', 'tcolorbox'],
+          code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} (4 pts) ...\n\\end{document}`,
+          preview: `<p>Structure d'une épreuve : en-tête, consigne, exercices numérotés, barème, pied de page.</p>
+            <div class="box box-consigne"><span class="box-title">Structure d'un devoir</span>
+            <ul><li>En-tête : établissement, matière, classe, date, durée</li>
+            <li>Consigne générale</li>
+            <li>Exercices avec barème entre parenthèses</li>
+            <li>Pied de page : numéro de page, date</li></ul></div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\documentclass[12pt,a4paper]{article}
+\\begin{document}
+\\begin{center}
+  \\textbf{Devoir de Mathématiques}
+\\end{center}
+\\textbf{Exercice 1 :} (4 points) Calculer $A = 3(2+5)-4$.
+\\textbf{Exercice 2 :} (6 points) Résoudre $4x-7=2x+3$.
+\\end{document}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 6.1</div>
+              <p>Concevez un devoir maison de 2 exercices (l'un de calcul numérique, l'autre de géométrie).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{document}
+\\begin{center}
+  \\textbf{Devoir Maison}
+\\end{center}
+\\textbf{Exercice 1 :} (4 pts) Calculer $A = 3 \\times (2+5) - 4$.
+\\textbf{Exercice 2 :} (6 pts) Dans un triangle ABC rectangle en A, AB=3 cm, AC=4 cm.
+Calculer BC.
+\\end{document}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "7. Outils mathématiques",
+          packages: ['amsmath', 'amssymb'],
+          code: `$\\frac{a}{b}$, $x^n$, $\\sqrt{2}$\n$(a+b)^2 = a^2+2ab+b^2$\n$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$`,
+          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$, $\\sqrt[3]{8}$</li></ul>
+            <div class="box box-theoreme">Identités remarquables :<br>$(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
+            <h4>Trigonométrie (3ème)</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
+            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr></thead>
+            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td><td>1</td></tr>
+            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td><td>0</td></tr>
+            <tr><td>$\\tan$</td><td>0</td><td>$\\frac{\\sqrt3}{3}$</td><td>1</td><td>$\\sqrt3$</td><td>—</td></tr></tbody></table></div>
+            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q} \\subset \\mathbb{R}$</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Calculer $(x+3)^2 - (x-3)^2$ :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+$(x+3)^2 - (x-3)^2 = (x^2+6x+9) - (x^2-6x+9) = 12x$</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 7.1</div>
+              <p>Simplifiez l'expression $\\sqrt{72}$ et résolvez l'équation $2x^2 - 8 = 0$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+$\\sqrt{72} = 6\\sqrt{2}$
+$2x^2 - 8 = 0 \\Rightarrow x^2 = 4 \\Rightarrow x = \\pm 2$</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 7.2</div>
+              <p>Dans un triangle rectangle, les côtés de l'angle droit mesurent 3 et 4. Calculer l'hypoténuse.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+$c = \\sqrt{3^2 + 4^2} = \\sqrt{9+16} = \\sqrt{25} = 5$</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "8. Ressources et compilation",
+          packages: ['article', 'inputenc', 'fontenc'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Compilation : <code>pdflatex</code> (ou <code>lualatex</code>) génère un PDF. Erreurs fréquentes : <code>Undefined control sequence</code> (commande inconnue), <code>Missing $ inserted</code> (formule mal délimitée), <code>File not found</code> (image introuvable).</p>
+            <div class="box box-attention"><span class="box-title">Bonnes pratiques</span><ul><li>Toujours compiler deux fois pour les références croisées.</li><li>Utiliser un éditeur avec auto-complétion (TeXstudio, VS Code).</li></ul></div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Compiler avec la ligne de commande :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+pdflatex mon_fichier.tex</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 8.1</div>
+              <p>Quelle commande utilisez-vous pour compiler un fichier LaTeX en PDF ?</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+pdflatex mon_fichier.tex</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 8.2</div>
+              <p>Que signifie l'erreur "Undefined control sequence" ?</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>Cette erreur signifie que vous avez utilisé une commande qui n'est pas définie (package manquant ou faute de frappe).</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "9. Nombres et calculs",
+          packages: ['amsmath', 'xcolor'],
+          code: `$\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$\n$(-3)+(-5)=-8$\n$2+3\\times4=14$`,
+          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{4}{6}+\\frac{5}{6} = \\frac{9}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{10}{18} = \\frac{5}{9}$</div>
+            <div class="box box-propriete">Nombres relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$, $(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
+            <div class="box box-attention">Priorités des opérations : $2+3\\times4=2+12=14$, $(2+3)\\times4=5\\times4=20$. Les puissances sont calculées avant les multiplications.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Calculer $\\frac{3}{4} + \\frac{1}{2} = \\frac{3}{4} + \\frac{2}{4} = \\frac{5}{4}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 9.1</div>
+              <p>Calculez $\\frac{5}{6} - \\frac{1}{3}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\frac{5}{6} - \\frac{1}{3} = \\frac{5}{6} - \\frac{2}{6} = \\frac{3}{6} = \\frac{1}{2}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice 9.2</div>
+              <p>Calculez $(-3) \\times (-4) + 2$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$(-3) \\times (-4) + 2 = 12 + 2 = 14$</p>
+              </div>
+            </div>`
+        }
+      ]
+    },
+    physique: {
+      title: "Physique – Collège",
+      chapters: [
+        {
+          title: "1. Introduction et rappels",
+          packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
+          code: `\\usepackage{siunitx}\n\\usepackage{chemformula}\n\\usepackage{circuitikz}\n\\usepackage{pgfplots}`,
+          preview: `<p>Les packages spécifiques pour la physique au collège :</p>
+            <ul><li><code>siunitx</code> : gestion des unités SI.</li>
+            <li><code>chemformula</code> : écriture des formules chimiques.</li>
+            <li><code>circuitikz</code> : schémas électriques.</li>
+            <li><code>pgfplots</code> : tracé de graphiques.</li></ul>
+            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Écrire une masse de 250 grammes avec <code>siunitx</code> : <code>\\SI{250}{g}</code> → $\\SI{250}{g}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P1.1</div>
+              <p>Écrivez une vitesse de 3,0×10⁸ m/s avec <code>siunitx</code>.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\SI{3.0e8}{m/s}</code> → $\\SI{3.0e8}{m/s}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P1.2</div>
+              <p>Quel package permet d'écrire des schémas électriques ?</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>circuitikz</code></p>
+              </div>
+            </div>`
+        },
+        {
+          title: "2. Formules chimiques",
+          packages: ['chemformula', 'siunitx'],
+          code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{NaCl}\n\\ch{2H2 + O2 -> 2H2O}`,
+          preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Chlorure de sodium : $\\ch{NaCl}$</li></ul>
+            <div class="box box-definition">Équation équilibrée : $\\ch{2H2 + O2 -> 2H2O}$</div>
+            <p>Les états physiques se notent : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux. Exemple : $\\ch{H2O_{(l)}}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Écrire la combustion du méthane : <code>\\ch{CH4 + 2O2 -> CO2 + 2H2O}</code> → $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P2.1</div>
+              <p>Écrivez la formule chimique de l'acide chlorhydrique.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\ch{HCl}</code> → $\\ch{HCl}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P2.2</div>
+              <p>Écrivez l'équation de la réaction entre le zinc et l'acide chlorhydrique (donne du chlorure de zinc et du dihydrogène).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\ch{Zn + 2HCl -> ZnCl2 + H2}</code> → $\\ch{Zn + 2HCl -> ZnCl2 + H2}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Grandeurs et unités",
+          packages: ['siunitx'],
+          code: `$\\SI{250}{g}$\n$\\SI{1.5}{L}$\n$\\SI{3.0e8}{m/s}$`,
+          preview: `<ul><li>Masse : $\\SI{250}{g}$</li><li>Volume : $\\SI{1.5}{L}$</li><li>Vitesse : $\\SI{3.0e8}{m/s}$</li></ul>
+            <div class="table-wrap"><table><thead><tr><th>Préfixe</th><th>Symbole</th><th>Facteur</th></tr></thead>
+            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr>
+            <tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
+            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr>
+            <tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>
+            <div class="box box-attention">Attention à la casse : <code>m</code> = milli, <code>M</code> = méga.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Convertir 25 cm en mètres : <code>\\SI{25}{cm}</code> = $\\SI{25}{cm}$ = $\\SI{0.25}{m}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P3.1</div>
+              <p>Écrivez une pression de 1013 hPa en Pa.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\SI{1013}{hPa}</code> = $\\SI{1013}{hPa}$ = $\\SI{101300}{Pa}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P3.2</div>
+              <p>Convertissez 36 km/h en m/s.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\SI{36}{km/h}</code> = $\\SI{36}{km/h}$ = $\\SI{10}{m/s}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Tableaux de mesures",
+          packages: ['siunitx', 'array'],
+          code: `\\begin{tabular}{|c|c|}\\hline\nTemps & Température \\\\\n0 & 20,0 \\\\\n10 & 25,5 \\\\\\hline\n\\end{tabular}`,
+          preview: `<div class="table-wrap"><table><thead><tr><th>Temps (s)</th><th>Température (°C)</th></tr></thead>
+            <tbody><tr><td>0</td><td>20,0</td></tr><tr><td>10</td><td>25,5</td></tr>
+            <tr><td>20</td><td>31,2</td></tr><tr><td>30</td><td>37,8</td></tr></tbody></table></div>
+            <p>Pour aligner les nombres avec leurs unités, utilisez <code>siunitx</code> avec <code>S[table-format=...]</code>.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tabular}{|c|S[table-format=3.1]|}
+\\hline
+\\textbf{Temps (s)} & \\textbf{Température (°C)} \\\\
+\\hline
+0 & 20,0 \\\\
+10 & 25,5 \\\\
+20 & 31,2 \\\\
+30 & 37,8 \\\\
+\\hline
+\\end{tabular}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P4.1</div>
+              <p>Créez un tableau de mesures de tension et d'intensité pour une résistance.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tabular}{|c|c|}
+\\hline
+\\textbf{Tension (V)} & \\textbf{Intensité (A)} \\\\
+\\hline
+0 & 0,0 \\\\
+2 & 0,02 \\\\
+4 & 0,04 \\\\
+6 & 0,06 \\\\
+\\hline
+\\end{tabular}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "5. Graphiques",
+          packages: ['pgfplots', 'siunitx'],
+          code: `\\begin{axis}[xlabel=Temps, ylabel=Température]\n\\addplot[only marks, mark=*] coordinates {(0,20) (10,25.5)};\n\\end{axis}`,
+          preview: `<div class="figure-tikz">[Courbe température en fonction du temps]</div>
+            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et droites de tendance. Exemple : <code>\\addplot[red, thick] {0.5*x+20};</code></p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{axis}[xlabel={Temps (s)}, ylabel={Température (°C)}]
+\\addplot[only marks, mark=*, blue] coordinates {(0,20) (10,25.5) (20,31.2) (30,37.8)};
+\\addlegendentry{Mesures}
+\\addplot[red, thick] {0.59*x + 20};
+\\addlegendentry{Tendance}
+\\end{axis}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P5.1</div>
+              <p>Tracez la courbe de l'intensité en fonction de la tension pour une résistance (loi d'Ohm).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>Coordonnées : (0,0), (1,0.01), (2,0.02), (3,0.03), (4,0.04), (5,0.05). Utilisez <code>\\addplot[only marks, mark=*]</code>.</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "6. Circuits série et dérivation",
+          packages: ['circuitikz', 'tikz'],
+          code: `\\begin{circuitikz}\n\\draw (0,0) to[battery1] (0,3) to[switch] (2,3) to[lamp] (2,0) -- (0,0);\n\\end{circuitikz}`,
+          preview: `<div class="figure-tikz">[Circuit série avec pile, interrupteur et lampe]</div>
+            <div class="box box-propriete">Série : $I$ constante, $U=U_1+U_2$<br>Dérivation : $U$ constante, $I=I_1+I_2$</div>
+            <p>Composants courants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>, <code>inductor</code>.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Circuit en dérivation avec deux lampes :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{circuitikz}
+\\draw (0,0) to[battery1,l=6V] (0,3)
+      to[switch] (2,3) -- (4,3)
+      to[lamp,l=$L_1$] (4,1.5) -- (4,0)
+      (4,3) to[lamp,l=$L_2$] (6,1.5) -- (6,0)
+      (4,0) -- (6,0) -- (0,0);
+\\end{circuitikz}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P6.1</div>
+              <p>Dessinez un circuit série avec une pile de 12 V, deux résistances $R_1 = 100\\Omega$ et $R_2 = 200\\Omega$, et un interrupteur.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{circuitikz}
+\\draw (0,0) to[battery1,l=12V] (0,3)
+      to[resistor,l=$R_1=100\\Omega$] (3,3)
+      to[resistor,l=$R_2=200\\Omega$] (3,0)
+      to[switch] (0,0);
+\\end{circuitikz}</pre>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P6.2</div>
+              <p>Dessinez un circuit en dérivation avec une pile, deux lampes et un ampèremètre qui mesure l'intensité totale.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{circuitikz}
+\\draw (0,0) to[battery1,l=6V] (0,3)
+      to[ammeter,l=$A$] (2,3)
+      -- (4,3)
+      to[lamp,l=$L_1$] (4,1.5) -- (4,0)
+      (4,3) to[lamp,l=$L_2$] (6,1.5) -- (6,0)
+      (4,0) -- (6,0) -- (0,0);
+\\end{circuitikz}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "7. Schémas expérimentaux",
+          packages: ['tikz'],
+          code: `\\begin{tikzpicture}\n\\draw (0,0) -- (0,2) arc (180:0:1) -- (2,0);\n\\end{tikzpicture}`,
+          preview: `<div class="figure-tikz">[Bécher]</div>
+            <p>Avec TikZ, on peut dessiner du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc. L'exemple ci-dessus dessine un bécher simple.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Montage de filtration :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tikzpicture}
+\\draw (0,0) -- (-1,-1) -- (1,-1) -- cycle;
+\\draw (0,0) -- (0,0.5);
+\\draw (-1.2,-1) -- (-1.2,-2) arc (180:0:1.2) -- (1.2,-1);
+\\draw[dashed] (-0.8,-1) -- (0.8,-1);
+\\end{tikzpicture}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice P7.1</div>
+              <p>Dessinez un erlenmeyer avec TikZ.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{tikzpicture}
+\\draw (0,0) -- (0,2.5) arc (180:0:0.8) -- (1.6,0);
+\\draw (0,2.5) -- (1.6,2.5);
+\\draw (0.2,2.5) -- (0.2,0.5);
+\\end{tikzpicture}</pre>
+              </div>
+            </div>`
+        }
+      ]
+    },
+    chimie: {
+      title: "Chimie – Collège",
+      chapters: [
+        {
+          title: "1. Formules chimiques",
+          packages: ['chemformula'],
+          code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{HCl}\n\\ch{CH4 + 2O2 -> CO2 + 2H2O}`,
+          preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Acide chlorhydrique : $\\ch{HCl}$</li></ul>
+            <div class="box box-definition">Combustion du méthane : $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Écrire la formule du glucose : <code>\\ch{C6H12O6}</code> → $\\ch{C6H12O6}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C1.1</div>
+              <p>Écrivez la formule chimique de l'acide sulfurique.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\ch{H2SO4}</code> → $\\ch{H2SO4}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C1.2</div>
+              <p>Écrivez l'équation de la combustion complète du propane ($\\ch{C3H8}$).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>\\ch{C3H8 + 5O2 -> 3CO2 + 4H2O}</code></p>
+              </div>
+            </div>`
+        },
+        {
+          title: "2. Équilibrage",
+          packages: ['chemformula'],
+          code: `\\ch{3Fe + 2O2 -> Fe3O4}`,
+          preview: `<p>Pour équilibrer une équation, on ajuste les coefficients stœchiométriques. Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
+            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients devant.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Équilibrer $\\ch{Al + O2 -> Al2O3}$ :<br>
+            $\\ch{4Al + 3O2 -> 2Al2O3}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C2.1</div>
+              <p>Équilibrer $\\ch{Fe + Cl2 -> FeCl3}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\ch{2Fe + 3Cl2 -> 2FeCl3}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C2.2</div>
+              <p>Équilibrer $\\ch{Ca + O2 -> CaO}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\ch{2Ca + O2 -> 2CaO}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Solutions et concentration",
+          packages: ['chemformula', 'siunitx'],
+          code: `$C = \\frac{n}{V}$\n$n = \\frac{m}{M}$`,
+          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L).</p>
+            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol), avec $m$ la masse (g) et $M$ la masse molaire (g/mol).</p>
+            <div class="box box-definition">Préparer une solution : dissoudre une masse $m$ de soluté dans un volume $V$ de solvant.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Préparer 250 mL d'une solution de NaCl à 0,1 mol/L :<br>
+            $n = C \\times V = 0,1 \\times 0,25 = 0,025$ mol<br>
+            $m = n \\times M = 0,025 \\times 58,5 = 1,4625$ g</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C3.1</div>
+              <p>Quelle masse de NaOH faut-il dissoudre pour préparer 500 mL d'une solution 0,2 mol/L ? (M(NaOH)=40 g/mol)</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$n = 0,2 \\times 0,5 = 0,1$ mol<br>$m = 0,1 \\times 40 = 4$ g</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Acides et bases",
+          packages: ['chemformula', 'siunitx'],
+          code: `$pH = -\\log[H_3O^+]$\n\\ch{HCl + NaOH -> NaCl + H2O}`,
+          preview: `<div class="box box-definition">Le pH est défini par $pH = -\\log[H_3O^+]$. Il varie de 0 (très acide) à 14 (très basique).</div>
+            <div class="box box-definition">Neutralisation : $\\ch{HCl + NaOH -> NaCl + H2O}$</div>
+            <p>Indicateurs colorés : tournesol (rouge en acide, bleu en basique), BBT (jaune acide, bleu basique).</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Calculer le pH d'une solution de HCl à 0,01 mol/L :<br>
+            $[H_3O^+] = 0,01$ mol/L → $pH = -\\log(0,01) = 2$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C4.1</div>
+              <p>Calculez le pH d'une solution d'acide chlorhydrique à 0,001 mol/L.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$pH = -\\log(10^{-3}) = 3$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice C4.2</div>
+              <p>Écrivez l'équation de la neutralisation entre $\\ch{H2SO4}$ et $\\ch{NaOH}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\ch{H2SO4 + 2NaOH -> Na2SO4 + 2H2O}$</p>
+              </div>
+            </div>`
+        }
+      ]
+    }
+  },
+  lycee: {
+    mathematiques: {
+      title: "Mathématiques – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
+          code: `\\usepackage{amsmath, amssymb}\n\\usepackage{pgfplots}\n\\usepackage{tkz-euclide}`,
+          preview: `<p>Packages avancés pour le lycée :</p>
+            <ul><li><code>amsmath</code> : environnements mathématiques (equation, align, gather).</li>
+            <li><code>amssymb</code> : symboles supplémentaires ($\\mathbb{R}$, $\\mathcal{F}$).</li>
+            <li><code>pgfplots</code> : tracé de courbes de fonctions.</li>
+            <li><code>tkz-euclide</code> : géométrie euclidienne (tracés de triangles, cercles).</li></ul>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Tracer la fonction $f(x)=x^2$ avec <code>pgfplots</code> :</p>
+            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{axis}[domain=-3:3, grid=major]
+\\addplot[blue, thick] {x^2};
+\\end{axis}</pre>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L1.1</div>
+              <p>Tracez la fonction $f(x) = \\sin(x)$ sur $[0, 2\\pi]$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
+\\begin{axis}[domain=0:2*pi, samples=100]
+\\addplot[blue, thick] {sin(deg(x))};
+\\end{axis}</pre>
+              </div>
+            </div>`
+        },
+        {
+          title: "2. Fonctions usuelles",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$\\exp(x)=e^x$, $(e^x)'=e^x$\n$\\ln x$, $(\\ln x)'=1/x$\n$\\cos^2 x+\\sin^2 x=1$`,
+          preview: `<div class="box box-definition">Fonction exponentielle : $e^x$, dérivée $(e^x)'=e^x$, primitive $\\int e^x dx = e^x+C$.</div>
+            <div class="box box-definition">Logarithme népérien : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$, primitive $\\int \\frac{1}{x} dx = \\ln|x|+C$.</div>
+            <div class="box box-theoreme">Identité fondamentale : $\\cos^2 x + \\sin^2 x = 1$.<br>Formules d'addition : $\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$, $\\sin(a+b)=\\sin a\\cos b + \\cos a\\sin b$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Dériver $f(x) = e^{2x} \\ln x$ :<br>
+            $f'(x) = 2e^{2x}\\ln x + e^{2x}\\cdot\\frac{1}{x}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L2.1</div>
+              <p>Calculez la dérivée de $f(x) = \\sin(2x)$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$f'(x) = 2\\cos(2x)$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L2.2</div>
+              <p>Calculez $\\int \\frac{1}{2x+1} dx$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\int \\frac{1}{2x+1} dx = \\frac{1}{2}\\ln|2x+1| + C$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Suites",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$u_n=2n+1$\n$u_{n+1}=\\frac12 u_n+1$`,
+          preview: `<ul><li>Suite explicite : $u_n=2n+1$.</li><li>Suite récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$.</li></ul>
+            <div class="box box-propriete">Limite d'une suite : $\\lim_{n\\to\\infty} u_n = L$.</div>
+            <p>Représentation graphique : on utilise <code>pgfplots</code> avec <code>only marks</code> pour les points.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Les premiers termes de $u_n = \\frac{1}{n+1}$ : 1, 1/2, 1/3, 1/4, ...</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L3.1</div>
+              <p>Donnez les 5 premiers termes de la suite $u_n = n^2 - 2n + 3$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$u_0=3$, $u_1=2$, $u_2=3$, $u_3=6$, $u_4=11$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L3.2</div>
+              <p>Calculez $\\lim_{n\\to\\infty} \\frac{2n+1}{n+3}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\lim_{n\\to\\infty} \\frac{2n+1}{n+3} = \\lim_{n\\to\\infty} \\frac{2+1/n}{1+3/n} = 2$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Dérivation",
+          packages: ['amsmath'],
+          code: `$f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}$\n$(x^n)'=n x^{n-1}$`,
+          preview: `<div class="box box-theoreme">Formules de dérivation :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
+            <p>Tangente à la courbe en $a$ : $y=f'(a)(x-a)+f(a)$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Tangente à $f(x)=x^2$ en $x=1$ :<br>
+            $f(1)=1$, $f'(1)=2$ → $y=2(x-1)+1 = 2x-1$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L4.1</div>
+              <p>Calculez la dérivée de $f(x) = \\frac{x^2+1}{x-1}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$f'(x) = \\frac{2x(x-1) - (x^2+1)}{(x-1)^2} = \\frac{x^2 - 2x - 1}{(x-1)^2}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L4.2</div>
+              <p>Déterminez l'équation de la tangente à $f(x)=\\sin x$ en $x=\\frac{\\pi}{4}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$f(\\pi/4)=\\frac{\\sqrt2}{2}$, $f'(\\pi/4)=\\frac{\\sqrt2}{2}$<br>$y=\\frac{\\sqrt2}{2}(x-\\frac{\\pi}{4}) + \\frac{\\sqrt2}{2}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "5. Intégration",
+          packages: ['amsmath'],
+          code: `$\\int_a^b f(x) dx$\n$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$`,
+          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ (pour $n\\neq -1$)<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$<br>$\\int \\sin x dx = -\\cos x+C$</div>
+            <p>L'intégrale définie $\\int_a^b f(x) dx$ représente l'aire sous la courbe entre $x=a$ et $x=b$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>$\\int_0^1 x^2 dx = [\\frac{x^3}{3}]_0^1 = \\frac{1}{3}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L5.1</div>
+              <p>Calculez $\\int_0^2 (x^2 - 1) dx$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\int_0^2 (x^2 - 1) dx = [\\frac{x^3}{3} - x]_0^2 = (\\frac{8}{3} - 2) - 0 = \\frac{2}{3}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L5.2</div>
+              <p>Calculez $\\int_1^e \\frac{1}{x} dx$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\int_1^e \\frac{1}{x} dx = [\\ln x]_1^e = 1 - 0 = 1$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "6. Nombres complexes",
+          packages: ['amsmath', 'amssymb', 'tkz-euclide'],
+          code: `$z=a+ib$, $z=re^{i\\theta}$\n$e^{i\\theta}=\\cos\\theta+i\\sin\\theta$`,
+          preview: `<div class="box box-theoreme">Formule d'Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$.</div>
+            <div class="figure-tikz">[Plan complexe avec affixe $z=x+iy$]</div>
+            <p>Affixe : $z = x + iy$ correspond au point $(x; y)$. Le module est $|z|=\\sqrt{x^2+y^2}$, l'argument $\\arg(z)=\\theta$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>$z = 1+i$ a pour module $\\sqrt{2}$ et argument $\\pi/4$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L6.1</div>
+              <p>Écrire $z = 3 - 4i$ sous forme exponentielle.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$|z|=5$, $\\arg(z) = -\\arctan(4/3)$ → $z = 5e^{-i\\arctan(4/3)}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L6.2</div>
+              <p>Calculer $(1+i)^2$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$(1+i)^2 = 1 + 2i + i^2 = 2i$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "7. Géométrie analytique",
+          packages: ['amsmath', 'tikz'],
+          code: `$\\overrightarrow{AB}=\\begin{pmatrix} x_B-x_A \\\\ y_B-y_A \\end{pmatrix}$\n$\\vec u\\cdot\\vec v = x_ux_v+y_uy_v$`,
+          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$.</div>
+            <p>Orthogonalité : $\\vec u \\perp \\vec v \\iff \\vec u\\cdot\\vec v = 0$.</p>
+            <p>Équation de droite : $ax+by+c=0$. Vecteur normal $\\vec n(a,b)$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Droite passant par A(1,2) de vecteur directeur $\\vec u(3,4)$ :<br>
+            $(x-1, y-2) = t(3,4)$ → $\\begin{cases} x=1+3t \\\\ y=2+4t \\end{cases}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L7.1</div>
+              <p>Calculer le produit scalaire de $\\vec u(2,3)$ et $\\vec v(-1,4)$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\vec u\\cdot\\vec v = 2\\times(-1) + 3\\times4 = -2 + 12 = 10$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L7.2</div>
+              <p>Déterminer l'angle entre $\\vec u(1,1)$ et $\\vec v(3,1)$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\cos\\theta = \\frac{1\\times3 + 1\\times1}{\\sqrt{2}\\sqrt{10}} = \\frac{4}{\\sqrt{20}} = \\frac{2}{\\sqrt{5}}$<br>$\\theta = \\arccos(\\frac{2}{\\sqrt{5}}) \\approx 26,6°$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "8. Géométrie dans l'espace",
+          packages: ['tikz', 'amsmath'],
+          code: `$AB=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$`,
+          preview: `<div class="figure-tikz">[Parallélépipède rectangle]</div>
+            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$.</p>
+            <p>Milieu : $I\\left(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}, \\frac{z_A+z_B}{2}\\right)$.</p>
+            <p>Produit scalaire dans l'espace : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v+z_uz_v$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Distance entre A(1,2,3) et B(4,6,8) :<br>
+            $AB = \\sqrt{(4-1)^2 + (6-2)^2 + (8-3)^2} = \\sqrt{9+16+25} = \\sqrt{50}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L8.1</div>
+              <p>Calculer la distance entre A(1,1,1) et B(2,3,4).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$AB = \\sqrt{(2-1)^2 + (3-1)^2 + (4-1)^2} = \\sqrt{1+4+9} = \\sqrt{14}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L8.2</div>
+              <p>Donner les coordonnées du milieu de [AB] avec A(1,2,3) et B(4,6,8).</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$M\\left(\\frac{1+4}{2}, \\frac{2+6}{2}, \\frac{3+8}{2}\\right) = (2,5; 4; 5,5)$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "9. Probabilités",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$E(X)=\\sum x_i P(X=x_i)$\n$P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$`,
+          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$.</div>
+            <div class="box box-definition">Variance : $V(X)=E(X^2)-(E(X))^2$, écart-type $\\sigma=\\sqrt{V(X)}$.</div>
+            <div class="box box-definition">Loi binomiale : $X\\sim \\mathcal{B}(n,p)$ avec $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Lancer d'une pièce équilibrée 3 fois : $X\\sim\\mathcal{B}(3,0,5)$.<br>
+            $P(X=2)=\\binom{3}{2}(0,5)^2(0,5)^1 = 3\\times0,25\\times0,5 = 0,375$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L9.1</div>
+              <p>Une urne contient 3 boules rouges et 2 boules bleues. On tire 2 boules sans remise. Calculez l'espérance du nombre de boules rouges tirées.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$P(X=0)=\\frac{2}{5}\\times\\frac{1}{4}=0,1$<br>
+                $P(X=1)=\\frac{3}{5}\\times\\frac{2}{4}+\\frac{2}{5}\\times\\frac{3}{4}=0,6$<br>
+                $P(X=2)=\\frac{3}{5}\\times\\frac{2}{4}=0,3$<br>
+                $E(X)=0\\times0,1+1\\times0,6+2\\times0,3=1,2$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "10. Équations différentielles",
+          packages: ['amsmath'],
+          code: `$y'+ay=b$ solution : $y=Ce^{-ax}+b/a$\n$y''+\\omega^2 y=0$`,
+          preview: `<p>Équation différentielle linéaire d'ordre 1 : $y'+ay=b$.</p>
+            <p>Solution générale : $y(x)=Ce^{-ax}+\\frac{b}{a}$ (si $a\\neq0$).</p>
+            <p>Équation différentielle linéaire d'ordre 2 : $y''+\\omega^2 y=0$.</p>
+            <p>Solution : $y(x)=A\\cos(\\omega x)+B\\sin(\\omega x)$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>$y'+2y=4$ → $y(x)=Ce^{-2x}+2$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L10.1</div>
+              <p>Résoudre $y' - 3y = 0$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$y(x)=Ce^{3x}$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L10.2</div>
+              <p>Résoudre $y'' + 4y = 0$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$y(x)=A\\cos(2x)+B\\sin(2x)$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "11. Matrices",
+          packages: ['amsmath'],
+          code: `$A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$\n$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$`,
+          preview: `<div class="box box-definition">Matrice $2\\times2$ : $A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$.</div>
+            <div class="box box-definition">Inverse : $A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$ (si $ad-bc\\neq0$).</div>
+            <p>Matrice identité : $I_2=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>$A=\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}$, $\\det(A)=1\\times4-2\\times3=-2$,<br>
+            $A^{-1}=-\\frac{1}{2}\\begin{pmatrix}4&-2\\\\-3&1\\end{pmatrix}=\\begin{pmatrix}-2&1\\\\1,5&-0,5\\end{pmatrix}$</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L11.1</div>
+              <p>Calculer le déterminant de $A=\\begin{pmatrix}2&1\\\\1&1\\end{pmatrix}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\det(A)=2\\times1 - 1\\times1 = 1$</p>
+              </div>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L11.2</div>
+              <p>Inverser $A=\\begin{pmatrix}2&1\\\\1&1\\end{pmatrix}$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$A^{-1}=\\begin{pmatrix}1&-1\\\\-1&2\\end{pmatrix}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "12. Ressources",
+          packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Packages incontournables pour le lycée : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>
+            <p>Compilation : <code>pdflatex</code> ou <code>lualatex</code>.</p>
+            <p>Ressources : Overleaf (en ligne), TeX StackExchange (forum), CTAN (documentation des packages).</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Compiler avec <code>pdflatex</code> puis <code>pdflatex</code> pour les références croisées.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice L12.1</div>
+              <p>Citez deux packages indispensables pour les mathématiques au lycée.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>amsmath</code> et <code>pgfplots</code></p>
+              </div>
+            </div>`
+        }
+      ]
+    },
+    physique: {
+      title: "Physique – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['siunitx', 'pgfplots', 'circuitikz', 'tikz'],
+          code: `\\usepackage{siunitx}\n\\usepackage{pgfplots}\n\\usepackage{circuitikz}\n\\usepackage{tikz}`,
+          preview: `<p>Packages essentiels pour la physique au lycée :</p>
+            <ul><li><code>siunitx</code> : unités SI.</li>
+            <li><code>pgfplots</code> : graphiques.</li>
+            <li><code>circuitikz</code> : schémas électriques.</li>
+            <li><code>tikz</code> : figures générales.</li></ul>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Écrire une température de 25°C : <code>\\SI{25}{\\celsius}</code> → $\\SI{25}{\\celsius}$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP1.1</div>
+              <p>Quel package utilisez-vous pour tracer des courbes ?</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p><code>pgfplots</code></p>
+              </div>
+            </div>`
+        },
+        {
+          title: "2. Mécanique – Cinématique et dynamique",
+          packages: ['amsmath', 'tikz', 'pgfplots'],
+          code: `$\\vec v = \\frac{d\\vec{OM}}{dt}$\n$\\sum\\vec F_{ext}=m\\vec a$`,
+          preview: `<div class="box box-theoreme">Principe fondamental de la dynamique (PFD) : $\\sum\\vec F_{ext}=m\\vec a$.</div>
+            <div class="figure-tikz">[Schéma de forces sur un solide]</div>
+            <p>Projection sur les axes : $\\sum F_x = m a_x$, $\\sum F_y = m a_y$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Un solide de masse 2 kg est soumis à une force de 10 N. Accélération : $a = F/m = 5$ m/s².</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP2.1</div>
+              <p>Un solide de masse 5 kg est soumis à une force de 20 N. Calculez son accélération.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$a = F/m = 20/5 = 4$ m/s²</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Énergie mécanique",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$E_c=\\frac12 mv^2$, $E_p=mgh$, $E_m=E_c+E_p$`,
+          preview: `<div class="box box-theoreme">Conservation de l'énergie mécanique : $\\Delta E_m = 0$ si les forces sont conservatives.</div>
+            <p>Énergie cinétique : $E_c=\\frac12 mv^2$.</p>
+            <p>Énergie potentielle de pesanteur : $E_p=mgh$.</p>
+            <p>Travail d'une force constante : $W_{AB}(\\vec F) = \\vec F \\cdot \\overrightarrow{AB}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Un objet de 2 kg tombe d'une hauteur de 10 m. $E_p = mgh = 2\\times9,81\\times10 = 196,2$ J.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP3.1</div>
+              <p>Un objet de 3 kg est lancé avec une vitesse de 4 m/s. Calculez son énergie cinétique.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$E_c = \\frac12 \\times 3 \\times 4^2 = 24$ J</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Électricité – Régime continu et variable",
+          packages: ['amsmath', 'circuitikz', 'pgfplots'],
+          code: `$u_C(t)=E(1-e^{-t/RC})$\n$i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$`,
+          preview: `<div class="figure-tikz">[Circuit RC série]</div>
+            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$, avec $\\tau=RC$ la constante de temps.</p>
+            <p>Décharge : $u_C(t)=E e^{-t/RC}$.</p>
+            <p>Circuit RL : $i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>$R=100\\Omega$, $C=10\\mu F$ → $\\tau = 100 \\times 10^{-5} = 10^{-3}$ s.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP4.1</div>
+              <p>Calculez la constante de temps d'un circuit RC avec $R=200\\Omega$ et $C=20\\mu F$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\tau = 200 \\times 20\\times10^{-6} = 4\\times10^{-3}$ s</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "5. Thermodynamique – Gaz parfait",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$PV=nRT$\n$\\Delta U=W+Q$`,
+          preview: `<div class="box box-definition">Équation d'état des gaz parfaits : $PV=nRT$.</div>
+            <div class="box box-definition">Premier principe de la thermodynamique : $\\Delta U = W + Q$.</div>
+            <p>Isotherme : $PV = \\text{cste}$ ; Isobare : $V/T = \\text{cste}$ ; Isochore : $P/T = \\text{cste}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>1 mole de gaz parfait à 0°C et 1 atm : $V = \\frac{nRT}{P} = \\frac{1\\times8,314\\times273,15}{101325} \\approx 22,4$ L.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP5.1</div>
+              <p>Quel est le volume occupé par 2 moles de gaz parfait à 27°C et 2 atm ?</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$V = \\frac{2\\times8,314\\times300,15}{2\\times101325} \\approx 24,6$ L</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "6. Ondes mécaniques et lumineuses",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$y(x,t)=A\\cos(\\omega t-kx)$`,
+          preview: `<div class="figure-tikz">[Onde progressive sinusoïdale]</div>
+            <p>Onde progressive : $y(x,t)=A\\cos(\\omega t - kx)$.</p>
+            <p>Longueur d'onde : $\\lambda = \\frac{2\\pi}{k}$ ; Période : $T = \\frac{2\\pi}{\\omega}$ ; Célérité : $v = \\lambda f$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Une onde de fréquence 50 Hz et de longueur d'onde 2 m a pour célérité $v = 50 \\times 2 = 100$ m/s.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP6.1</div>
+              <p>Calculez la longueur d'onde d'une onde de fréquence 100 Hz et de célérité 340 m/s.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\lambda = v/f = 340/100 = 3,4$ m</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "7. Physique nucléaire",
+          packages: ['amsmath', 'chemformula', 'pgfplots'],
+          code: `$N(t)=N_0e^{-\\lambda t}$\n$t_{1/2}=\\frac{\\ln2}{\\lambda}$\n\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}`,
+          preview: `<div class="box box-definition">Loi de décroissance radioactive : $N(t)=N_0e^{-\\lambda t}$.</div>
+            <div class="box box-definition">Temps de demi-vie : $t_{1/2}=\\frac{\\ln 2}{\\lambda}$.</div>
+            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$.</div>
+            <div class="box box-theoreme">Fusion : $\\ch{^2_1H + ^3_1H -> ^4_2He + n}$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Un échantillon de 100 g de carbone 14 ($t_{1/2}=5730$ ans) : après 5730 ans, il reste 50 g.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP7.1</div>
+              <p>Calculer le temps de demi-vie si $\\lambda = 0,1$ s⁻¹.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$t_{1/2} = \\frac{\\ln2}{0,1} \\approx 6,93$ s</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "8. Mécanique des fluides",
+          packages: ['amsmath', 'tikz'],
+          code: `$P=F/S$\n$\\Delta P = \\rho g \\Delta h$\n$\\vec F_A = -\\rho_f V_{im}\\vec g$`,
+          preview: `<div class="box box-definition">Pression : $P=\\frac{F}{S}$ (Pa).</div>
+            <div class="box box-propriete">Pression hydrostatique : $\\Delta P = \\rho g \\Delta h$.</div>
+            <div class="box box-theoreme">Principe d'Archimède : $\\vec F_A = -\\rho_f V_{im} \\vec g$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Un cube de 10 cm d'arête immergé dans l'eau ($\\rho=1000$ kg/m³) subit une poussée d'Archimède de $F_A = 1000 \\times 0,001 \\times 9,81 \\approx 9,81$ N.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LP8.1</div>
+              <p>Calculez la pression exercée par une colonne d'eau de 5 m de hauteur.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\Delta P = 1000 \\times 9,81 \\times 5 = 49050$ Pa</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "9. Ressources",
+          packages: ['siunitx', 'circuitikz', 'pgfplots', 'chemformula'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs fréquentes :</p>
+            <ul><li><code>circuitikz</code> : vérifier les coordonnées des connexions.</li>
+            <li><code>pgfplots</code> : adapter le domaine et les échantillons.</li>
+            <li><code>chemformula</code> : respecter la syntaxe (espaces, parenthèses).</li></ul>`
+        }
+      ]
+    },
+    chimie: {
+      title: "Chimie – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `\\usepackage{chemformula}\n\\usepackage{siunitx}\n\\usepackage{pgfplots}`,
+          preview: `<p>Packages spécifiques pour la chimie au lycée :</p>
+            <ul><li><code>chemformula</code> : formules et équations chimiques.</li>
+            <li><code>siunitx</code> : unités et grandeurs.</li>
+            <li><code>pgfplots</code> : tracé de courbes de titrage, de cinétique.</li></ul>`
+        },
+        {
+          title: "2. Acides et bases – pH",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `$pH=-\\log[H_3O^+]$\n$K_a = \\frac{[A^-][H_3O^+]}{[HA]}$\n$pH = pK_a + \\log\\frac{[A^-]}{[HA]}$`,
+          preview: `<div class="box box-definition">$pH = -\\log[H_3O^+]$.</div>
+            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$.</div>
+            <div class="box box-propriete">Relation de Henderson-Hasselbalch : $pH = pK_a + \\log\\frac{[A^-]}{[HA]}$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Un acide $HA$ de $pK_a=4,76$ et $[A^-]/[HA]=10$ → $pH = 4,76 + \\log(10) = 5,76$.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LC2.1</div>
+              <p>Calculez le pH d'une solution où $[A^-]=0,1$ M et $[HA]=0,01$ M, $pK_a=4,76$.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$pH = 4,76 + \\log(10) = 5,76$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "3. Oxydoréduction",
+          packages: ['chemformula', 'amsmath'],
+          code: `\\ch{Fe^{2+} -> Fe^{3+} + e-}\n\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}\n$E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$`,
+          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$ (à 25°C).</div>
+            <p>Demi-équations : <br>$\\ch{Fe^{2+} -> Fe^{3+} + e-}$<br>$\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}$</p>
+            <p>Pile : $E_{pile}=E_{cathode}-E_{anode}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Pour $\\ch{Fe^{3+}/Fe^{2+}}$, $E^\\circ=0,77$ V. Si $[Fe^{3+}]=0,1$ M et $[Fe^{2+}]=0,01$ M, $E=0,77+0,06\\log(10)=0,83$ V.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LC3.1</div>
+              <p>Calculez le potentiel d'une électrode $\\ch{Cu^{2+}/Cu}$ ($E^\\circ=0,34$ V) si $[Cu^{2+}]=0,01$ M.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$E = 0,34 + \\frac{0,06}{2}\\log(0,01) = 0,34 - 0,06 = 0,28$ V</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "4. Cinétique chimique",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$v=-\\frac{d[A]}{dt}$\n$v=k[A]$ (ordre 1)\n$t_{1/2}=\\frac{\\ln2}{k}$`,
+          preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>
+            <p>Vitesse de réaction : $v=-\\frac{d[A]}{dt}$.</p>
+            <p>Réaction d'ordre 1 : $v=k[A]$, temps de demi-réaction $t_{1/2}=\\frac{\\ln 2}{k}$.</p>
+            <p>Réaction d'ordre 2 : $v=k[A]^2$, $t_{1/2}=\\frac{1}{k[A]_0}$.</p>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Une réaction d'ordre 1 a $k=0,1$ s⁻¹. $t_{1/2}=\\frac{\\ln2}{0,1}\\approx6,93$ s.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LC4.1</div>
+              <p>Calculez le temps de demi-réaction d'une réaction d'ordre 1 avec $k=0,05$ s⁻¹.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$t_{1/2}=\\frac{\\ln2}{0,05}\\approx13,86$ s</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "5. Chimie organique",
+          packages: ['chemformula'],
+          code: `\\ch{C_nH_{2n+2}}\n\\ch{CH4}, \\ch{C2H6}, \\ch{C3H8}\nAlcool : \\ch{R-OH}`,
+          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$.</p>
+            <ul><li>Méthane $\\ch{CH4}$</li><li>Éthane $\\ch{C2H6}$</li><li>Propane $\\ch{C3H8}$</li></ul>
+            <p>Groupes fonctionnels :</p>
+            <ul><li>Alcool : $\\ch{R-OH}$</li><li>Acide carboxylique : $\\ch{R-COOH}$</li><li>Ester : $\\ch{R-COOR'}$</li></ul>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>L'éthanol $\\ch{C2H5OH}$ est un alcool primaire.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LC5.1</div>
+              <p>Donnez la formule semi-développée du propan-2-ol.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\ch{CH3-CH(OH)-CH3}$</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "6. Thermodynamique chimique",
+          packages: ['amsmath', 'chemformula'],
+          code: `$\\Delta H = H_{prod}-H_{réact}$\n$\\Delta G = \\Delta H - T\\Delta S$\n$\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$`,
+          preview: `<div class="box box-definition">Enthalpie de réaction : $\\Delta H = H_{prod}-H_{réact}$.</div>
+            <div class="box box-definition">Entropie : $\\Delta S = S_{prod}-S_{réact}$.</div>
+            <div class="box box-theoreme">Énergie libre de Gibbs : $\\Delta G = \\Delta H - T\\Delta S$. Réaction spontanée si $\\Delta G<0$.</div>
+            <div class="box box-theoreme">Loi de Hess : $\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod) - \\sum\\Delta H_f^\\circ(réact)$.</div>
+            <div class="example-box"><div class="ex-title">💡 Exemple</div>
+            <p>Pour $\\ch{2H2 + O2 -> 2H2O}$, $\\Delta H = 2\\times(-285,8) - 0 = -571,6$ kJ/mol.</p>
+            </div>
+            <div class="exercise-box">
+              <div class="ex-title">📝 Exercice LC6.1</div>
+              <p>Calculez $\\Delta G$ si $\\Delta H = -100$ kJ, $\\Delta S = 0,2$ kJ/K, $T=300$ K.</p>
+              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
+              <div class="ex-correction">
+                <p>$\\Delta G = -100 - 300\\times0,2 = -160$ kJ</p>
+              </div>
+            </div>`
+        },
+        {
+          title: "7. Ressources",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs fréquentes :</p>
+            <ul><li><code>chemformula</code> : vérifier les espaces et parenthèses dans les formules.</li>
+            <li><code>siunitx</code> : séparer correctement le nombre et l'unité (ex: <code>\\SI{5}{mol}</code>).</li></ul>`
+        }
+      ]
+    }
+  }
+};
+
+// =================================================================
+// 3. SOURCE LATEX POUR LE COMPOSEUR (identique à la version précédente)
+// =================================================================
+const LATEX_SOURCE = String.raw`
+\documentclass[a4paper,12pt]{article}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mhchem}
+\usepackage{chemfig}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{circuitikz}
+\usepackage{tkz-tab}
+\usepackage{bclogo}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{textcomp}
+\usepackage{draftwatermark}
+
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\definecolor{codebg}{rgb}{0.95,0.95,0.95}
+\definecolor{codeframe}{rgb}{0.8,0.8,0.8}
+\lstdefinestyle{mylatex}{
+  language={[LaTeX]TeX},
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  columns=fullflexible,
+  commentstyle=\color{green!40!black},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  morekeywords={documentclass,begin,end,chapter,section,subsection,
+    textbf,textit,underline,texttt,textsc,textsf,
+    includegraphics,tabular,hline,multirow,multicol,
+    itemize,enumerate,description,item,
+    equation,align,split,frac,sqrt,sum,int,lim,
+    iint,iiint,oint,
+    partial,nabla,to,infty,limsup,liminf,
+    prod,coprod,binom,choose,atop,
+    matrix,pmatrix,bmatrix,vmatrix,Vmatrix,
+    left,right,big,bigg,langle,rangle,colon,prime,
+    in,notin,subset,supset,subseteq,supseteq,cup,cap,forall,exists,emptyset,neg,
+    alpha,beta,gamma,delta,epsilon,varepsilon,zeta,eta,theta,vartheta,iota,kappa,
+    lambda,mu,nu,xi,omicron,pi,varpi,rho,varrho,sigma,varsigma,tau,upsilon,
+    phi,varphi,chi,psi,omega,
+    Gamma,Delta,Theta,Lambda,Xi,Pi,Sigma,Phi,Psi,Omega,
+    ce,chemfig,mhchem,
+    caption,label,ref,footnote,par,newpage,
+    textcolor,colorbox,mbox,fbox,framebox,makebox,parbox,fcolorbox,
+    definecolor,pagecolor,
+    rotatebox,scalebox,reflectbox,resizebox,raisebox,
+    wrapfigure,wrapfig,
+    rule,dotfill,hspace,vspace,
+    bcboite,bccrayon,bcinfo,bcattention,bcexemple,bcquestion,bcnotation,bcdanger,
+    couleur,arrondi,ombre,logo,bordure,epBordure,
+    ampoule,crayon,livre, loupe,clef,horloge,
+    geometry,margin,SetWatermarkText,SetWatermarkScale,SetWatermarkColor,SetWatermarkAngle,
+    pgfplots,axis,addplot,legend,
+    circuitikz,resistor,capacitor,inductor,battery,lamp,switch,voltage,current,ammeter,voltmeter,
+    tkzTabInit,tkzTabLine,tkzTabVar,tkzTabFct,
+    coordinates,mathbb,mathcal,mathrm,
+    headrulewidth,footrulewidth,
+    pagestyle,fancypagestyle,fancyhead,fancyfoot,fancyhf,thispagestyle,renewcommand,
+    leftmark,rightmark,today,
+    color,
+    lstset,lstlisting,
+    onlyframes,trans,onslide,pause,
+    tableofcontents,printindex,maketitle,
+    textsuperscript,textsubscript,oe,ae,ss}
+}
+
+\title{\textbf{Initiation à \LaTeX}\\
+\small Destiné aux enseignants de sciences au collège et au lycée}
+\author{}
+\date{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{\LaTeX} -- Sciences Collège}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\vfill
+\begin{center}
+\large Un outil professionnel pour produire\\
+des documents scientifiques de qualité
+\end{center}
+\vfill
+\newpage
+\tableofcontents
+\newpage
+
+% Leçons 1 à 10 avec blocs lstlisting...
+\end{document}
+`;
+
+// =================================================================
+// 4. FONCTIONS DU MODE COMPOSEUR (extraction et affichage)
+// =================================================================
+let widgets = [];
+let filteredWidgets = [];
+let projectorIndex = 0;
+let isProjecting = false;
+
+function parseLaTeX(source) {
+  const listings = [];
+  const lines = source.split('\n');
+  let currentSection = 'PREAMBULE';
+  let currentSub = '';
+  let inListing = false;
+  let listingLines = [];
+  let listingStartLine = 0;
+  let explanation = '';
+  let buf = [];
+
+  function collectExplanation() {
+    let text = [];
+    for (let i = buf.length - 1; i >= 0; i--) {
+      const ln = buf[i].trim();
+      if (!ln || ln.startsWith('%') || ln.startsWith('\\') || ln.startsWith('\\begin') || ln.startsWith('\\end') || ln.startsWith('\\item') || /^\\[a-z]/.test(ln)) continue;
+      if (ln.length > 8 && !ln.startsWith('\\') && !ln.startsWith('%')) text.unshift(ln);
+      if (text.length >= 4) break;
+    }
+    return text.join(' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function flushListing() {
+    if (listingLines.length > 0) {
+      const code = listingLines.join('\n');
+      const expl = collectExplanation();
+      listings.push({ code, section: currentSection, subsection: currentSub, explanation: expl, line: listingStartLine + 1 });
+      listingLines = [];
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const secMatch = line.match(/^\s*\\section\{(.+?)\}/);
+    if (secMatch) {
+      currentSection = secMatch[1].replace(/\\LaTeX/g, 'LaTeX').replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1').replace(/[{}`'~,]/g, '').replace(/\s+/g, ' ').trim();
+      currentSub = '';
+      buf = [];
+    }
+    const subMatch = line.match(/^\s*\\subsection\{(.+?)\}/);
+    if (subMatch) {
+      currentSub = subMatch[1].replace(/\\LaTeX/g, 'LaTeX').replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1').replace(/[{}`'~,]/g, '').replace(/\s+/g, ' ').trim();
+      buf = [];
+    }
+    if (line.includes('\\begin{lstlisting}')) {
+      explanation = collectExplanation();
+      flushListing();
+      inListing = true;
+      listingLines = [];
+      listingStartLine = i;
+      continue;
+    }
+    if (line.includes('\\end{lstlisting}')) {
+      flushListing();
+      inListing = false;
+      continue;
+    }
+    if (!inListing) buf.push(line);
+    if (inListing) listingLines.push(line);
+  }
+  flushListing();
+  return listings;
+}
+
+function highlightLaTeX(code) {
+  let h = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h
+    .replace(/(%.*)/g, '<span class="hl-cmt">$1</span>')
+    .replace(/(\\ce\{[^}]*\})/g, '<span class="hl-str">$1</span>')
+    .replace(/(\\(?:documentclass|usepackage|begin|end|chapter|section|subsection|subsubsection|textbf|textit|underline|texttt|textsc|textsf|includegraphics|tabular|hline|itemize|enumerate|description|item|equation|align|split|frac|sqrt|sum|int|lim|alpha|beta|gamma|delta|epsilon|theta|pi|omega|times|div|pm|approx|neq|leq|geq|vec|circ|label|ref|footnote|par|newpage|textcolor|colorbox|mbox|lstset|lstinline|ce|chemfig|caption|tableofcontents|printindex|maketitle|textsuperscript|textsubscript|textbackslash|textasciitilde|left|right|quad|qquad|hfill|vfill|medskip|bigskip|smallskip|centering|large|small|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|displaystyle|textstyle|scriptstyle|scriptscriptstyle|choose|over|above|atop|brace|bracket|lines|plain|toprule|midrule|bottomrule|columnbreak|multicols))\b/g, '<span class="hl-kw">$1</span>')
+    .replace(/(\$)/g, '<span class="hl-sec">$1</span>')
+    .replace(/([\[\]|])/g, '<span class="hl-bra">$1</span>')
+    .replace(/({|})/g, '<span class="hl-bra">$1</span>')
+    .replace(/\b(\d+[.,]?\d*)\b/g, '<span class="hl-num">$1</span>');
+  return h;
+}
+
+function renderWidgetsComposeur() {
+  const grid = document.getElementById('widgetGridComposeur');
+  const filterSelect = document.getElementById('sectionFilterComposeur');
+  if (!grid) return;
+
+  const filter = filterSelect ? filterSelect.value : '';
+  filteredWidgets = filter ? widgets.filter(w => w.section === filter) : widgets;
+
+  const stats = document.getElementById('statsComposeur');
+  if (stats) {
+    stats.innerHTML = '<strong>' + filteredWidgets.length + '</strong> widget' + (filteredWidgets.length > 1 ? 's' : '') +
+      ' sur <strong>' + widgets.length + '</strong> extrai' + (widgets.length > 1 ? 'ts' : 't');
+  }
+
+  if (filteredWidgets.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>Aucun widget trouvé</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filteredWidgets.map(function(w, i) {
+    const code = highlightLaTeX(w.code);
+    const sec = w.section.length > 32 ? escHtml(w.section.substring(0, 30)) + '...' : escHtml(w.section);
+    const expl = w.explanation ? sanitize(w.explanation) : '';
+    return '<div class="widget" data-index="' + i + '">' +
+      '<div class="widget-header">' +
+        '<span class="label">&#9998; Code LaTeX</span>' +
+        '<span class="section-tag" title="' + sanitize(w.section) + (w.subsection ? ' > ' + sanitize(w.subsection) : '') + '">' + sec + '</span>' +
+      '</div>' +
+      (expl ? '<div class="widget-expl" id="expl-c-' + i + '">' +
+        '<div class="expl-label">&#128214; Explication</div>' +
+        '<div class="expl-text">' + expl + '</div>' +
+        (expl.length > 180 ? '<button class="expl-toggle" onclick="toggleExplComposeur(\'expl-c-' + i + '\')">Afficher plus</button>' : '') +
+      '</div>' : '') +
+      '<div class="widget-code">' +
+        '<pre>' + code + '</pre>' +
+        '<button class="copy-btn" onclick="copyCodeComposeur(this, ' + i + ')">Copier</button>' +
+      '</div>' +
+      '<div class="widget-footer">' +
+        '<span class="index">#' + (i + 1) + (w.subsection ? ' - ' + escHtml(w.subsection) : '') + '</span>' +
+        '<button class="project-btn" onclick="projectFromComposeur(' + i + ')">&#9654; Projeter</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleExplComposeur(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.toggle('expanded'); const btn = el.querySelector('.expl-toggle'); if (btn) btn.textContent = el.classList.contains('expanded') ? 'Reduire' : 'Afficher plus'; }
+}
+function copyCodeComposeur(btn, index) {
+  const code = filteredWidgets[index].code;
+  navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copie !'; setTimeout(() => btn.textContent = 'Copier', 1500); }).catch(() => {});
+}
+function projectFromComposeur(index) {
+  projectorIndex = index;
+  toggleProjection(true);
+}
+
+function updateProjector() {
+  if (filteredWidgets.length === 0) return;
+  const w = filteredWidgets[projectorIndex];
+  const code = highlightLaTeX(w.code);
+  const expl = w.explanation ? sanitize(w.explanation) : '';
+  document.getElementById('projectorSlide').innerHTML =
+    '<div class="slide-section">' + escHtml(w.section) + '</div>' +
+    '<div class="slide-title">' + (w.subsection ? escHtml(w.subsection) : 'Code LaTeX') + '</div>' +
+    (expl ? '<div class="slide-expl">' + expl + '</div>' : '') +
+    '<div class="slide-code"><pre>' + code + '</pre></div>' +
+    '<div class="slide-hint">&#9000; &#8592; &#8594; navigation &bull; &#9096; copier &bull; Esc quitter</div>';
+  document.getElementById('projectorCounter').textContent = (projectorIndex + 1) + ' / ' + filteredWidgets.length;
+  document.getElementById('prevBtn').disabled = projectorIndex === 0;
+  document.getElementById('nextBtn').disabled = projectorIndex === filteredWidgets.length - 1;
+}
+function projectorNext() { if (projectorIndex < filteredWidgets.length - 1) { projectorIndex++; updateProjector(); } }
+function projectorPrev() { if (projectorIndex > 0) { projectorIndex--; updateProjector(); } }
+function toggleProjection(force) {
+  const proj = document.getElementById('projector');
+  if (force === true) { proj.classList.add('active'); isProjecting = true; updateProjector(); document.body.style.overflow = 'hidden'; }
+  else if (force === false) { proj.classList.remove('active'); isProjecting = false; document.body.style.overflow = ''; }
+  else { isProjecting = !isProjecting; proj.classList.toggle('active'); document.body.style.overflow = isProjecting ? 'hidden' : ''; if (isProjecting) updateProjector(); }
+}
+
+// =================================================================
+// 5. FONCTIONS DU MODE FORMATION (avec introduction, packages, code)
+// =================================================================
+let currentSearchTerm = '';
+
+function renderFormationWidgets() {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  const grid = document.getElementById('widgetGridFormation');
+  const stats = document.getElementById('statsFormation');
+
+  if (!module) {
+    stats.innerHTML = 'Aucun module trouvé.';
+    grid.innerHTML = '<div class="empty-state"><p>Choisissez un niveau et une matière.</p></div>';
+    return;
+  }
+
+  let chapters = module.chapters;
+  const searchTerm = currentSearchTerm.trim().toLowerCase();
+  if (searchTerm) {
+    chapters = chapters.filter(chap => chap.title.toLowerCase().includes(searchTerm));
+  }
+
+  stats.innerHTML = '<strong>' + chapters.length + '</strong> chapitre' + (chapters.length > 1 ? 's' : '') +
+    ' sur <strong>' + module.chapters.length + '</strong> dans <strong>' + module.title + '</strong>';
+
+  if (chapters.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>Aucun chapitre ne correspond à votre recherche.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = chapters.map(function(chap, i) {
+    const code = highlightLaTeX(chap.code);
+
+    // Construction de la section des packages
+    let packagesHtml = '';
+    if (chap.packages && chap.packages.length) {
+      packagesHtml = `<div class="widget-packages">
+        <div class="packages-label">📦 Packages utilisés dans ce chapitre</div>`;
+      chap.packages.forEach(pkg => {
+        const info = PACKAGE_INFO[pkg] || { role: 'Rôle à préciser', importance: 'Information à compléter' };
+        packagesHtml += `<div class="pkg-item">
+          <span class="pkg-name">${pkg}</span>
+          <span class="pkg-role">${info.role}</span>
+          <span class="pkg-importance">⭐ <strong>Importance :</strong> ${info.importance}</span>
+        </div>`;
+      });
+      packagesHtml += `</div>`;
+    } else {
+      packagesHtml = `<div class="widget-packages"><div class="packages-label">📦 Aucun package spécifique requis</div></div>`;
+    }
+
+    return '<div class="widget" data-index="' + i + '">' +
+      '<div class="widget-header">' +
+        '<span class="label">📘 Chapitre</span>' +
+        '<span class="section-tag">' + escHtml(chap.title) + '</span>' +
+      '</div>' +
+      // Introduction
+      '<div class="widget-intro" id="intro-' + i + '">' +
+        '<div class="intro-label">📖 Introduction</div>' +
+        '<div class="intro-content">' + chap.preview + '</div>' +
+        '<span class="intro-toggle" onclick="toggleIntro(' + i + ')">Afficher moins</span>' +
+      '</div>' +
+      // Packages
+      packagesHtml +
+      // Code
+      '<div class="widget-code">' +
+        '<pre>' + code + '</pre>' +
+        '<button class="copy-btn" onclick="copyCodeFormation(this, ' + i + ')">Copier</button>' +
+      '</div>' +
+      '<div class="widget-footer">' +
+        '<span class="index">#' + (i + 1) + '</span>' +
+        '<button class="project-btn" onclick="projectChapterFormation(' + i + ')">&#9654; Projeter</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(() => {});
+  }
+}
+
+// Fonction pour réduire/afficher l'introduction
+function toggleIntro(index) {
+  const intro = document.getElementById('intro-' + index);
+  if (!intro) return;
+  intro.classList.toggle('expanded');
+  const toggleBtn = intro.querySelector('.intro-toggle');
+  if (toggleBtn) toggleBtn.textContent = intro.classList.contains('expanded') ? 'Afficher moins' : 'Afficher plus';
+}
+
+// Fonction pour afficher/masquer les corrections d'exercices
+function toggleCorrection(btn) {
+  const parent = btn.parentElement;
+  const correction = parent.querySelector('.ex-correction');
+  if (!correction) return;
+  correction.classList.toggle('show');
+  btn.textContent = correction.classList.contains('show') ? '🔍 Masquer la correction' : '🔍 Voir la correction';
+}
+
+// Injection du CSS pour les toggles d'introduction
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .widget-intro .intro-content { max-height: 180px; overflow: hidden; transition: max-height 0.3s ease; }
+    .widget-intro.expanded .intro-content { max-height: none; }
+    .widget-intro .intro-toggle { display: inline-block; margin-top: 4px; font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 500; }
+    .widget-intro .intro-toggle:hover { text-decoration: underline; }
+  `;
+  document.head.appendChild(style);
+})();
+
+function copyCodeFormation(btn, index) {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  if (!module) return;
+  const chaptersFiltres = module.chapters.filter(chap => {
+    if (!currentSearchTerm) return true;
+    return chap.title.toLowerCase().includes(currentSearchTerm.trim().toLowerCase());
+  });
+  const chap = chaptersFiltres[index];
+  if (!chap) return;
+  navigator.clipboard.writeText(chap.code).then(() => { btn.textContent = 'Copie !'; setTimeout(() => btn.textContent = 'Copier', 1500); }).catch(() => {});
+}
+
+function projectChapterFormation(index) {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  if (!module) return;
+  const chaptersFiltres = module.chapters.filter(chap => {
+    if (!currentSearchTerm) return true;
+    return chap.title.toLowerCase().includes(currentSearchTerm.trim().toLowerCase());
+  });
+  const chap = chaptersFiltres[index];
+  if (!chap) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'projectionOverlay';
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #0f172a; z-index: 99999;
+    padding: 40px 60px; overflow-y: auto;
+    color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+  `;
+  const exitBtn = document.createElement('button');
+  exitBtn.textContent = '✕ Quitter la projection';
+  exitBtn.style.cssText = `
+    position: fixed; top: 20px; right: 30px;
+    background: #ef4444; color: white; border: none;
+    padding: 10px 24px; border-radius: 30px;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    z-index: 100000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: background 0.2s;
+  `;
+  exitBtn.onmouseover = () => { exitBtn.style.background = '#dc2626'; };
+  exitBtn.onmouseout = () => { exitBtn.style.background = '#ef4444'; };
+  exitBtn.onclick = () => {
+    document.body.removeChild(overlay);
+    document.body.removeChild(exitBtn);
+    document.body.classList.remove('projection-mode');
+    document.body.style.overflow = '';
+  };
+  const contentWrapper = document.createElement('div');
+  contentWrapper.style.maxWidth = '1000px';
+  contentWrapper.style.margin = '0 auto';
+  contentWrapper.innerHTML = `
+    <h2 style="color: #f1f5f9; border-left: 4px solid #3b82f6; padding-left: 14px;">${module.title} – ${chap.title}</h2>
+    ${chap.preview}
+  `;
+  overlay.appendChild(contentWrapper);
+  document.body.appendChild(overlay);
+  document.body.appendChild(exitBtn);
+  document.body.classList.add('projection-mode');
+  document.body.style.overflow = 'hidden';
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(() => {});
+  }
+}
+
+// =================================================================
+// 6. FONCTIONS DE BASCULE DE MODE
+// =================================================================
+function switchMode(mode) {
+  document.body.classList.remove('composeur-mode');
+  if (mode === 'composeur') {
+    document.body.classList.add('composeur-mode');
+    document.getElementById('modeFormationBtn').classList.remove('active');
+    document.getElementById('modeComposeurBtn').classList.add('active');
+    renderWidgetsComposeur();
+  } else {
+    document.getElementById('modeFormationBtn').classList.add('active');
+    document.getElementById('modeComposeurBtn').classList.remove('active');
+    renderFormationWidgets();
+  }
+}
+
+function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function sanitize(s) { return escHtml(s); }
+
+// =================================================================
+// 7. INITIALISATION
+// =================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  // Formation
+  document.getElementById('niveauSelect').addEventListener('change', function() { renderFormationWidgets(); });
+  document.getElementById('matiereSelect').addEventListener('change', function() { renderFormationWidgets(); });
+  const searchInput = document.getElementById('searchChapitre');
+  searchInput.addEventListener('input', function() {
+    currentSearchTerm = this.value;
+    renderFormationWidgets();
+  });
+
+  renderFormationWidgets();
+
+  // Composeur
+  widgets = parseLaTeX(LATEX_SOURCE);
+  const filterSelect = document.getElementById('sectionFilterComposeur');
+  if (filterSelect) {
+    const sections = [];
+    widgets.forEach(w => { if (!sections.includes(w.section)) sections.push(w.section); });
+    sections.sort();
+    sections.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      filterSelect.appendChild(opt);
+    });
+    filterSelect.addEventListener('change', renderWidgetsComposeur);
+  }
+  renderWidgetsComposeur();
+
+  // Mode projecteur global
+  document.getElementById('projectorBtn').addEventListener('click', function() {
+    document.body.classList.toggle('projector-mode');
+    this.textContent = document.body.classList.contains('projector-mode') ? '🔲 Quitter projecteur' : '🔲 Mode projecteur';
+  });
+
+  // Gestion des touches pour le projecteur
+  document.addEventListener('keydown', function(e) {
+    if (!isProjecting) return;
+    if (e.key === 'Escape') { toggleProjection(false); e.preventDefault(); }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { projectorNext(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { projectorPrev(); e.preventDefault(); }
+    if (e.key === 'c' || e.key === 'C') {
+      if (filteredWidgets[projectorIndex]) navigator.clipboard.writeText(filteredWidgets[projectorIndex].code);
+      e.preventDefault();
+    }
+  });
+});
+</script>
+</body>
+</html>===============================================
   Fichier : formation_complete.html
   Projet  : Plateforme LaTeX – Formation & Composeur
   Description :
