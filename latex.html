@@ -5,7 +5,7 @@
   Description :
     Fusion complète avec tous les chapitres enrichis.
     Mode Formation : widgets pour chaque chapitre (packages, code, aperçu).
-    Mode Composeur : widgets pour chaque bloc lstlisting.
+    Mode Composeur : widgets pour chaque bloc lstlisting avec filtre par section.
 ============================================================ -->
 <html lang="fr">
 <head>
@@ -195,6 +195,34 @@
     body.composeur-mode .mode-formation { display: none; }
     body.composeur-mode .mode-composeur { display: block; }
 
+    .composeur-controls {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .composeur-controls label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .composeur-controls select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+    }
+
     #projector {
       display: none;
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -306,6 +334,9 @@
     body.projector-mode .btn-projector { background: #3b82f6; }
     body.projector-mode .btn-projector:hover { background: #2563eb; }
     body.projector-mode .subtitle { border-bottom-color: #334155; }
+    body.projector-mode .composeur-controls { background: #1e293b; }
+    body.projector-mode .composeur-controls label { color: #e2e8f0; }
+    body.projector-mode .composeur-controls select { background: #334155; border-color: #475569; color: white; }
 
     @media (max-width: 640px) {
       .container { padding: 16px; }
@@ -318,6 +349,7 @@
       .projector-slide .slide-code pre { font-size: 14px; }
       .projector-slide .slide-title { font-size: 20px; }
       .projector-nav .btn-nav { width: 36px; height: 36px; font-size: 15px; }
+      .composeur-controls { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -348,17 +380,27 @@
     </div>
   </div>
 
+  <!-- ========== MODE FORMATION ========== -->
   <div class="mode-formation" id="modeFormation">
     <div class="stats" id="statsFormation">Chargement...</div>
     <div class="widget-grid" id="widgetGridFormation"></div>
   </div>
 
+  <!-- ========== MODE COMPOSEUR ========== -->
   <div class="mode-composeur" id="modeComposeur">
+    <div class="composeur-controls">
+      <label>Filtrer par section
+        <select id="sectionFilterComposeur">
+          <option value="">Toutes les sections</option>
+        </select>
+      </label>
+    </div>
     <div class="stats" id="statsComposeur">Chargement...</div>
     <div class="widget-grid" id="widgetGridComposeur"></div>
   </div>
 </div>
 
+<!-- ========== PROJECTEUR ========== -->
 <div id="projector">
   <div class="projector-bg"></div>
   <div class="projector-header">
@@ -675,26 +717,30 @@ const data = {
           packages: ['amsmath', 'amssymb', 'tkz-euclide'],
           code: `$z=a+ib$, $z=re^{i\\theta}$\n$e^{i\\theta}=\\cos\\theta+i\\sin\\theta$`,
           preview: `<div class="box box-theoreme">Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$</div>
-            <div class="figure-tikz">[Plan complexe]</div>`
+            <div class="figure-tikz">[Plan complexe]</div>
+            <p>Affixe : $z = x + iy$ correspond au point $(x; y)$.</p>`
         },
         {
           title: "7. Géométrie analytique",
           packages: ['amsmath', 'tikz'],
           code: `$\\overrightarrow{AB}=\\begin{pmatrix} x_B-x_A \\\\ y_B-y_A \\end{pmatrix}$\n$\\vec u\\cdot\\vec v = x_ux_v+y_uy_v$`,
-          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$</div>`
+          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$</div>
+            <p>Orthogonalité : $\\vec u \\perp \\vec v \\iff \\vec u\\cdot\\vec v = 0$</p>`
         },
         {
           title: "8. Géométrie 3D",
           packages: ['tikz', 'amsmath'],
           code: `$AB=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$`,
           preview: `<div class="figure-tikz">[Parallélépipède]</div>
-            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$</p>`
+            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$</p>
+            <p>Milieu : $I(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}, \\frac{z_A+z_B}{2})$</p>`
         },
         {
           title: "9. Probabilités",
           packages: ['amsmath', 'pgfplots'],
           code: `$E(X)=\\sum x_i P(X=x_i)$\n$P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$`,
           preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$</div>
+            <div class="box box-definition">Variance : $V(X)=E(X^2)-(E(X))^2$</div>
             <div class="box box-definition">Loi binomiale : $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$</div>`
         },
         {
@@ -702,13 +748,15 @@ const data = {
           packages: ['amsmath'],
           code: `$y'+ay=b$ solution : $y=Ce^{-ax}+b/a$\n$y''+\\omega^2 y=0$`,
           preview: `<p>Ordre 1 : $y'+ay=b \\Rightarrow y=Ce^{-ax}+\\frac{b}{a}$</p>
-            <p>Ordre 2 : $y''+\\omega^2 y=0 \\Rightarrow y=A\\cos(\\omega x)+B\\sin(\\omega x)$</p>`
+            <p>Ordre 2 : $y''+\\omega^2 y=0 \\Rightarrow y=A\\cos(\\omega x)+B\\sin(\\omega x)$</p>
+            <p>Régime critique, apériodique, pseudo-périodique.</p>`
         },
         {
           title: "11. Matrices",
           packages: ['amsmath'],
           code: `$A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$\n$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$`,
-          preview: `<div class="box box-definition">Inverse d'une matrice 2×2 :<br>$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$</div>`
+          preview: `<div class="box box-definition">Inverse d'une matrice 2×2 :<br>$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$</div>
+            <p>Matrice identité : $I_2 = \\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}$</p>`
         },
         {
           title: "12. Ressources",
@@ -733,47 +781,56 @@ const data = {
           packages: ['amsmath', 'tikz', 'pgfplots'],
           code: `$\\vec v = \\frac{d\\vec{OM}}{dt}$\n$\\sum\\vec F_{ext}=m\\vec a$`,
           preview: `<div class="box box-theoreme">PFD : $\\sum\\vec F_{ext}=m\\vec a$</div>
-            <div class="figure-tikz">[Schéma de forces]</div>`
+            <div class="figure-tikz">[Schéma de forces]</div>
+            <p>Projection sur les axes : $\\sum F_x = m a_x$, $\\sum F_y = m a_y$.</p>`
         },
         {
           title: "3. Énergie mécanique",
           packages: ['amsmath', 'pgfplots'],
           code: `$E_c=\\frac12 mv^2$, $E_p=mgh$, $E_m=E_c+E_p$`,
-          preview: `<div class="box box-theoreme">Conservation : $\\Delta E_m=0$ si forces conservatives</div>`
+          preview: `<div class="box box-theoreme">Conservation : $\\Delta E_m=0$ si forces conservatives</div>
+            <p>Travail : $W_{AB}(\\vec F) = \\vec F \\cdot \\overrightarrow{AB}$</p>`
         },
         {
           title: "4. Électricité",
           packages: ['amsmath', 'circuitikz', 'pgfplots'],
           code: `$u_C(t)=E(1-e^{-t/RC})$\n$i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$`,
           preview: `<div class="figure-tikz">[Circuit RC]</div>
-            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$</p>`
+            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$</p>
+            <p>Constante de temps : $\\tau = RC$</p>
+            <p>Décharge : $u_C(t)=E e^{-t/RC}$</p>`
         },
         {
           title: "5. Thermodynamique",
           packages: ['amsmath', 'pgfplots'],
           code: `$PV=nRT$\n$\\Delta U=W+Q$`,
           preview: `<div class="box box-definition">Gaz parfait : $PV=nRT$</div>
-            <div class="box box-definition">Premier principe : $\\Delta U=W+Q$</div>`
+            <div class="box box-definition">Premier principe : $\\Delta U=W+Q$</div>
+            <p>Isotherme : $PV = cste$ ; Isobare : $V/T = cste$.</p>`
         },
         {
           title: "6. Ondes",
           packages: ['amsmath', 'pgfplots'],
           code: `$y(x,t)=A\\cos(\\omega t-kx)$`,
-          preview: `<div class="figure-tikz">[Onde sinusoïdale]</div>`
+          preview: `<div class="figure-tikz">[Onde sinusoïdale]</div>
+            <p>Longueur d'onde : $\\lambda = \\frac{2\\pi}{k}$ ; Période : $T = \\frac{2\\pi}{\\omega}$</p>
+            <p>Célérité : $v = \\lambda f$</p>`
         },
         {
           title: "7. Physique nucléaire",
           packages: ['amsmath', 'chemformula', 'pgfplots'],
           code: `$N(t)=N_0e^{-\\lambda t}$\n$t_{1/2}=\\frac{\\ln2}{\\lambda}$\n\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}`,
           preview: `<div class="box box-definition">Décroissance : $N=N_0e^{-\\lambda t}$, $t_{1/2}=\\ln2/\\lambda$</div>
-            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$</div>`
+            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$</div>
+            <div class="box box-theoreme">Fusion : $\\ch{^2_1H + ^3_1H -> ^4_2He + n}$</div>`
         },
         {
           title: "8. Mécanique des fluides",
           packages: ['amsmath', 'tikz'],
           code: `$P=F/S$\n$\\Delta P = \\rho g \\Delta h$\n$\\vec F_A = -\\rho_f V_{im}\\vec g$`,
           preview: `<div class="box box-definition">Pression : $P=F/S$</div>
-            <div class="box box-propriete">Archimède : $\\vec F_A = -\\rho_f V_{im}\\vec g$</div>`
+            <div class="box box-propriete">Pression hydrostatique : $\\Delta P = \\rho g \\Delta h$</div>
+            <div class="box box-theoreme">Archimède : $\\vec F_A = -\\rho_f V_{im}\\vec g$</div>`
         },
         {
           title: "9. Ressources",
@@ -804,21 +861,24 @@ const data = {
           title: "3. Oxydoréduction",
           packages: ['chemformula', 'amsmath'],
           code: `\\ch{Fe^{2+} -> Fe^{3+} + e-}\n\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}\n$E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$`,
-          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$</div>`
+          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$</div>
+            <p>Pile : $E_{pile} = E_{cathode} - E_{anode}$</p>`
         },
         {
           title: "4. Cinétique",
           packages: ['amsmath', 'pgfplots'],
           code: `$v=-\\frac{d[A]}{dt}$\n$v=k[A]$ (ordre 1)\n$t_{1/2}=\\frac{\\ln2}{k}$`,
           preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>
-            <p>Temps de demi-réaction : $t_{1/2}=\\ln2/k$</p>`
+            <p>Temps de demi-réaction : $t_{1/2}=\\ln2/k$</p>
+            <p>Ordre 2 : $v=k[A]^2$, $t_{1/2}=1/(k[A]_0)$</p>`
         },
         {
           title: "5. Chimie organique",
           packages: ['chemformula'],
           code: `\\ch{C_nH_{2n+2}}\n\\ch{CH4}, \\ch{C2H6}, \\ch{C3H8}\nAlcool : \\ch{R-OH}`,
           preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$<br>Méthane $\\ch{CH4}$, Éthane $\\ch{C2H6}$, Propane $\\ch{C3H8}$</p>
-            <p>Groupes fonctionnels : Alcool $\\ch{R-OH}$, Acide carboxylique $\\ch{R-COOH}$</p>`
+            <p>Groupes fonctionnels : Alcool $\\ch{R-OH}$, Acide carboxylique $\\ch{R-COOH}$</p>
+            <p>Estérification : $\\ch{R-COOH + R'-OH -> R-COOR' + H2O}$</p>`
         },
         {
           title: "6. Thermodynamique chimique",
@@ -840,7 +900,7 @@ const data = {
 };
 
 // =================================================================
-// 3. SOURCE LATEX POUR LE COMPOSEUR (extrait)
+// 3. SOURCE LATEX POUR LE COMPOSEUR
 // =================================================================
 const LATEX_SOURCE = String.raw`
 \documentclass[a4paper,12pt]{article}
@@ -951,27 +1011,16 @@ des documents scientifiques de qualité
 \newpage
 
 % ===================================================================
-\section{Leçon 1 : Découverte de \LaTeX}
+% Leçon 1 : Découverte de \LaTeX
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
+\section{Leçon 1 : Découverte de \LaTeX}
+\textbf{Objectifs :}
 \begin{itemize}
 \item Comprendre le principe de compilation d'un document \LaTeX
 \item Connaître la structure minimale d'un fichier \lstinline|.tex|
 \item Savoir organiser un document avec \lstinline|\section| et \lstinline|\subsection|
 \item Maîtriser les commandes de base : \lstinline|\textbf|, \lstinline|\textit|, \lstinline|\underline|
-\item Créer des listes et gérer les caractères spéciaux
 \end{itemize}
-\LaTeX\, est un système de composition de documents particulièrement adapté aux mathématiques, à la physique et à la chimie.
-\begin{center}
-\fbox{\parbox{0.8\textwidth}{\centering
-\textbf{Avantages pour les enseignants de sciences}
-\begin{itemize}
-\item Écrire des formules mathématiques et chimiques complexes
-\item Numérotation automatique des équations, figures, tableaux
-\item Gestion des références croisées et bibliographie
-\item Documents professionnels avec une mise en page homogène
-\end{itemize}}}
-\end{center}
 
 \subsection{Structure minimale}
 \begin{lstlisting}[style=mylatex]
@@ -982,15 +1031,6 @@ des documents scientifiques de qualité
 Bonjour le monde ! Ceci est mon premier document \LaTeX.
 \end{document}
 \end{lstlisting}
-\begin{center}
-\colorbox{green!10}{\parbox{0.85\textwidth}{
-\textbf{À retenir} :
-\begin{itemize}
-\item \lstinline|\documentclass[...]{article}| : classe
-\item \lstinline|\usepackage{...}| : charger des paquets
-\item \lstinline|\begin{document}| ... \lstinline|\end{document}| : corps du document
-\end{itemize}}}
-\end{center}
 
 \subsection{Caractères spéciaux}
 \begin{center}
@@ -1008,17 +1048,11 @@ Bonjour le monde ! Ceci est mon premier document \LaTeX.
 \bottomrule
 \end{tabular}
 \end{center}
-\newpage
 
 % ===================================================================
-\section{Leçon 2 : Mathématiques -- notions fondamentales}
+% Leçon 2 : Mathématiques -- notions fondamentales
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Distinguer le mode mathématique en ligne et hors-texte
-\item Écrire fractions, puissances, racines et indices
-\item Utiliser les lettres grecques
-\end{itemize}
+\section{Leçon 2 : Mathématiques -- notions fondamentales}
 \subsection{Opérations de base}
 \begin{lstlisting}[style=mylatex]
 $a + b = c$, $a - b = c$, $a \times b = c$, $a \div b = c$
@@ -1026,16 +1060,11 @@ $\frac{a}{b}$, $a^{n}$, $a_{n}$, $\sqrt{x}$, $\sqrt[n]{x}$
 \end{lstlisting}
 \subsection{Lettres grecques}
 $\alpha$, $\beta$, $\gamma$, $\delta$, $\theta$, $\pi$, $\omega$, $\Gamma$, $\Delta$, $\Theta$, $\Pi$, $\Sigma$, $\Omega$
-\newpage
 
 % ===================================================================
-\section{Leçon 3 : Mathématiques -- outils avancés}
+% Leçon 3 : Mathématiques -- outils avancés
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Calculer des intégrales, dérivées, limites
-\item Créer des matrices et manipuler les ensembles
-\end{itemize}
+\section{Leçon 3 : Mathématiques -- outils avancés}
 \subsection{Intégrales et dérivées}
 \begin{lstlisting}[style=mylatex]
 $\int_{a}^{b} f(x) dx$, $\iint_{D} f(x,y) dxdy$
@@ -1047,16 +1076,11 @@ $\lim_{x\to a} f(x)=L$, $\nabla f$
 $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$,
 $\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad-bc$
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 4 : Chimie avec \LaTeX}
+% Leçon 4 : Chimie avec \LaTeX
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Écrire des formules chimiques avec \lstinline|\ce|
-\item Équilibrer des réactions chimiques
-\end{itemize}
+\section{Leçon 4 : Chimie avec \LaTeX}
 \subsection{Formules chimiques}
 \begin{lstlisting}[style=mylatex]
 \ce{H2O}, \ce{CO2}, \ce{C6H12O6}, \ce{NaCl}, \ce{H2SO4}
@@ -1065,18 +1089,12 @@ $\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad-bc$
 \begin{lstlisting}[style=mylatex]
 \ce{2 H2 + O2 -> 2 H2O}
 \ce{CH4 + 2 O2 -> CO2 + 2 H2O}
-\ce{C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 5 : Tableaux, figures et schémas}
+% Leçon 5 : Tableaux, figures et schémas
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Créer des tableaux avec \lstinline|tabular|
-\item Insérer des images et dessiner des schémas avec TikZ
-\end{itemize}
+\section{Leçon 5 : Tableaux, figures et schémas}
 \subsection{Tableaux}
 \begin{lstlisting}[style=mylatex]
 \begin{tabular}{|l|c|r|}
@@ -1095,16 +1113,11 @@ Carbone & C & 12,011 \\
 \draw[->] (0,0) -- (0,3);
 \end{tikzpicture}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 6 : Pédagogie -- exercices et présentations}
+% Leçon 6 : Pédagogie -- exercices et présentations
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Structurer un énoncé d'exercice et sa correction
-\item Créer un diaporama avec Beamer
-\end{itemize}
+\section{Leçon 6 : Pédagogie -- exercices et présentations}
 \subsection{Énoncé d'exercice}
 \begin{lstlisting}[style=mylatex]
 \textbf{Exercice 1 -- Vitesse}
@@ -1122,17 +1135,11 @@ Un automobiliste parcourt 150 km en 2h30min.
 Contenu...
 \end{frame}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 7 : Mise en page avancée}
+% Leçon 7 : Mise en page avancée
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Encadrer du texte avec \lstinline|fbox|, \lstinline|colorbox|
-\item Utiliser les couleurs avec \lstinline|textcolor|
-\item Ajouter un filigrane avec \lstinline|draftwatermark|
-\end{itemize}
+\section{Leçon 7 : Mise en page avancée}
 \subsection{Boîtes et couleurs}
 \begin{lstlisting}[style=mylatex]
 \fbox{Texte encadré}
@@ -1146,17 +1153,11 @@ Contenu...
 \SetWatermarkText{CONFIDENTIEL}
 \SetWatermarkScale{3}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 8 : Mathématiques et sciences au lycée}
+% Leçon 8 : Mathématiques et sciences au lycée
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Tracer des courbes avec \lstinline|pgfplots|
-\item Construire des tableaux de signe et de variation
-\item Dessiner des circuits électriques
-\end{itemize}
+\section{Leçon 8 : Mathématiques et sciences au lycée}
 \subsection{pgfplots}
 \begin{lstlisting}[style=mylatex]
 \begin{axis}[xlabel=$x$, ylabel=$y$, grid=major]
@@ -1169,17 +1170,11 @@ Contenu...
 \draw (0,0) to[battery] (0,2) to[lamp] (3,2) to[switch] (3,0) -- (0,0);
 \end{circuitikz}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 9 : Pédagogie -- interactivité et évaluation}
+% Leçon 9 : Pédagogie -- interactivité et évaluation
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Créer des exercices à trous, vrai/faux et QCM
-\item Intégrer des images avec \lstinline|wrapfig|
-\item Utiliser \lstinline|bclogo| pour des boîtes décoratives
-\end{itemize}
+\section{Leçon 9 : Pédagogie -- interactivité et évaluation}
 \subsection{Exercices à trous}
 \begin{lstlisting}[style=mylatex]
 Le nom de ce gaz est \rule{3cm}{0.5pt}.
@@ -1198,24 +1193,11 @@ $\_\_ + 5 = 12$
 \bcinfo{Information}
 \bcexemple{Exemple}
 \end{lstlisting}
-\newpage
 
 % ===================================================================
-\section{Leçon 10 : Projet final et ressources}
+% Leçon 10 : Projet final et ressources
 % ===================================================================
-\textbf{Objectifs de cette leçon :}
-\begin{itemize}
-\item Synthétiser toutes les compétences acquises
-\item Consulter l'aide-mémoire
-\end{itemize}
-\subsection{Exercice final}
-Créez un document complet avec :
-\begin{enumerate}
-\item Titre, section, formule mathématique
-\item Équation chimique
-\item Tableau
-\item Figure TikZ
-\end{enumerate}
+\section{Leçon 10 : Projet final et ressources}
 \subsection{Aide-mémoire}
 \begin{center}
 \begin{tabular}{ll}
@@ -1318,17 +1300,23 @@ function highlightLaTeX(code) {
 
 function renderWidgetsComposeur() {
   const grid = document.getElementById('widgetGridComposeur');
+  const filterSelect = document.getElementById('sectionFilterComposeur');
   if (!grid) return;
-  filteredWidgets = widgets;
+
+  const filter = filterSelect ? filterSelect.value : '';
+  filteredWidgets = filter ? widgets.filter(w => w.section === filter) : widgets;
+
   const stats = document.getElementById('statsComposeur');
   if (stats) {
     stats.innerHTML = '<strong>' + filteredWidgets.length + '</strong> widget' + (filteredWidgets.length > 1 ? 's' : '') +
       ' sur <strong>' + widgets.length + '</strong> extrai' + (widgets.length > 1 ? 'ts' : 't');
   }
+
   if (filteredWidgets.length === 0) {
     grid.innerHTML = '<div class="empty-state"><p>Aucun widget trouvé</p></div>';
     return;
   }
+
   grid.innerHTML = filteredWidgets.map(function(w, i) {
     const code = highlightLaTeX(w.code);
     const sec = w.section.length > 32 ? escHtml(w.section.substring(0, 30)) + '...' : escHtml(w.section);
@@ -1537,6 +1525,7 @@ function switchMode(mode) {
     document.body.classList.add('composeur-mode');
     document.getElementById('modeFormationBtn').classList.remove('active');
     document.getElementById('modeComposeurBtn').classList.add('active');
+    renderWidgetsComposeur();
   } else {
     document.getElementById('modeFormationBtn').classList.add('active');
     document.getElementById('modeComposeurBtn').classList.remove('active');
@@ -1551,19 +1540,36 @@ function sanitize(s) { return escHtml(s); }
 // 7. INITIALISATION
 // =================================================================
 document.addEventListener('DOMContentLoaded', function() {
+  // Formation
   document.getElementById('niveauSelect').addEventListener('change', function() { renderFormationWidgets(); });
   document.getElementById('matiereSelect').addEventListener('change', function() { renderFormationWidgets(); });
 
   renderFormationWidgets();
 
+  // Composeur
   widgets = parseLaTeX(LATEX_SOURCE);
+  const filterSelect = document.getElementById('sectionFilterComposeur');
+  if (filterSelect) {
+    const sections = [];
+    widgets.forEach(w => { if (!sections.includes(w.section)) sections.push(w.section); });
+    sections.sort();
+    sections.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      filterSelect.appendChild(opt);
+    });
+    filterSelect.addEventListener('change', renderWidgetsComposeur);
+  }
   renderWidgetsComposeur();
 
+  // Mode projecteur global
   document.getElementById('projectorBtn').addEventListener('click', function() {
     document.body.classList.toggle('projector-mode');
     this.textContent = document.body.classList.contains('projector-mode') ? '🔲 Quitter projecteur' : '🔲 Mode projecteur';
   });
 
+  // Gestion des touches pour le projecteur
   document.addEventListener('keydown', function(e) {
     if (!isProjecting) return;
     if (e.key === 'Escape') { toggleProjection(false); e.preventDefault(); }
