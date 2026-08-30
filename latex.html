@@ -1,545 +1,848 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  Fichier : composer.html
-  Projet  : Composeur de Code LaTeX
-  Auteur  : [Votre Nom]
-  Date    : 2025-05-31
+  Fichier : fusion_complete.html
+  Projet  : Plateforme LaTeX – Formation & Composeur
   Description :
-    Application web interactive qui analyse un fichier source LaTeX,
-    extrait chaque bloc lstlisting, et les affiche sous forme de
-    "widgets" (fiches) dans une grille. Chaque widget présente :
-      - L'en-tête avec le nom de la section LaTeX d'origine
-      - Une explication contextuelle (texte précédant le listing)
-      - Le code LaTeX avec coloration syntaxique
-      - Un bouton pour copier le code
-      - Un bouton pour projeter le widget en plein écran
-    L'application offre aussi un mode "Projection" (diaporama) pour
-    présenter les extraits de code en grand, avec navigation au
-    clavier.
+    Fusion complète avec tous les chapitres enrichis.
+    Mode Formation : widgets pour chaque chapitre (packages, code, aperçu).
+    Mode Composeur : widgets pour chaque bloc lstlisting.
 ============================================================ -->
 <html lang="fr">
 <head>
-  <!-- ===================== MÉTADONNÉES ===================== -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Composeur de Code LaTeX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaTeX – Formation & Composeur</title>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
 
-  <!-- ===================== STYLES CSS ====================== -->
   <style>
-    /* ---------- RESET & VARIABLES ---------- */
-    /* On réinitialise les marges/padding et on définit
-       le modèle de boîte "border-box" pour tous les éléments. */
-    *{margin:0;padding:0;box-sizing:border-box}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa; color: #1e293b; padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
+      max-width: 1200px; margin: 0 auto; background: white;
+      border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 20px 30px 40px;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    h1 { font-size: 28px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .subtitle { color: #475569; margin-bottom: 24px; font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; }
 
-    /* Variables CSS (custom properties) pour la palette,
-       les ombres, les polices, etc. Centraliser les valeurs
-       facilite la maintenance et le thème. */
-    :root{
-      --bg:#f0f2f5;              /* Fond de la page */
-      --card:#fff;                /* Fond des widgets */
-      --text:#1a1a2e;             /* Couleur de texte principale */
-      --text2:#6b7280;            /* Texte secondaire (stats, labels) */
-      --primary:#2563eb;          /* Bleu principal (boutons, accents) */
-      --primary2:#3b82f6;         /* Bleu plus clair (hover) */
-      --accent:#dc2626;           /* Rouge d'accentuation (suppression) */
-      --border:#e5e7eb;           /* Bordures */
-      --codebg:#f8fafc;           /* Fond des blocs de code */
-      --explbg:#f0fdf4;           /* Fond des explications (vert) */
-      --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
-      --radius:10px;              /* Coins arrondis */
-      --font:'Inter','Segoe UI',system-ui,sans-serif;
-      --mono:'Cascadia Code','Fira Code','JetBrains Mono','Consolas',monospace;
-      --header-h:60px;            /* Hauteur de l'en-tête fixe */
+    .selectors {
+      display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 28px;
+      background: #f1f5f9; padding: 16px 20px; border-radius: 12px;
+      align-items: center; transition: background 0.3s;
     }
+    .selectors label { font-weight: 600; font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px; }
+    .selectors select {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1;
+      background: white; font-size: 14px; font-weight: 500; cursor: pointer;
+      outline: none; transition: border 0.2s;
+    }
+    .selectors select:focus { border-color: #3b82f6; }
+    .btn-projector {
+      margin-left: auto; background: #1e293b; color: white; border: none;
+      padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-projector:hover { background: #0f172a; }
 
-    /* ---------- STYLES GLOBAUX ---------- */
-    body{
-      font-family:var(--font);
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
     }
+    .widget {
+      background: var(--card, #fff);
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      transition: box-shadow 0.2s;
+    }
+    .widget:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .widget-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .widget-header .label {
+      font-size: 11px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .widget-header .section-tag {
+      font-size: 10px; background: #2563eb; color: #fff;
+      padding: 2px 8px; border-radius: 4px;
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap; font-weight: 500;
+    }
+    .widget-expl {
+      background: #f0fdf4; border-bottom: 1px solid #d1fae5;
+      padding: 10px 14px; font-size: 13px; line-height: 1.5;
+      color: #065f46;
+    }
+    .widget-expl .expl-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #059669; margin-bottom: 3px;
+    }
+    .widget-expl .expl-text {
+      overflow: hidden; display: -webkit-box;
+      -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    }
+    .widget-expl.expanded .expl-text { -webkit-line-clamp: unset; }
+    .widget-expl .expl-toggle {
+      background: none; border: none; color: #059669;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+      padding: 2px 0; margin-top: 2px;
+    }
+    .widget-expl .expl-toggle:hover { text-decoration: underline; }
+    .widget-code {
+      position: relative; padding: 14px;
+      overflow-x: auto; max-height: 280px; overflow-y: auto;
+    }
+    .widget-code pre {
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+      font-size: 12.5px; line-height: 1.6; white-space: pre; tab-size: 4;
+    }
+    .widget-code .copy-btn {
+      position: absolute; top: 6px; right: 6px;
+      opacity: 0; transition: opacity 0.15s;
+      background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 6px; padding: 3px 8px; font-size: 10px;
+      cursor: pointer; color: #6b7280;
+    }
+    .widget-code:hover .copy-btn { opacity: 1; }
+    .widget-code .copy-btn:hover { background: #f8fafc; color: #1e293b; }
+    .widget-footer {
+      padding: 8px 14px; border-top: 1px solid #e5e7eb;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .widget-footer .index { font-size: 11px; color: #6b7280; }
+    .widget-footer .project-btn {
+      font-size: 11px; padding: 3px 10px;
+      border: 1px solid #2563eb; border-radius: 6px;
+      background: transparent; color: #2563eb;
+      cursor: pointer; transition: all 0.15s; font-weight: 500;
+    }
+    .widget-footer .project-btn:hover { background: #2563eb; color: #fff; }
 
-    /* ---------- EN-TÊTE (HEADER) ---------- */
-    /* Barre fixe en haut avec effet de flou (glassmorphism) */
-    header{
-      position:fixed;
-      top:0;left:0;right:0;
-      height:var(--header-h);
-      background:rgba(255,255,255,0.85);
-      -webkit-backdrop-filter:blur(12px);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 24px;
-      z-index:100;
+    .widget-preview {
+      padding: 14px;
+      background: #f8fafc;
+      border-top: 1px solid #e5e7eb;
+      max-height: 300px;
+      overflow-y: auto;
     }
-    header h1{
-      font-size:17px;
-      font-weight:700;
-      color:var(--text);
+    .widget-preview .preview-toggle {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #2563eb;
+      cursor: pointer;
+      font-weight: 500;
     }
-    header h1 span{color:var(--primary)}
+    .widget-preview .preview-toggle:hover { text-decoration: underline; }
+    .widget-preview .preview-content { display: none; }
+    .widget-preview .preview-content.open { display: block; }
 
-    /* Contrôles dans l'en-tête (sélecteur de section + bouton) */
-    .header-controls{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .header-controls select{
-      padding:6px 12px;
-      border:1px solid var(--border);
-      border-radius:8px;
-      font-size:13px;
-      background:#fff;
-      color:var(--text);
-      cursor:pointer;
-      outline:none;
-    }
-    .header-controls select:focus{
-      border-color:var(--primary);
-      box-shadow:0 0 0 3px rgba(37,99,235,0.1);
-    }
+    .hl-kw { color: #a78bfa; }
+    .hl-cmt { color: #64748b; font-style: italic; }
+    .hl-str { color: #4ade80; }
+    .hl-fn { color: #818cf8; }
+    .hl-num { color: #fb923c; }
+    .hl-bra { color: #22d3ee; }
+    .hl-sec { color: #facc15; }
 
-    /* ---------- BOUTONS ---------- */
-    .btn{
-      padding:7px 14px;
-      border:none;
-      border-radius:8px;
-      font-size:13px;
-      font-weight:600;
-      cursor:pointer;
-      transition:all .15s;
-      display:inline-flex;
-      align-items:center;
-      gap:5px;
+    .stats {
+      font-size: 13px; color: #6b7280; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-primary:hover{background:var(--primary2)}
-    .btn-accent{background:var(--accent);color:#fff}
-    .btn-accent:hover{opacity:.9}
-    .btn-outline{
-      background:#fff;
-      border:1px solid var(--border);
-      color:var(--text);
-    }
-    .btn-outline:hover{background:var(--codebg);border-color:#d1d5db}
-    .btn-sm{padding:3px 8px;font-size:11px}
-
-    /* ---------- ZONE PRINCIPALE ---------- */
-    #main{
-      padding-top:calc(var(--header-h) + 20px);
-      padding-left:24px;
-      padding-right:24px;
-      padding-bottom:40px;
-      max-width:1400px;
-      margin:0 auto;
-    }
-
-    /* Barre de statistiques (nombre de widgets) */
-    .stats{
-      font-size:13px;
-      color:var(--text2);
-      margin-bottom:16px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .stats strong{color:var(--text)}
-
-    /* ---------- GRILLE DE WIDGETS ---------- */
-    /* Grille responsive : chaque widget fait au moins 480px */
-    .widget-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(480px,1fr));
-      gap:18px;
-    }
-
-    /* ---------- CARTE (WIDGET) ---------- */
-    .widget{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      border:1px solid var(--border);
-      transition:box-shadow .2s;
-    }
-    .widget:hover{box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-
-    /* En-tête du widget : label + tag de section */
-    .widget-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 14px;
-      background:#f8fafc;          /* Fond légèrement grisé */
-      border-bottom:1px solid var(--border);
-    }
-    .widget-header .label{
-      font-size:11px;
-      font-weight:600;
-      color:var(--text2);
-      text-transform:uppercase;
-      letter-spacing:.4px;
-    }
-    .widget-header .section-tag{
-      font-size:10px;
-      background:var(--primary);
-      color:#fff;
-      padding:2px 8px;
-      border-radius:4px;
-      max-width:220px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      font-weight:500;
+    .stats strong { color: #1e293b; }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center; padding: 60px 20px; color: #6b7280;
     }
 
-    /* ---------- ZONE D'EXPLICATION ---------- */
-    /* Encart vert sous l'en-tête qui décrit le code */
-    .widget-expl{
-      background:var(--explbg);
-      border-bottom:1px solid #d1fae5;
-      padding:10px 14px;
-      font-size:13px;
-      line-height:1.5;
-      color:#065f46;
+    .mode-toggle {
+      display: flex; align-items: center; gap: 10px;
+      margin-left: 20px;
     }
-    .widget-expl .expl-label{
-      font-size:10px;
-      font-weight:600;
-      text-transform:uppercase;
-      letter-spacing:.4px;
-      color:#059669;
-      margin-bottom:3px;
+    .mode-toggle .toggle-label {
+      font-size: 13px; font-weight: 500; color: #334155;
     }
-    /* Texte tronqué à 3 lignes par défaut */
-    .widget-expl .expl-text{
-      overflow:hidden;
-      display:-webkit-box;
-      -webkit-line-clamp:3;
-      -webkit-box-orient:vertical;
+    .mode-toggle .toggle-btn {
+      background: #e2e8f0; border: none; border-radius: 30px;
+      padding: 4px 12px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      color: #1e293b;
     }
-    /* Si la classe "expanded" est ajoutée, on affiche tout */
-    .widget-expl.expanded .expl-text{
-      -webkit-line-clamp:unset;
+    .mode-toggle .toggle-btn.active {
+      background: #3b82f6; color: white;
     }
-    /* Bouton pour afficher plus ou réduire */
-    .widget-expl .expl-toggle{
-      background:none;
-      border:none;
-      color:#059669;
-      font-size:11px;
-      font-weight:600;
-      cursor:pointer;
-      padding:2px 0;
-      margin-top:2px;
-    }
-    .widget-expl .expl-toggle:hover{text-decoration:underline}
+    .mode-toggle .toggle-btn:hover { opacity: 0.8; }
 
-    /* ---------- BLOC DE CODE ---------- */
-    .widget-code{
-      position:relative;
-      padding:14px;
-      overflow-x:auto;             /* Scroll horizontal si code long */
-      max-height:280px;            /* Limite la hauteur */
-      overflow-y:auto;             /* Scroll vertical si besoin */
-    }
-    .widget-code pre{
-      font-family:var(--mono);      /* Police monospace */
-      font-size:12.5px;
-      line-height:1.6;
-      white-space:pre;              /* Conserver les espaces */
-      tab-size:4;
-    }
-    /* Bouton Copier (caché par défaut, visible au survol) */
-    .widget-code .copy-btn{
-      position:absolute;
-      top:6px;right:6px;
-      opacity:0;
-      transition:opacity .15s;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:6px;
-      padding:3px 8px;
-      font-size:10px;
-      cursor:pointer;
-      color:var(--text2);
-    }
-    .widget-code:hover .copy-btn{opacity:1}
-    .widget-code .copy-btn:hover{background:var(--codebg);color:var(--text)}
+    .mode-formation { display: block; }
+    .mode-composeur { display: none; }
+    body.composeur-mode .mode-formation { display: none; }
+    body.composeur-mode .mode-composeur { display: block; }
 
-    /* ---------- PIED DE WIDGET ---------- */
-    .widget-footer{
-      padding:8px 14px;
-      border-top:1px solid var(--border);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+    #projector {
+      display: none;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0f172a; z-index: 1000;
+      flex-direction: column; color: #fff;
     }
-    .widget-footer .index{
-      font-size:11px;
-      color:var(--text2);
+    #projector.active { display: flex; }
+    .projector-bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 30%, #1e293b 0%, #0f172a 70%);
+      z-index: -1;
     }
-    /* Bouton pour projeter le widget en plein écran */
-    .widget-footer .project-btn{
-      font-size:11px;
-      padding:3px 10px;
-      border:1px solid var(--primary);
-      border-radius:6px;
-      background:transparent;
-      color:var(--primary);
-      cursor:pointer;
-      transition:all .15s;
-      font-weight:500;
+    .projector-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
-    .widget-footer .project-btn:hover{background:var(--primary);color:#fff}
-
-    /* ---------- MODE PROJECTION (PLEIN ÉCRAN) ---------- */
-    #projector{
-      display:none;                /* Caché par défaut */
-      position:fixed;
-      top:0;left:0;
-      width:100vw;height:100vh;
-      background:#0f172a;          /* Fond sombre */
-      z-index:1000;
-      flex-direction:column;
-      color:#fff;
+    .projector-header .title {
+      font-size: 15px; font-weight: 600; opacity: 0.85;
     }
-    /* Quand la classe "active" est ajoutée, on affiche */
-    #projector.active{display:flex}
-
-    /* Fond décoratif avec un dégradé radial */
-    .projector-bg{
-      position:absolute;
-      top:0;left:0;
-      width:100%;height:100%;
-      background:radial-gradient(ellipse at 50% 30%,#1e293b 0%,#0f172a 70%);
-      z-index:-1;
+    .projector-header .title span { color: #60a5fa; }
+    .projector-controls .btn-exit {
+      background: rgba(255,255,255,0.1); color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .projector-controls .btn-exit:hover { background: #dc2626; border-color: #dc2626; }
+    .projector-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; overflow: auto;
+    }
+    .projector-slide {
+      max-width: 1050px; width: 100%;
+    }
+    .projector-slide .slide-section {
+      text-align: center; margin-bottom: 6px;
+      font-size: 13px; color: #60a5fa; font-weight: 500;
+      letter-spacing: 0.8px; text-transform: uppercase;
+    }
+    .projector-slide .slide-title {
+      text-align: center; margin-bottom: 6px;
+      font-size: 24px; font-weight: 700; color: #f1f5f9;
+    }
+    .projector-slide .slide-expl {
+      text-align: center; margin-bottom: 22px;
+      font-size: 15px; color: #94a3b8; max-width: 800px;
+      margin-left: auto; margin-right: auto; line-height: 1.5;
+    }
+    .projector-slide .slide-code {
+      background: rgba(255,255,255,0.05); border-radius: 14px;
+      padding: 28px 36px; border: 1px solid rgba(255,255,255,0.08);
+      max-height: 55vh; overflow: auto;
+    }
+    .projector-slide .slide-code pre {
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+      font-size: 17px; line-height: 1.7; white-space: pre;
+      color: #e2e8f0;
+    }
+    .projector-slide .slide-hint {
+      text-align: center; margin-top: 12px;
+      font-size: 12px; color: rgba(255,255,255,0.3);
+    }
+    .projector-nav {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; padding: 16px; background: rgba(0,0,0,0.3);
+    }
+    .projector-nav span {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      min-width: 80px; text-align: center;
+    }
+    .projector-nav .btn-nav {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06); color: #fff;
+      font-size: 18px; cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .projector-nav .btn-nav:hover {
+      background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);
+    }
+    .projector-nav .btn-nav:disabled {
+      opacity: 0.15; cursor: default; background: transparent;
     }
 
-    /* En-tête du projecteur */
-    .projector-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 28px;
-      background:rgba(0,0,0,0.4);
-      border-bottom:1px solid rgba(255,255,255,0.08);
+    body.projector-mode {
+      background: #0f172a;
     }
-    .projector-header .title{
-      font-size:15px;
-      font-weight:600;
-      opacity:.85;
+    body.projector-mode .container {
+      background: #0f172a;
+      box-shadow: none;
+      border-radius: 0;
+      max-width: 100%;
+      padding: 20px 30px 40px;
+      color: #e2e8f0;
     }
-    .projector-header .title span{color:#60a5fa}
+    body.projector-mode .selectors { background: #1e293b; color: #e2e8f0; }
+    body.projector-mode .selectors select { background: #334155; border-color: #475569; color: white; }
+    body.projector-mode .widget { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+    body.projector-mode .widget-header { background: #0f172a; border-bottom-color: #334155; }
+    body.projector-mode .widget-header .label { color: #94a3b8; }
+    body.projector-mode .widget-header .section-tag { background: #3b82f6; }
+    body.projector-mode .widget-expl { background: #1a3d2e; border-bottom-color: #1e4d3a; color: #a7f3d0; }
+    body.projector-mode .widget-expl .expl-label { color: #34d399; }
+    body.projector-mode .widget-footer { border-top-color: #334155; }
+    body.projector-mode .widget-footer .index { color: #94a3b8; }
+    body.projector-mode .widget-footer .project-btn { border-color: #60a5fa; color: #60a5fa; }
+    body.projector-mode .widget-footer .project-btn:hover { background: #3b82f6; color: #fff; }
+    body.projector-mode .widget-preview { background: #0f172a; border-top-color: #334155; }
+    body.projector-mode .btn-projector { background: #3b82f6; }
+    body.projector-mode .btn-projector:hover { background: #2563eb; }
+    body.projector-mode .subtitle { border-bottom-color: #334155; }
 
-    .projector-controls .btn-exit{
-      background:rgba(255,255,255,0.1);
-      color:#fff;
-      border:1px solid rgba(255,255,255,0.15);
-    }
-    .projector-controls .btn-exit:hover{background:var(--accent);border-color:var(--accent)}
-
-    /* Corps du projecteur (diapositive centrée) */
-    .projector-body{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      overflow:auto;
-    }
-    .projector-slide{
-      max-width:1050px;
-      width:100%;
-    }
-    .projector-slide .slide-section{
-      text-align:center;
-      margin-bottom:6px;
-      font-size:13px;
-      color:#60a5fa;
-      font-weight:500;
-      letter-spacing:.8px;
-      text-transform:uppercase;
-    }
-    .projector-slide .slide-title{
-      text-align:center;
-      margin-bottom:6px;
-      font-size:24px;
-      font-weight:700;
-      color:#f1f5f9;
-    }
-    .projector-slide .slide-expl{
-      text-align:center;
-      margin-bottom:22px;
-      font-size:15px;
-      color:#94a3b8;
-      max-width:800px;
-      margin-left:auto;
-      margin-right:auto;
-      line-height:1.5;
-    }
-    .projector-slide .slide-code{
-      background:rgba(255,255,255,0.05);
-      border-radius:14px;
-      padding:28px 36px;
-      border:1px solid rgba(255,255,255,0.08);
-      max-height:55vh;
-      overflow:auto;
-    }
-    .projector-slide .slide-code pre{
-      font-family:var(--mono);
-      font-size:17px;
-      line-height:1.7;
-      white-space:pre;
-      color:#e2e8f0;
-    }
-    .projector-slide .slide-hint{
-      text-align:center;
-      margin-top:12px;
-      font-size:12px;
-      color:rgba(255,255,255,0.3);
-    }
-
-    /* Navigation (précédent/suivant) en bas du projecteur */
-    .projector-nav{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:16px;
-      padding:16px;
-      background:rgba(0,0,0,0.3);
-    }
-    .projector-nav span{
-      font-size:13px;
-      color:rgba(255,255,255,0.5);
-      min-width:80px;
-      text-align:center;
-    }
-    .projector-nav .btn-nav{
-      width:44px;height:44px;
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,0.15);
-      background:rgba(255,255,255,0.06);
-      color:#fff;
-      font-size:18px;
-      cursor:pointer;
-      transition:all .15s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .projector-nav .btn-nav:hover{
-      background:rgba(255,255,255,0.15);
-      border-color:rgba(255,255,255,0.3);
-    }
-    .projector-nav .btn-nav:disabled{
-      opacity:.15;
-      cursor:default;
-      background:transparent;
-    }
-
-    /* ---------- COLORATION SYNTAXIQUE ---------- */
-    .hl-kw{color:#a78bfa}    /* Mots-clés LaTeX (commandes) */
-    .hl-cmt{color:#64748b;font-style:italic}  /* Commentaires */
-    .hl-str{color:#4ade80}   /* Chaînes / \ce{...} */
-    .hl-fn{color:#818cf8}    /* Fonctions */
-    .hl-num{color:#fb923c}   /* Nombres */
-    .hl-bra{color:#22d3ee}   /* Délimiteurs (crochets, accolades) */
-    .hl-sec{color:#facc15}   /* Symboles spéciaux ($, etc.) */
-
-    /* ---------- ÉTAT VIDE ---------- */
-    .empty-state{
-      grid-column:1/-1;
-      text-align:center;
-      padding:60px 20px;
-      color:var(--text2);
-    }
-    .empty-state p{font-size:15px;margin-bottom:6px}
-
-    /* ---------- RESPONSIVE (MOBILE) ---------- */
-    @media(max-width:768px){
-      .widget-grid{grid-template-columns:1fr}
-      header{
-        flex-wrap:wrap;height:auto;
-        padding:12px 16px;gap:8px;
-      }
-      header h1{font-size:14px}
-      .header-controls{width:100%;gap:6px;flex-wrap:wrap}
-      .header-controls select{flex:1;min-width:100px;font-size:12px}
-      .btn{font-size:12px;padding:5px 10px}
-      #main{padding-left:12px;padding-right:12px}
-      .projector-slide .slide-code{padding:16px;max-height:45vh}
-      .projector-slide .slide-code pre{font-size:14px}
-      .projector-slide .slide-title{font-size:20px}
-      .projector-nav .btn-nav{width:36px;height:36px;font-size:15px}
+    @media (max-width: 640px) {
+      .container { padding: 16px; }
+      .selectors { flex-direction: column; align-items: stretch; }
+      .selectors label { flex-wrap: wrap; }
+      .btn-projector { margin-left: 0; }
+      .widget-grid { grid-template-columns: 1fr; }
+      .mode-toggle { margin-left: 0; }
+      .projector-slide .slide-code { padding: 16px; max-height: 45vh; }
+      .projector-slide .slide-code pre { font-size: 14px; }
+      .projector-slide .slide-title { font-size: 20px; }
+      .projector-nav .btn-nav { width: 36px; height: 36px; font-size: 15px; }
     }
   </style>
 </head>
 <body>
+<div class="container" id="app">
+  <h1>📘 Plateforme LaTeX – Formation &amp; Composeur</h1>
+  <div class="subtitle">Navigation par niveau/matière &bull; Tous les chapitres en widgets</div>
 
-  <!-- ==================== EN-TÊTE ==================== -->
-  <header>
-    <!-- Icone engrenage + titre "Composeur LaTeX" -->
-    <h1>&#9881; Composeur <span>LaTeX</span></h1>
-    <div class="header-controls">
-      <!-- Sélecteur pour filtrer les widgets par section -->
-      <select id="sectionFilter">
-        <option value="">Toutes les sections</option>
+  <div class="selectors">
+    <label>Niveau
+      <select id="niveauSelect">
+        <option value="college">Collège</option>
+        <option value="lycee">Lycée</option>
       </select>
-      <!-- Bouton pour basculer en mode projection (diaporama) -->
-      <button class="btn btn-outline btn-sm" onclick="toggleProjection()" title="Mode projection plein ecran">
-        &#9654; Projection
-      </button>
-    </div>
-  </header>
-
-  <!-- ==================== CORPS PRINCIPAL ==================== -->
-  <div id="main">
-    <!-- Barre de statistiques (nombre de widgets affichés/total) -->
-    <div class="stats" id="stats">Chargement...</div>
-    <!-- Grille contenant les widgets -->
-    <div class="widget-grid" id="widgetGrid"></div>
-  </div>
-
-  <!-- ==================== MODE PROJECTION ==================== -->
-  <div id="projector">
-    <!-- Fond décoratif (dégradé) -->
-    <div class="projector-bg"></div>
-    <!-- En-tête du projecteur -->
-    <div class="projector-header">
-      <div class="title">&#9881; Composeur <span>LaTeX</span> &mdash; Mode Projection</div>
-      <div class="projector-controls">
-        <button class="btn btn-exit" onclick="toggleProjection()">&#10005; Quitter</button>
-      </div>
-    </div>
-    <!-- Diapositive courante -->
-    <div class="projector-body" id="projectorBody">
-      <div class="projector-slide" id="projectorSlide"></div>
-    </div>
-    <!-- Barre de navigation (précédent / compteur / suivant) -->
-    <div class="projector-nav">
-      <button class="btn-nav" id="prevBtn" onclick="projectorPrev()">&#9664;</button>
-      <span id="projectorCounter">0 / 0</span>
-      <button class="btn-nav" id="nextBtn" onclick="projectorNext()">&#9654;</button>
+    </label>
+    <label>Matière
+      <select id="matiereSelect">
+        <option value="mathematiques">Mathématiques</option>
+        <option value="physique">Physique</option>
+        <option value="chimie">Chimie</option>
+      </select>
+    </label>
+    <button class="btn-projector" id="projectorBtn">🔲 Mode projecteur</button>
+    <div class="mode-toggle">
+      <span class="toggle-label">Mode :</span>
+      <button class="toggle-btn active" id="modeFormationBtn" onclick="switchMode('formation')">Formation</button>
+      <button class="toggle-btn" id="modeComposeurBtn" onclick="switchMode('composeur')">Composeur</button>
     </div>
   </div>
 
-  <!-- ==================== JAVASCRIPT ==================== -->
-  <script>
-    // ----------------------------------------------------------
-    // 1. SOURCE LATEX (stockée dans un template literal)
-    // ----------------------------------------------------------
-    // Le contenu LaTeX est directement intégré dans cette variable.
-    // Chaque bloc \begin{lstlisting}...\end{lstlisting} sera
-    // extrait et affiché comme un widget individuel.
-    // ----------------------------------------------------------
-    const LATEX_SOURCE = String.raw`
+  <div class="mode-formation" id="modeFormation">
+    <div class="stats" id="statsFormation">Chargement...</div>
+    <div class="widget-grid" id="widgetGridFormation"></div>
+  </div>
+
+  <div class="mode-composeur" id="modeComposeur">
+    <div class="stats" id="statsComposeur">Chargement...</div>
+    <div class="widget-grid" id="widgetGridComposeur"></div>
+  </div>
+</div>
+
+<div id="projector">
+  <div class="projector-bg"></div>
+  <div class="projector-header">
+    <div class="title">&#9881; Composeur <span>LaTeX</span> &mdash; Mode Projection</div>
+    <div class="projector-controls">
+      <button class="btn btn-exit" onclick="toggleProjection()">&#10005; Quitter</button>
+    </div>
+  </div>
+  <div class="projector-body" id="projectorBody">
+    <div class="projector-slide" id="projectorSlide"></div>
+  </div>
+  <div class="projector-nav">
+    <button class="btn-nav" id="prevBtn" onclick="projectorPrev()">&#9664;</button>
+    <span id="projectorCounter">0 / 0</span>
+    <button class="btn-nav" id="nextBtn" onclick="projectorNext()">&#9654;</button>
+  </div>
+</div>
+
+<script>
+// =================================================================
+// 1. INFORMATION SUR LES PACKAGES
+// =================================================================
+const PACKAGE_INFO = {
+  'article': { role: 'Classe de document de base', importance: 'Essentielle – toute épreuve commence par \\documentclass{article}' },
+  'babel': { role: 'Gestion des règles typographiques en français', importance: 'Indispensable pour un document en français' },
+  'inputenc': { role: 'Encodage des caractères', importance: 'Nécessaire pour les accents' },
+  'fontenc': { role: 'Encodage des polices', importance: 'Améliore la qualité des polices' },
+  'geometry': { role: 'Gestion des marges', importance: 'Permet de personnaliser les marges facilement' },
+  'xcolor': { role: 'Définition et utilisation de couleurs', importance: 'Essentiel pour colorer les boîtes' },
+  'fancyhdr': { role: 'Personnalisation des en-têtes et pieds de page', importance: 'Indispensable pour les épreuves officielles' },
+  'tcolorbox': { role: 'Création de boîtes de texte décoratives', importance: 'Permet de structurer visuellement le cours' },
+  'array': { role: 'Étend les fonctionnalités des tableaux', importance: 'Très utile pour les tableaux de notes' },
+  'multirow': { role: 'Fusion de cellules verticalement', importance: 'Utile pour les tableaux complexes' },
+  'makecell': { role: 'Formatage du texte dans les cellules', importance: 'Facilite la mise en forme' },
+  'graphicx': { role: 'Insertion d\'images', importance: 'Indispensable pour intégrer des schémas' },
+  'float': { role: 'Placement précis des figures', importance: 'Utile pour forcer l\'image à rester à l\'endroit du code' },
+  'amsmath': { role: 'Environnements mathématiques avancés', importance: 'Indispensable pour les équations' },
+  'amssymb': { role: 'Symboles mathématiques supplémentaires', importance: 'Essentiel pour les ensembles de nombres' },
+  'systeme': { role: 'Écriture et alignement des systèmes', importance: 'Facilite l\'écriture des systèmes' },
+  'tikz': { role: 'Dessin vectoriel pour les figures', importance: 'Permet de créer des figures de haute qualité' },
+  'tkz-euclide': { role: 'Géométrie euclidienne avec TikZ', importance: 'Simplifie la création de figures géométriques' },
+  'pgfplots': { role: 'Tracé de courbes de fonctions', importance: 'Indispensable pour les graphiques' },
+  'caption': { role: 'Personnalisation des légendes', importance: 'Permet de gérer les légendes proprement' },
+  'subcaption': { role: 'Création de sous-figures', importance: 'Utile pour comparer plusieurs images' },
+  'enumitem': { role: 'Personnalisation des listes', importance: 'Permet d\'adapter les listes' },
+  'parskip': { role: 'Espacement entre les paragraphes', importance: 'Améliore la lisibilité' },
+  'longtable': { role: 'Tableaux sur plusieurs pages', importance: 'Indispensable pour les données volumineuses' },
+  'lastpage': { role: 'Nombre total de pages', importance: 'Utile pour afficher "Page X sur Y"' },
+  'eso-pic': { role: 'Ajout d\'éléments en arrière-plan', importance: 'Permet d\'ajouter des filigranes' },
+  'siunitx': { role: 'Gestion des unités SI', importance: 'Indispensable pour la physique et la chimie' },
+  'chemformula': { role: 'Écriture des formules chimiques', importance: 'Essentiel pour la chimie' },
+  'mhchem': { role: 'Écriture des formules chimiques (alternative)', importance: 'Alternative pour les équations' },
+  'circuitikz': { role: 'Schémas électriques', importance: 'Indispensable pour l\'électricité' },
+};
+
+// =================================================================
+// 2. DONNÉES COMPLÈTES DE LA FORMATION (tous les chapitres enrichis)
+// =================================================================
+const data = {
+  college: {
+    mathematiques: {
+      title: "Mathématiques – Collège",
+      chapters: [
+        {
+          title: "1. Introduction à LaTeX",
+          packages: ['article', 'babel', 'inputenc', 'fontenc'],
+          code: `% ---- Structure minimale ----\n\\documentclass{article}\n\\begin{document}\nBonjour, ceci est mon premier document.\n\\end{document}`,
+          preview: `<p>LaTeX est un système de composition de documents de haute qualité, particulièrement adapté aux mathématiques.</p>
+            <div class="box box-definition"><span class="box-title">Structure minimale</span>
+            <p>Un fichier LaTeX se compose d'un préambule et d'un corps.</p></div>
+            <ul><li><code>article</code> : pour des devoirs, épreuves.</li>
+            <li><code>report</code> : pour des rapports.</li>
+            <li><code>book</code> : pour des livres.</li>
+            <li><code>beamer</code> : pour des présentations.</li></ul>
+            <div class="box box-attention"><span class="box-title">Astuce</span><p>Pour compiler : <code>pdflatex mon_fichier.tex</code></p></div>`
+        },
+        {
+          title: "2. En-têtes et pieds de page",
+          packages: ['fancyhdr', 'lastpage'],
+          code: `\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}\n\\fancyfoot[L]{\\textit{Page \\thepage}}\n\\fancyfoot[C]{\\textit{Classe}}\n\\fancyfoot[R]{\\textit{Année}}`,
+          preview: `<p>Le package <code>fancyhdr</code> personnalise l'en-tête et le pied de page.</p>
+            <div class="box box-propriete"><span class="box-title">Configuration type</span>
+            <pre>\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}</pre></div>
+            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date.</p>`
+        },
+        {
+          title: "3. Boîtes de texte",
+          packages: ['tcolorbox', 'xcolor'],
+          code: `\\usepackage{tcolorbox}\n\\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=Définition]\nUne fonction affine est $f(x)=ax+b$.\n\\end{tcolorbox}`,
+          preview: `<p>Le package <code>tcolorbox</code> encadre définitions, théorèmes, consignes.</p>
+            <div class="box box-definition"><span class="box-title">Définition</span><p>Une fonction affine est $f(x)=ax+b$.</p></div>
+            <div class="box box-theoreme"><span class="box-title">Pythagore</span><p>$BC^2 = AB^2 + AC^2$.</p></div>
+            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages).</p>`
+        },
+        {
+          title: "4. Tableaux",
+          packages: ['array', 'multirow', 'makecell'],
+          code: `\\begin{tabular}{|c|c|c|}\\hline\n\\textbf{Élève} & \\textbf{Note} & \\textbf{Appréciation}\\\\\\hline\nAlice & 18 & Très bien \\\\\nBob & 12 & Bien \\\\\\hline\n\\end{tabular}`,
+          preview: `<p>Les tableaux avec <code>tabular</code>.</p>
+            <div class="table-wrap"><table><thead><tr><th>Élève</th><th>Note</th><th>Appréciation</th></tr></thead>
+            <tbody><tr><td>Alice</td><td>18</td><td>Très bien</td></tr>
+            <tr><td>Bob</td><td>12</td><td>Bien</td></tr></tbody></table></div>
+            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe).</p>`
+        },
+        {
+          title: "5. Insertion d'images",
+          packages: ['graphicx', 'float', 'caption'],
+          code: `\\usepackage{graphicx}\n\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.5\\textwidth]{image.png}\n  \\caption{Légende}\n\\end{figure}`,
+          preview: `<p><code>graphicx</code> insère des images.</p>
+            <div class="box box-propriete"><span class="box-title">Placement</span>
+            <ul><li><code>h</code> : ici</li><li><code>t</code> : en haut</li><li><code>b</code> : en bas</li><li><code>H</code> : exactement (package <code>float</code>)</li></ul></div>
+            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>.</p>`
+        },
+        {
+          title: "6. Modèles d'épreuves",
+          packages: ['article', 'fancyhdr', 'tcolorbox'],
+          code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} (4 pts) ...\n\\end{document}`,
+          preview: `<p>Structure d'une épreuve : en-tête, consigne, exercices numérotés, barème, pied de page.</p>
+            <div class="box box-consigne"><span class="box-title">Structure</span><ul><li>En-tête</li><li>Consigne</li><li>Exercices avec barème</li><li>Pied de page</li></ul></div>`
+        },
+        {
+          title: "7. Outils mathématiques",
+          packages: ['amsmath', 'amssymb'],
+          code: `$\\frac{a}{b}$, $x^n$, $\\sqrt{2}$\n$(a+b)^2 = a^2+2ab+b^2$\n$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$`,
+          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$</li></ul>
+            <div class="box box-theoreme">Identités : $(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
+            <h4>Trigonométrie</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
+            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th></tr></thead>
+            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td></tr>
+            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td></tr></tbody></table></div>
+            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q}$</p>`
+        },
+        {
+          title: "8. Ressources et compilation",
+          packages: ['article', 'inputenc', 'fontenc'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Compilation : <code>pdflatex</code>. Erreurs fréquentes : <code>Undefined control sequence</code>, <code>Missing $</code>, <code>File not found</code>.</p>
+            <div class="box box-attention"><span class="box-title">Erreurs</span><ul><li>Commande inconnue</li><li>Oubli de $</li><li>Image introuvable</li></ul></div>`
+        },
+        {
+          title: "9. Nombres et calculs",
+          packages: ['amsmath', 'xcolor'],
+          code: `$\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$\n$(-3)+(-5)=-8$\n$2+3\\times4=14$`,
+          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{5}{9}$</div>
+            <div class="box box-propriete">Relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$<br>$(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
+            <div class="box box-attention">Priorités : $2+3\\times4=14$, $(2+3)\\times4=20$<br>Puissances avant multiplications.</div>`
+        }
+      ]
+    },
+    physique: {
+      title: "Physique – Collège",
+      chapters: [
+        {
+          title: "1. Introduction et rappels",
+          packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
+          code: `\\usepackage{siunitx}\n\\usepackage{chemformula}\n\\usepackage{circuitikz}\n\\usepackage{pgfplots}`,
+          preview: `<p>Packages : <code>siunitx</code> (unités), <code>chemformula</code> (chimie), <code>circuitikz</code> (électricité), <code>pgfplots</code> (graphiques).</p>
+            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques au collège.</div>`
+        },
+        {
+          title: "2. Formules chimiques",
+          packages: ['chemformula', 'siunitx'],
+          code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{NaCl}\n\\ch{2H2 + O2 -> 2H2O}`,
+          preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Chlorure de sodium : $\\ch{NaCl}$</li></ul>
+            <div class="box box-definition">Équation équilibrée : $\\ch{2H2 + O2 -> 2H2O}$</div>
+            <p>États : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux.</p>`
+        },
+        {
+          title: "3. Grandeurs et unités",
+          packages: ['siunitx'],
+          code: `$\\SI{250}{g}$\n$\\SI{1.5}{L}$\n$\\SI{3.0e8}{m/s}$`,
+          preview: `<ul><li>Masse : $\\SI{250}{g}$</li><li>Volume : $\\SI{1.5}{L}$</li><li>Vitesse : $\\SI{3.0e8}{m/s}$</li></ul>
+            <div class="table-wrap"><table><thead><tr><th>Préfixe</th><th>Symbole</th><th>Facteur</th></tr></thead>
+            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr><tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
+            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr><tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>`
+        },
+        {
+          title: "4. Tableaux de mesures",
+          packages: ['siunitx', 'array'],
+          code: `\\begin{tabular}{|c|c|}\\hline\nTemps & Température \\\\\n0 & 20,0 \\\\\n10 & 25,5 \\\\\\hline\n\\end{tabular}`,
+          preview: `<div class="table-wrap"><table><thead><tr><th>Temps (s)</th><th>Température (°C)</th></tr></thead>
+            <tbody><tr><td>0</td><td>20,0</td></tr><tr><td>10</td><td>25,5</td></tr>
+            <tr><td>20</td><td>31,2</td></tr><tr><td>30</td><td>37,8</td></tr></tbody></table></div>
+            <p>Utilisez <code>siunitx</code> pour aligner les nombres avec leurs unités.</p>`
+        },
+        {
+          title: "5. Graphiques",
+          packages: ['pgfplots', 'siunitx'],
+          code: `\\begin{axis}[xlabel=Temps, ylabel=Température]\n\\addplot[only marks, mark=*] coordinates {(0,20) (10,25.5)};\n\\end{axis}`,
+          preview: `<div class="figure-tikz">[Courbe température en fonction du temps]</div>
+            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et tendances.</p>`
+        },
+        {
+          title: "6. Circuits série et dérivation",
+          packages: ['circuitikz', 'tikz'],
+          code: `\\begin{circuitikz}\n\\draw (0,0) to[battery1] (0,3) to[switch] (2,3) to[lamp] (2,0) -- (0,0);\n\\end{circuitikz}`,
+          preview: `<div class="figure-tikz">[Circuit série avec pile, interrupteur et lampe]</div>
+            <div class="box box-propriete">Série : $I$ constante, $U=U_1+U_2$<br>Dérivation : $U$ constante, $I=I_1+I_2$</div>
+            <p>Composants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>.</p>`
+        },
+        {
+          title: "7. Schémas expérimentaux",
+          packages: ['tikz'],
+          code: `\\begin{tikzpicture}\n\\draw (0,0) -- (0,2) arc (180:0:1) -- (2,0);\n\\end{tikzpicture}`,
+          preview: `<div class="figure-tikz">[Bécher]</div>
+            <p>Avec TikZ, on dessine du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc.</p>`
+        },
+        {
+          title: "8. Modèles d'épreuves",
+          packages: ['article', 'fancyhdr', 'circuitikz', 'pgfplots', 'chemformula'],
+          code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} ...\n\\end{document}`,
+          preview: `<div class="box box-consigne">Structure d'une épreuve de physique :<ul><li>En-tête</li><li>Consignes</li><li>Exercices avec barème</li><li>Schémas et tableaux</li></ul></div>`
+        },
+        {
+          title: "9. Ressources",
+          packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs fréquentes : <code>chemformula</code> (syntaxe), <code>siunitx</code> (accolades), <code>circuitikz</code> (connexions).</p>`
+        },
+        {
+          title: "10. Optique",
+          packages: ['tikz'],
+          code: `\\begin{tikzpicture}\n\\draw[->] (0,0) -- (4,0);\n\\end{tikzpicture}`,
+          preview: `<div class="box box-definition">Propagation rectiligne de la lumière</div>
+            <div class="figure-tikz">[Schéma de lentille convergente]</div>
+            <p>La lumière se propage en ligne droite dans un milieu homogène. Les lentilles convergentes focalisent les rayons.</p>`
+        },
+        {
+          title: "11. Mécanique",
+          packages: ['amsmath', 'tikz'],
+          code: `$v = \\frac{d}{t}$\n$\\vec{P} = m\\vec{g}$`,
+          preview: `<div class="box box-definition">Vitesse moyenne : $v = \\frac{d}{t}$</div>
+            <div class="box box-theoreme">Poids : $\\vec{P} = m\\vec{g}$ avec $g \\approx 9,81$ m/s²</div>
+            <div class="figure-tikz">[Schéma de forces : poids et réaction]</div>`
+        }
+      ]
+    },
+    chimie: {
+      title: "Chimie – Collège",
+      chapters: [
+        {
+          title: "1. Formules chimiques",
+          packages: ['chemformula'],
+          code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{HCl}\n\\ch{CH4 + 2O2 -> CO2 + 2H2O}`,
+          preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Acide chlorhydrique : $\\ch{HCl}$</li></ul>
+            <div class="box box-definition">Combustion du méthane : $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$</div>`
+        },
+        {
+          title: "2. Équilibrage",
+          packages: ['chemformula'],
+          code: `\\ch{3Fe + 2O2 -> Fe3O4}`,
+          preview: `<p>Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
+            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients.</div>`
+        },
+        {
+          title: "3. Solutions et concentration",
+          packages: ['chemformula', 'siunitx'],
+          code: `$C = \\frac{n}{V}$\n$n = \\frac{m}{M}$`,
+          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L)</p>
+            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol)</p>
+            <div class="box box-definition">Préparer une solution : dissoudre $m$ grammes de soluté dans $V$ litres de solvant.</div>`
+        },
+        {
+          title: "4. Acides et bases",
+          packages: ['chemformula', 'siunitx'],
+          code: `$pH = -\\log[H_3O^+]$\n\\ch{HCl + NaOH -> NaCl + H2O}`,
+          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
+            <div class="box box-definition">Neutralisation : $\\ch{HCl + NaOH -> NaCl + H2O}$</div>
+            <p>Indicateurs : tournesol (rouge acide, bleu basique), BBT (jaune acide, bleu basique).</p>`
+        }
+      ]
+    }
+  },
+  lycee: {
+    mathematiques: {
+      title: "Mathématiques – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
+          code: `\\usepackage{amsmath, amssymb}\n\\usepackage{pgfplots}\n\\usepackage{tkz-euclide}`,
+          preview: `<p>Packages avancés pour le lycée : <code>amsmath</code> (équations), <code>amssymb</code> (symboles), <code>pgfplots</code> (courbes), <code>tkz-euclide</code> (géométrie).</p>`
+        },
+        {
+          title: "2. Fonctions usuelles",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$\\exp(x)=e^x$, $(e^x)'=e^x$\n$\\ln x$, $(\\ln x)'=1/x$\n$\\cos^2 x+\\sin^2 x=1$`,
+          preview: `<div class="box box-definition">Exponentielle : $e^x$, dérivée $(e^x)'=e^x$</div>
+            <div class="box box-definition">Logarithme : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$</div>
+            <div class="box box-theoreme">Identité : $\\cos^2 x + \\sin^2 x = 1$<br>$\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$</div>`
+        },
+        {
+          title: "3. Suites",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$u_n=2n+1$\n$u_{n+1}=\\frac12 u_n+1$`,
+          preview: `<ul><li>Explicite : $u_n=2n+1$</li><li>Récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$</li></ul>
+            <div class="box box-propriete">Limite : $\\lim_{n\\to\\infty} u_n = L$</div>`
+        },
+        {
+          title: "4. Dérivation",
+          packages: ['amsmath'],
+          code: `$f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}$\n$(x^n)'=n x^{n-1}$`,
+          preview: `<div class="box box-theoreme">Formules :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
+            <p>Tangente : $y=f'(a)(x-a)+f(a)$</p>`
+        },
+        {
+          title: "5. Intégration",
+          packages: ['amsmath'],
+          code: `$\\int_a^b f(x) dx$\n$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$`,
+          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$</div>`
+        },
+        {
+          title: "6. Nombres complexes",
+          packages: ['amsmath', 'amssymb', 'tkz-euclide'],
+          code: `$z=a+ib$, $z=re^{i\\theta}$\n$e^{i\\theta}=\\cos\\theta+i\\sin\\theta$`,
+          preview: `<div class="box box-theoreme">Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$</div>
+            <div class="figure-tikz">[Plan complexe]</div>`
+        },
+        {
+          title: "7. Géométrie analytique",
+          packages: ['amsmath', 'tikz'],
+          code: `$\\overrightarrow{AB}=\\begin{pmatrix} x_B-x_A \\\\ y_B-y_A \\end{pmatrix}$\n$\\vec u\\cdot\\vec v = x_ux_v+y_uy_v$`,
+          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$</div>`
+        },
+        {
+          title: "8. Géométrie 3D",
+          packages: ['tikz', 'amsmath'],
+          code: `$AB=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$`,
+          preview: `<div class="figure-tikz">[Parallélépipède]</div>
+            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$</p>`
+        },
+        {
+          title: "9. Probabilités",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$E(X)=\\sum x_i P(X=x_i)$\n$P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$`,
+          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$</div>
+            <div class="box box-definition">Loi binomiale : $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$</div>`
+        },
+        {
+          title: "10. Équations différentielles",
+          packages: ['amsmath'],
+          code: `$y'+ay=b$ solution : $y=Ce^{-ax}+b/a$\n$y''+\\omega^2 y=0$`,
+          preview: `<p>Ordre 1 : $y'+ay=b \\Rightarrow y=Ce^{-ax}+\\frac{b}{a}$</p>
+            <p>Ordre 2 : $y''+\\omega^2 y=0 \\Rightarrow y=A\\cos(\\omega x)+B\\sin(\\omega x)$</p>`
+        },
+        {
+          title: "11. Matrices",
+          packages: ['amsmath'],
+          code: `$A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$\n$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$`,
+          preview: `<div class="box box-definition">Inverse d'une matrice 2×2 :<br>$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$</div>`
+        },
+        {
+          title: "12. Ressources",
+          packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Packages incontournables : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>
+            <p>Compilation : <code>pdflatex</code> ou <code>lualatex</code>.</p>`
+        }
+      ]
+    },
+    physique: {
+      title: "Physique – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['siunitx', 'pgfplots', 'circuitikz', 'tikz'],
+          code: `\\usepackage{siunitx}\n\\usepackage{pgfplots}\n\\usepackage{circuitikz}\n\\usepackage{tikz}`,
+          preview: `<p>Packages : <code>siunitx</code> (unités), <code>pgfplots</code> (courbes), <code>circuitikz</code> (électricité), <code>tikz</code> (figures).</p>`
+        },
+        {
+          title: "2. Mécanique",
+          packages: ['amsmath', 'tikz', 'pgfplots'],
+          code: `$\\vec v = \\frac{d\\vec{OM}}{dt}$\n$\\sum\\vec F_{ext}=m\\vec a$`,
+          preview: `<div class="box box-theoreme">PFD : $\\sum\\vec F_{ext}=m\\vec a$</div>
+            <div class="figure-tikz">[Schéma de forces]</div>`
+        },
+        {
+          title: "3. Énergie mécanique",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$E_c=\\frac12 mv^2$, $E_p=mgh$, $E_m=E_c+E_p$`,
+          preview: `<div class="box box-theoreme">Conservation : $\\Delta E_m=0$ si forces conservatives</div>`
+        },
+        {
+          title: "4. Électricité",
+          packages: ['amsmath', 'circuitikz', 'pgfplots'],
+          code: `$u_C(t)=E(1-e^{-t/RC})$\n$i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$`,
+          preview: `<div class="figure-tikz">[Circuit RC]</div>
+            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$</p>`
+        },
+        {
+          title: "5. Thermodynamique",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$PV=nRT$\n$\\Delta U=W+Q$`,
+          preview: `<div class="box box-definition">Gaz parfait : $PV=nRT$</div>
+            <div class="box box-definition">Premier principe : $\\Delta U=W+Q$</div>`
+        },
+        {
+          title: "6. Ondes",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$y(x,t)=A\\cos(\\omega t-kx)$`,
+          preview: `<div class="figure-tikz">[Onde sinusoïdale]</div>`
+        },
+        {
+          title: "7. Physique nucléaire",
+          packages: ['amsmath', 'chemformula', 'pgfplots'],
+          code: `$N(t)=N_0e^{-\\lambda t}$\n$t_{1/2}=\\frac{\\ln2}{\\lambda}$\n\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}`,
+          preview: `<div class="box box-definition">Décroissance : $N=N_0e^{-\\lambda t}$, $t_{1/2}=\\ln2/\\lambda$</div>
+            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$</div>`
+        },
+        {
+          title: "8. Mécanique des fluides",
+          packages: ['amsmath', 'tikz'],
+          code: `$P=F/S$\n$\\Delta P = \\rho g \\Delta h$\n$\\vec F_A = -\\rho_f V_{im}\\vec g$`,
+          preview: `<div class="box box-definition">Pression : $P=F/S$</div>
+            <div class="box box-propriete">Archimède : $\\vec F_A = -\\rho_f V_{im}\\vec g$</div>`
+        },
+        {
+          title: "9. Ressources",
+          packages: ['siunitx', 'circuitikz', 'pgfplots', 'chemformula'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs : <code>circuitikz</code> (connexions), <code>pgfplots</code> (domaines), <code>chemformula</code> (syntaxe).</p>`
+        }
+      ]
+    },
+    chimie: {
+      title: "Chimie – Lycée",
+      chapters: [
+        {
+          title: "1. Introduction",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `\\usepackage{chemformula}\n\\usepackage{siunitx}\n\\usepackage{pgfplots}`,
+          preview: `<p>Packages : <code>chemformula</code> (chimie), <code>siunitx</code> (unités), <code>pgfplots</code> (courbes de titrage).</p>`
+        },
+        {
+          title: "2. Acides et bases",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `$pH=-\\log[H_3O^+]$\n$K_a = \\frac{[A^-][H_3O^+]}{[HA]}$\n$pH = pK_a + \\log\\frac{[A^-]}{[HA]}$`,
+          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
+            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$</div>
+            <p>Henderson-Hasselbalch : $pH = pK_a + \\log\\frac{[A^-]}{[HA]}$</p>`
+        },
+        {
+          title: "3. Oxydoréduction",
+          packages: ['chemformula', 'amsmath'],
+          code: `\\ch{Fe^{2+} -> Fe^{3+} + e-}\n\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}\n$E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$`,
+          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$</div>`
+        },
+        {
+          title: "4. Cinétique",
+          packages: ['amsmath', 'pgfplots'],
+          code: `$v=-\\frac{d[A]}{dt}$\n$v=k[A]$ (ordre 1)\n$t_{1/2}=\\frac{\\ln2}{k}$`,
+          preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>
+            <p>Temps de demi-réaction : $t_{1/2}=\\ln2/k$</p>`
+        },
+        {
+          title: "5. Chimie organique",
+          packages: ['chemformula'],
+          code: `\\ch{C_nH_{2n+2}}\n\\ch{CH4}, \\ch{C2H6}, \\ch{C3H8}\nAlcool : \\ch{R-OH}`,
+          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$<br>Méthane $\\ch{CH4}$, Éthane $\\ch{C2H6}$, Propane $\\ch{C3H8}$</p>
+            <p>Groupes fonctionnels : Alcool $\\ch{R-OH}$, Acide carboxylique $\\ch{R-COOH}$</p>`
+        },
+        {
+          title: "6. Thermodynamique chimique",
+          packages: ['amsmath', 'chemformula'],
+          code: `$\\Delta H = H_{prod}-H_{réact}$\n$\\Delta G = \\Delta H - T\\Delta S$\n$\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$`,
+          preview: `<div class="box box-definition">Enthalpie : $\\Delta H = H_{prod}-H_{réact}$</div>
+            <div class="box box-theoreme">Gibbs : $\\Delta G = \\Delta H - T\\Delta S$</div>
+            <div class="box box-theoreme">Loi de Hess : $\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$</div>`
+        },
+        {
+          title: "7. Ressources",
+          packages: ['chemformula', 'siunitx', 'pgfplots'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs : <code>chemformula</code> (espaces, parenthèses), <code>siunitx</code> (séparation nombre/unité).</p>`
+        }
+      ]
+    }
+  }
+};
+
+// =================================================================
+// 3. SOURCE LATEX POUR LE COMPOSEUR (extrait)
+// =================================================================
+const LATEX_SOURCE = String.raw`
 \documentclass[a4paper,12pt]{article}
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
@@ -635,7 +938,6 @@
 \fancyfoot[C]{}
 
 \begin{document}
-
 \maketitle
 \thispagestyle{empty}
 \vfill
@@ -645,14 +947,12 @@ des documents scientifiques de qualité
 \end{center}
 \vfill
 \newpage
-
 \tableofcontents
 \newpage
 
 % ===================================================================
 \section{Leçon 1 : Découverte de \LaTeX}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
 \item Comprendre le principe de compilation d'un document \LaTeX
@@ -660,15 +960,8 @@ des documents scientifiques de qualité
 \item Savoir organiser un document avec \lstinline|\section| et \lstinline|\subsection|
 \item Maîtriser les commandes de base : \lstinline|\textbf|, \lstinline|\textit|, \lstinline|\underline|
 \item Créer des listes et gérer les caractères spéciaux
-\item Compiler son premier document complet
 \end{itemize}
-
-\LaTeX\, est un système de composition de documents particulièrement adapté
-aux mathématiques, à la physique et à la chimie. Contrairement à un traitement
-de texte classique (Word, LibreOffice), \LaTeX\, fonctionne sur le principe
-de \textbf{langage de balisage}~: on écrit le contenu dans un fichier source
-\lstinline|.tex|, et le programme se charge de la mise en forme.
-
+\LaTeX\, est un système de composition de documents particulièrement adapté aux mathématiques, à la physique et à la chimie.
 \begin{center}
 \fbox{\parbox{0.8\textwidth}{\centering
 \textbf{Avantages pour les enseignants de sciences}
@@ -677,81 +970,29 @@ de \textbf{langage de balisage}~: on écrit le contenu dans un fichier source
 \item Numérotation automatique des équations, figures, tableaux
 \item Gestion des références croisées et bibliographie
 \item Documents professionnels avec une mise en page homogène
-\item Séparation du fond et de la forme
-\item Fichiers légers, versionnables (Git)
 \end{itemize}}}
 \end{center}
 
-% -------------------------------------------------------------------
-\subsection{Deux façons de travailler}
-% -------------------------------------------------------------------
-
-\begin{enumerate}
-\item \textbf{En ligne -- Overleaf} : \url{https://www.overleaf.com}
-  \begin{itemize}
-  \item Aucune installation requise
-  \item Travail collaboratif en temps réel
-  \item Modèles prêts à l'emploi
-  \end{itemize}
-\item \textbf{En local -- Installation} :
-  \begin{itemize}
-  \item \textbf{Windows} : \href{https://miktex.org}{MiKTeX} ou \href{https://tug.org/texlive/}{TeX Live}
-  \item \textbf{macOS} : \href{https://tug.org/mactex/}{MacTeX}
-  \item \textbf{Linux} : paquet \lstinline|texlive-full|
-  \item Éditeur recommandé : \href{https://code.visualstudio.com}{VS Code}~+ extension \og LaTeX Workshop \fg
-  \end{itemize}
-\end{enumerate}
-
-\newpage
-
-% ===================================================================
-\section{Leçon 1 : Découverte de \LaTeX}
-% ===================================================================
-
 \subsection{Structure minimale}
-
-Tout fichier \LaTeX\, commence par une \textbf{classe de document}
-et se termine par \lstinline|\end{document}|.
-
 \begin{lstlisting}[style=mylatex]
 \documentclass[a4paper,12pt]{article}
 \usepackage[french]{babel}
 \usepackage[utf8]{inputenc}
-
 \begin{document}
-
 Bonjour le monde ! Ceci est mon premier document \LaTeX.
-
 \end{document}
 \end{lstlisting}
-
 \begin{center}
 \colorbox{green!10}{\parbox{0.85\textwidth}{
 \textbf{À retenir} :
 \begin{itemize}
-\item \lstinline|\documentclass[...]{article}| : classe (article, report, book, beamer\ldots)
+\item \lstinline|\documentclass[...]{article}| : classe
 \item \lstinline|\usepackage{...}| : charger des paquets
-\item \lstinline|\begin{document}| ... \lstinline|\end{document}| : le corps du document
+\item \lstinline|\begin{document}| ... \lstinline|\end{document}| : corps du document
 \end{itemize}}}
 \end{center}
 
-\subsection{Organisation du texte}
-
-\begin{lstlisting}[style=mylatex]
-\section{Introduction}
-\subsection{Sous-partie}
-\subsubsection{Paragraphe détaillé}
-
-Un saut de ligne dans le source \textbf{ne} crée \textit{pas}
-un nouveau paragraphe.
-
-Une ligne vide dans le source \underline{crée} un nouveau paragraphe.
-
-Les \texttt{espaces} multiples sont ignorés.
-\end{lstlisting}
-
 \subsection{Caractères spéciaux}
-
 \begin{center}
 \begin{tabular}{lll}
 \toprule
@@ -764,2261 +1005,576 @@ Les \texttt{espaces} multiples sont ignorés.
 \& & \lstinline|\&| & Esperluette (tableaux) \\
 \_ & \lstinline|\_| & Indice (mode maths) \\
 \{ \} & \lstinline|\{ \}| & Délimiteurs \\
-\textasciitilde & \lstinline|\textasciitilde| & Espace insécable \\
-\textbackslash & \lstinline|\textbackslash| & Anti-slash \\
 \bottomrule
 \end{tabular}
 \end{center}
-
-\subsection{Mise en pratique -- Premier document}
-
-Créez un document avec titre, sections et styles de texte.
-
-\begin{lstlisting}[style=mylatex]
-\documentclass[a4paper,12pt]{article}
-\usepackage[french]{babel}
-\usepackage[utf8]{inputenc}
-
-\title{Mon premier document}
-\author{Votre nom}
-\date{\today}
-
-\begin{document}
-\maketitle
-\tableofcontents
-
-\section{Introduction}
-Bienvenue dans \LaTeX. C'est \textbf{facile} et \textit{puissant}.
-
-\section{Liste des notions}
-\begin{itemize}
-\item Textes : \textbf{gras}, \textit{italique}, \underline{souligné}
-\item Listes : itemize, enumerate, description
-\end{itemize}
-\end{document}
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 1 :}
-\begin{itemize}
-\item Je sais créer un document minimal avec \lstinline|\documentclass|, \lstinline|\begin{document}|
-\item Je connais les commandes de mise en forme : \lstinline|\textbf|, \lstinline|\textit|, \lstinline|\underline|
-\item Je sais structurer avec \lstinline|\section| et \lstinline|\subsection|
-\item Je maîtrise les environnements \lstinline|itemize|, \lstinline|enumerate|, \lstinline|description|
-\item Je connais les caractères spéciaux et leur échappement
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 2 : Mathématiques -- notions fondamentales}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
 \item Distinguer le mode mathématique en ligne et hors-texte
 \item Écrire fractions, puissances, racines et indices
-\item Utiliser les lettres grecques (indispensables en sciences)
-\item Appliquer les mathématiques aux formules de physique et chimie
-\item Numéroter des équations avec \lstinline|\label| et \lstinline|\ref|
-\item Résoudre des systèmes d'équations avec \lstinline|cases|
+\item Utiliser les lettres grecques
 \end{itemize}
-
-C'est le point fort de \LaTeX. Deux modes~:
-\begin{itemize}
-\item \textbf{Mode en ligne} : entre \lstinline|$...$| ou \lstinline|\(...\)|
-\item \textbf{Mode hors-texte} : entre \lstinline|\[...\]|,
-  \lstinline|\begin{equation}...\end{equation}| ou
-  \lstinline|\begin{align}...\end{align}|
-\end{itemize}
-
 \subsection{Opérations de base}
-
-\begin{multicols}{2}
 \begin{lstlisting}[style=mylatex]
-$a + b = c$
-$a - b = c$
-$a \times b = c$
-$a \div b = c$
-$\frac{a}{b}$
-$a^{n}$
-$a_{n}$
-$\sqrt{x}$
-$\sqrt[n]{x}$
-$|x|$
+$a + b = c$, $a - b = c$, $a \times b = c$, $a \div b = c$
+$\frac{a}{b}$, $a^{n}$, $a_{n}$, $\sqrt{x}$, $\sqrt[n]{x}$
 \end{lstlisting}
-
-\columnbreak
-
-\begin{tabular}{ll}
-\toprule
-Commande & Résultat \\
-\midrule
-\lstinline|a + b = c| & $a + b = c$ \\
-\lstinline|a - b = c| & $a - b = c$ \\
-\lstinline|\times| & $\times$ \\
-\lstinline|\div| & $\div$ \\
-\lstinline|\frac{a}{b}| & $\frac{a}{b}$ \\
-\lstinline|a^{n}| & $a^{n}$ \\
-\lstinline|a_{n}| & $a_{n}$ \\
-\lstinline|\sqrt{x}| & $\sqrt{x}$ \\
-\lstinline|\sqrt[n]{x}| & $\sqrt[n]{x}$ \\
-\lstinline||x|| & $|x|$ \\
-\bottomrule
-\end{tabular}
-\end{multicols}
-
-\subsection{Lettres grecques (indispensables en sciences)}
-
-\begin{multicols}{3}
-\textbf{Minuscules :}
-\begin{itemize}
-\item $\alpha$ \lstinline|\alpha|
-\item $\beta$ \lstinline|\beta|
-\item $\gamma$ \lstinline|\gamma|
-\item $\delta$ \lstinline|\delta|
-\item $\epsilon$ \lstinline|\epsilon|
-\item $\varepsilon$ \lstinline|\varepsilon|
-\item $\zeta$ \lstinline|\zeta|
-\item $\eta$ \lstinline|\eta|
-\item $\theta$ \lstinline|\theta|
-\item $\vartheta$ \lstinline|\vartheta|
-\item $\iota$ \lstinline|\iota|
-\item $\kappa$ \lstinline|\kappa|
-\item $\lambda$ \lstinline|\lambda|
-\item $\mu$ \lstinline|\mu|
-\item $\nu$ \lstinline|\nu|
-\item $\xi$ \lstinline|\xi|
-\item $\omicron$ \lstinline|\omicron|
-\item $\pi$ \lstinline|\pi|
-\item $\varpi$ \lstinline|\varpi|
-\item $\rho$ \lstinline|\rho|
-\item $\varrho$ \lstinline|\varrho|
-\item $\sigma$ \lstinline|\sigma|
-\item $\varsigma$ \lstinline|\varsigma|
-\item $\tau$ \lstinline|\tau|
-\item $\upsilon$ \lstinline|\upsilon|
-\item $\phi$ \lstinline|\phi|
-\item $\varphi$ \lstinline|\varphi|
-\item $\chi$ \lstinline|\chi|
-\item $\psi$ \lstinline|\psi|
-\item $\omega$ \lstinline|\omega|
-\end{itemize}
-\columnbreak
-\textbf{Majuscules :}
-\begin{itemize}
-\item $\Gamma$ \lstinline|\Gamma|
-\item $\Delta$ \lstinline|\Delta|
-\item $\Theta$ \lstinline|\Theta|
-\item $\Lambda$ \lstinline|\Lambda|
-\item $\Xi$ \lstinline|\Xi|
-\item $\Pi$ \lstinline|\Pi|
-\item $\Sigma$ \lstinline|\Sigma|
-\item $\Upsilon$ \lstinline|\Upsilon|
-\item $\Phi$ \lstinline|\Phi|
-\item $\Psi$ \lstinline|\Psi|
-\item $\Omega$ \lstinline|\Omega|
-\end{itemize}
-\textbf{Utilisations courantes :}
-\begin{itemize}
-\item $\pi$ : périmètre/cercle
-\item $\rho$ : masse volumique
-\item $\lambda$ : longueur d'onde
-\item $\mu$ : micro ($10^{-6}$)
-\item $\Delta$ : différence
-\item $\Sigma$ : somme
-\item $\Omega$ : résistance ($\Omega$)
-\item $\alpha,\beta,\gamma$ : angles
-\end{itemize}
-\end{multicols}
-\vspace{0.3cm}
-
-\newpage
-
-\subsection{Exemples pour les sciences}
-
-\textbf{Physique -- Vitesse, distance, temps}~:
-\begin{lstlisting}[style=mylatex]
-$v = \frac{d}{t}$
-$d = v \times t$
-$t = \frac{d}{v}$
-\end{lstlisting}
-$v = \dfrac{d}{t}$\hfill
-$d = v \times t$\hfill
-$t = \dfrac{d}{v}$
-
-\medskip
-\textbf{Physique -- Deuxième loi de Newton}~:
-\begin{lstlisting}[style=mylatex]
-$\vec{F} = m \times \vec{a}$
-\end{lstlisting}
-$\vec{F} = m \times \vec{a}$
-
-\medskip
-\textbf{Physique -- Énergie cinétique}~:
-\begin{lstlisting}[style=mylatex]
-$E_c = \frac{1}{2} m v^{2}$
-\end{lstlisting}
-$E_c = \frac{1}{2} m v^{2}$
-
-\medskip
-\textbf{Physique -- Poids et masse}~:
-\begin{lstlisting}[style=mylatex]
-$P = m \times g$
-où $g \approx 9,\!81$ N/kg sur Terre
-\end{lstlisting}
-$P = m \times g$\quad où $g \approx 9,\!81$ N/kg sur Terre
-
-\medskip
-\textbf{Physique -- Loi d'Ohm}~:
-\begin{lstlisting}[style=mylatex]
-$U = R \times I$
-\end{lstlisting}
-$U = R \times I$
-
-\medskip
-\textbf{Physique -- Puissance électrique}~:
-\begin{lstlisting}[style=mylatex]
-$P = U \times I$
-\end{lstlisting}
-$P = U \times I$
-
-\medskip
-\textbf{Physique -- Relation de conjugaison (lentilles)}~:
-\begin{lstlisting}[style=mylatex]
-$\frac{1}{\overline{OA'}} - \frac{1}{\overline{OA}} = \frac{1}{f'}$
-\end{lstlisting}
-$\dfrac{1}{\overline{OA'}} - \dfrac{1}{\overline{OA}} = \dfrac{1}{f'}$
-
-\medskip
-\textbf{Physique -- Travail d'une force}~:
-\begin{lstlisting}[style=mylatex]
-$W = \int_{A}^{B} \vec{F} \cdot d\vec{l}$
-\end{lstlisting}
-$W = \displaystyle\int_{A}^{B} \vec{F} \cdot d\vec{l}$
-
-\medskip
-\textbf{Physique -- Loi de désintégration radioactive}~:
-\begin{lstlisting}[style=mylatex]
-$N(t) = N_{0} e^{-\lambda t}$
-$\frac{dN}{dt} = -\lambda N$
-\end{lstlisting}
-$N(t) = N_{0} e^{-\lambda t}$\qquad
-$\dfrac{dN}{dt} = -\lambda N$
-\newpage
-
-\subsection{Équations numérotées}
-
-\begin{lstlisting}[style=mylatex]
-\begin{equation}
-E_c = \frac{1}{2} m v^{2}
-\label{eq:ec}
-\end{equation}
-
-L'énergie cinétique (équation~\ref{eq:ec}) se calcule à partir de...
-\end{lstlisting}
-
-Résultat :
-\begin{equation}
-E_c = \frac{1}{2} m v^{2}
-\label{eq:ec_demo}
-\end{equation}
-L'énergie cinétique (équation~\ref{eq:ec_demo}) se calcule à partir de
-la masse $m$ et de la vitesse $v$.
-
-\subsection{Systèmes d'équations}
-
-\begin{lstlisting}[style=mylatex]
-\[
-\begin{cases}
-x + y = 10 \\
-2x - y = 5
-\end{cases}
-\]
-\end{lstlisting}
-
-\[
-\begin{cases}
-x + y = 10 \\
-2x - y = 5
-\end{cases}
-\]
-
-\textbf{Bilan de la leçon 2 :}
-\begin{itemize}
-\item Je maîtrise les deux modes mathématiques (\lstinline|$...$| et \lstinline|\[...\]|)
-\item Je sais écrire fractions \lstinline|\frac|, puissances \lstinline|^|, racines \lstinline|\sqrt| et indices \lstinline|_|
-\item Je connais les lettres grecques essentielles : \lstinline|\alpha|, \lstinline|\beta|, \lstinline|\gamma|, \lstinline|\delta|, \lstinline|\theta|, \lstinline|\pi|, \lstinline|\omega|
-\item Je sais numéroter et référencer une équation avec \lstinline|\label| et \lstinline|\ref|
-\item Je peux écrire des systèmes d'équations avec \lstinline|cases|
-\end{itemize}
-
+\subsection{Lettres grecques}
+$\alpha$, $\beta$, $\gamma$, $\delta$, $\theta$, $\pi$, $\omega$, $\Gamma$, $\Delta$, $\Theta$, $\Pi$, $\Sigma$, $\Omega$
 \newpage
 
 % ===================================================================
 \section{Leçon 3 : Mathématiques -- outils avancés}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Calculer des intégrales simples, doubles et triples
-\item Écrire des dérivées, dérivées partielles et gradients
-\item Manipuler les limites et asymptotes
-\item Utiliser les symboles de somme \lstinline|\sum| et produit \lstinline|\prod|
-\item Créer des matrices et calculer des déterminants
-\item Manipuler les ensembles et les quantificateurs logiques
+\item Calculer des intégrales, dérivées, limites
+\item Créer des matrices et manipuler les ensembles
 \end{itemize}
-
-\subsection{Intégrales}
-
-\LaTeX{} permet d'écrire tous types d'intégrales.
-
+\subsection{Intégrales et dérivées}
 \begin{lstlisting}[style=mylatex]
-% Intégrale simple
-$\int_{a}^{b} f(x) \, dx$
-
-% Intégrale double
-$\iint_{D} f(x,y) \, dx \, dy$
-
-% Intégrale triple
-$\iiint_{V} f(x,y,z) \, dx \, dy \, dz$
-
-% Intégrale curviligne
-$\oint_{C} \vec{F} \cdot d\vec{r}$
-
-% Intégrale indéfinie
-$F(x) = \int f(x) \, dx$
+$\int_{a}^{b} f(x) dx$, $\iint_{D} f(x,y) dxdy$
+$f'(x)=\frac{df}{dx}$, $\frac{\partial f}{\partial x}$
+$\lim_{x\to a} f(x)=L$, $\nabla f$
 \end{lstlisting}
-
-Résultats :
-\[
-\int_{a}^{b} f(x) \, dx \qquad
-\iint_{D} f(x,y) \, dx\,dy \qquad
-\oint_{C} \vec{F} \cdot d\vec{r}
-\]
-
-\subsection{Dérivées}
-
-\begin{lstlisting}[style=mylatex]
-% Dérivée simple
-$f'(x) = \frac{df}{dx}$
-
-% Dérivée d'ordre n
-$f^{(n)}(x) = \frac{d^{n}f}{dx^{n}}$
-
-% Dérivée partielle
-$\frac{\partial f}{\partial x}$
-
-% Gradient
-$\nabla f$
-
-% Dérivée temporelle
-$\dot{x} = \frac{dx}{dt} \quad \ddot{x} = \frac{d^{2}x}{dt^{2}}$
-\end{lstlisting}
-
-\subsection{Limites et asymptotes}
-
-\begin{lstlisting}[style=mylatex]
-% Limite simple
-$\lim_{x \to a} f(x) = L$
-
-% Limite à l'infini
-$\lim_{x \to +\infty} f(x) = 0$
-
-% Limite à gauche et à droite
-$\lim_{x \to 0^{-}} f(x) \quad \lim_{x \to 0^{+}} f(x)$
-
-% Limite et dérivée
-$\lim_{x \to a} \frac{f(x)-f(a)}{x-a} = f'(a)$
-\end{lstlisting}
-
-\subsection{Sommes et produits}
-
-\begin{lstlisting}[style=mylatex]
-% Somme
-$\sum_{k=1}^{n} k = \frac{n(n+1)}{2}$
-
-% Somme double
-$\sum_{i=1}^{n} \sum_{j=1}^{m} a_{ij}$
-
-% Produit
-$\prod_{k=1}^{n} k = n!$
-
-% Somme infinie
-$\sum_{n=0}^{\infty} \frac{1}{2^{n}} = 2$
-\end{lstlisting}
-
 \subsection{Matrices}
-
 \begin{lstlisting}[style=mylatex]
-% Matrice simple
-$\begin{matrix}
-a & b \\
-c & d
-\end{matrix}$
-
-% Matrice avec parenthèses
-$\begin{pmatrix}
-1 & 2 & 3 \\
-4 & 5 & 6
-\end{pmatrix}$
-
-% Matrice avec crochets
-$\begin{bmatrix}
-0 & 1 \\
--1 & 0
-\end{bmatrix}$
-
-% Déterminant
-$\begin{vmatrix}
-a & b \\
-c & d
-\end{vmatrix} = ad - bc$
+$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$,
+$\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad-bc$
 \end{lstlisting}
-
-\subsection{Ensembles et logique}
-
-\begin{lstlisting}[style=mylatex]
-% Appartenance
-$x \in \mathbb{R} \quad y \notin \mathbb{N}$
-
-% Inclusion
-$A \subset B \quad A \subseteq B$
-
-% Opérations
-$A \cup B \quad A \cap B$
-
-% Quantificateurs
-$\forall \varepsilon > 0 \; \exists \delta > 0$
-
-% Ensemble vide
-$\emptyset \quad \neg(P \land Q)$
-\end{lstlisting}
-
-\subsection{Mise en pratique -- Mathématiques}
-
-Rédigez un document complet utilisant tous les outils mathématiques.
-
-\begin{lstlisting}[style=mylatex]
-\section{Exercices de mathématiques}
-
-\subsection{Calcul intégral}
-Calculez :
-\[
-\int_{0}^{1} 3x^{2} \, dx \qquad
-\iint_{D} (x+y) \, dx\,dy
-\]
-
-\subsection{Dérivées}
-\[
-f(x) = x^{3} - 2x + 1 \quad \Rightarrow \quad f'(x) = 3x^{2} - 2
-\]
-Dérivée partielle :
-\[
-\frac{\partial}{\partial x}(x^{2}y + y^{2})
-\]
-
-\subsection{Limites}
-\[
-\lim_{x \to +\infty} \frac{2x+1}{x-3} = 2
-\]
-
-\subsection{Matrices}
-\[
-A = \begin{pmatrix}
-1 & 2 \\
-3 & 4
-\end{pmatrix}
-\qquad
-\det(A) = \begin{vmatrix}
-1 & 2 \\
-3 & 4
-\end{vmatrix} = -2
-\]
-
-\subsection{Sommes et produits}
-\[
-\sum_{k=1}^{n} k^{2} = \frac{n(n+1)(2n+1)}{6}
-\]
-
-\subsection{Système d'équations}
-\[
-\begin{cases}
-3x + 2y = 12 \\
-x - y = 1
-\end{cases}
-\]
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 3 :}
-\begin{itemize}
-\item Je sais écrire des intégrales simples, doubles, triples et curvilignes
-\item Je maîtrise les dérivées, dérivées partielles (\lstinline|\partial|) et le gradient (\lstinline|\nabla|)
-\item Je manipule les limites (\lstinline|\lim|, \lstinline|\to|, \lstinline|\infty|)
-\item Je peux écrire des sommes (\lstinline|\sum|) et des produits (\lstinline|\prod|)
-\item Je sais créer des matrices avec \lstinline|matrix|, \lstinline|pmatrix|, \lstinline|bmatrix|, \lstinline|vmatrix|
-\item J'utilise les symboles d'ensembles (\lstinline|\in|, \lstinline|\subset|, \lstinline|\cup|) et les quantificateurs (\lstinline|\forall|, \lstinline|\exists|)
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 4 : Chimie avec \LaTeX}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Écrire des formules chimiques avec \lstinline|\ce| (mhchem)
+\item Écrire des formules chimiques avec \lstinline|\ce|
 \item Équilibrer des réactions chimiques
-\item Représenter les états de la matière, isotopes et ions
-\item Utiliser \lstinline|chemfig| pour dessiner des molécules
-\item Connaître les commandes d'unités et grandeurs physiques
 \end{itemize}
-
-Le paquet \textbf{\texttt{mhchem}} permet d'écrire facilement des
-formules chimiques et des équations avec la commande \lstinline|\ce|.
-
 \subsection{Formules chimiques}
-
-\begin{multicols}{2}
 \begin{lstlisting}[style=mylatex]
-\ce{H2O}
-\ce{CO2}
-\ce{C6H12O6}
-\ce{NaCl}
-\ce{H2SO4}
-\ce{CH4}
-\ce{NH3}
-\ce{C2H6O}
+\ce{H2O}, \ce{CO2}, \ce{C6H12O6}, \ce{NaCl}, \ce{H2SO4}
 \end{lstlisting}
-\columnbreak
-\begin{tabular}{ll}
-\toprule
-Commande & Résultat \\
-\midrule
-\lstinline|\ce{H2O}| & \ce{H2O} \\
-\lstinline|\ce{CO2}| & \ce{CO2} \\
-\lstinline|\ce{C6H12O6}| & \ce{C6H12O6} \\
-\lstinline|\ce{NaCl}| & \ce{NaCl} \\
-\lstinline|\ce{H2SO4}| & \ce{H2SO4} \\
-\lstinline|\ce{CH4}| & \ce{CH4} \\
-\lstinline|\ce{NH3}| & \ce{NH3} \\
-\lstinline|\ce{C2H6O}| & \ce{C2H6O} \\
-\bottomrule
-\end{tabular}
-\end{multicols}
-
-\subsection{Équations chimiques équilibrées}
-
+\subsection{Équations chimiques}
 \begin{lstlisting}[style=mylatex]
 \ce{2 H2 + O2 -> 2 H2O}
 \ce{CH4 + 2 O2 -> CO2 + 2 H2O}
 \ce{C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O}
-\ce{2 Mg + O2 -> 2 MgO}
-\ce{6 CO2 + 6 H2O -> C6H12O6 + 6 O2}
-\ce{Fe + CuSO4 -> FeSO4 + Cu}
-\ce{HCl + NaOH -> NaCl + H2O}
-\ce{2 Al + 6 HCl -> 2 AlCl3 + 3 H2 ^}
 \end{lstlisting}
-
-Résultats :
-\begin{itemize}
-\item \ce{2 H2 + O2 -> 2 H2O}
-\item \ce{CH4 + 2 O2 -> CO2 + 2 H2O}
-\item \ce{C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O}
-\item \ce{2 Mg + O2 -> 2 MgO}
-\item \ce{6 CO2 + 6 H2O -> C6H12O6 + 6 O2}
-\item \ce{Fe + CuSO4 -> FeSO4 + Cu}
-\item \ce{HCl + NaOH -> NaCl + H2O}
-\item \ce{2 Al + 6 HCl -> 2 AlCl3 + 3 H2 ^}
-\end{itemize}
-
-\newpage
-
-\subsection{États de la matière et conditions}
-
-\begin{lstlisting}[style=mylatex]
-\ce{H2O_{(l)} -> H2O_{(g)}}       % liquide -> gaz
-\ce{H2O_{(s)} -> H2O_{(l)}}       % solide -> liquide
-\ce{2 H2_{(g)} + O2_{(g)} -> 2 H2O_{(l)}}
-\ce{CaCO3_{(s)} ->[+\Delta] CaO_{(s)} + CO2_{(g)}}
-\end{lstlisting}
-
-Résultats :
-\begin{itemize}
-\item \ce{H2O_{(l)} -> H2O_{(g)}}
-\item \ce{H2O_{(s)} -> H2O_{(l)}}
-\item \ce{2 H2_{(g)} + O2_{(g)} -> 2 H2O_{(l)}}
-\item \ce{CaCO3_{(s)} ->[+\Delta] CaO_{(s)} + CO2_{(g)}}
-\end{itemize}
-
-\subsection{Isotopes, ions, nombres d'oxydation}
-
-\begin{lstlisting}[style=mylatex]
-\ce{^{14}_{6}C}           % carbone 14
-\ce{^{238}_{92}U}         % uranium 238
-\ce{Na+}                  % ion sodium
-\ce{Cl-}                  % ion chlorure
-\ce{Mg^{2+}}              % ion magnésium
-\ce{SO4^{2-}}             % ion sulfate
-\ce{Fe^{3+}}              % ion fer III
-\ce{NO3-}                 % ion nitrate
-\end{lstlisting}
-
-Résultats :
-\begin{itemize}
-\item \ce{^{14}_{6}C} --- \ce{^{238}_{92}U}
-\item \ce{Na+} --- \ce{Cl-} --- \ce{Mg^{2+}} --- \ce{Fe^{3+}}
-\item \ce{SO4^{2-}} --- \ce{NO3-}
-\end{itemize}
-
-\subsection{Unités et grandeurs}
-
-\begin{lstlisting}[style=mylatex]
-$m = 12,\!5$~kg
-$V = 250$~mL
-$T = 273$~K
-$P = 1,\!013 \times 10^{5}$~Pa
-$n = 2,\!0$~mol
-$C = 5,\!0 \times 10^{-2}$~mol/L
-$\rho = 1,\!0$~g/mL
-\end{lstlisting}
-
-Résultats :
-$m = 12,\!5$~kg,\quad
-$V = 250$~mL,\quad
-$T = 273$~K,\quad
-$P = 1,\!013 \times 10^{5}$~Pa,\quad
-$n = 2,\!0$~mol,\quad
-$C = 5,\!0 \times 10^{-2}$~mol/L,\quad
-$\rho = 1,\!0$~g/mL
-
-\newpage
-
-\subsection{Molécules avec \texttt{chemfig}}
-
-Le paquet \texttt{chemfig} permet de dessiner des molécules.
-
-\begin{lstlisting}[style=mylatex]
-% Méthane
-\chemfig{C(-[2]H)(-[4]H)(-[6]H)(-[8]H)}
-
-% Éthanol
-\chemfig{C(-[2]H)(-[4]H)(-[6]H)(-[8]C(-[2]H)(-[6]H)(-[8]OH))}
-
-% Cycle du cyclohexane
-\chemfig{*6(------)}
-
-% Benzène
-\chemfig{*6(=-=-=-)}
-\end{lstlisting}
-
-Résultats :
-
-\medskip
-\hfill
-\chemfig{C(-[2]H)(-[4]H)(-[6]H)(-[8]H)}
-\hfill
-\chemfig{C(-[2]H)(-[4]H)(-[6]H)(-[8]C(-[2]H)(-[6]H)(-[8]OH))}
-\hfill
-\chemfig{*6(------)}
-\hfill
-\chemfig{*6(=-=-=-)}
-\hfill
-\medskip
-
-Pour des molécules plus complexes (glucose, ATP\ldots), \texttt{chemfig}
-offre des possibilités très avancées avec des angles et des longueurs
-paramétrables.
-
-\subsection{Mise en pratique -- Chimie}
-
-Écrivez les équations chimiques équilibrées suivantes en \LaTeX.
-
-\begin{lstlisting}[style=mylatex]
-\section{Réactions chimiques}
-
-\subsection{Combustion}
-\ce{CH4 + 2 O2 -> CO2 + 2 H2O}
-
-\subsection{Photosynthèse}
-\ce{6 CO2 + 6 H2O -> C6H12O6 + 6 O2}
-
-\subsection{Précipitation}
-\ce{AgNO3 + NaCl -> AgCl v + NaNO3}
-
-\subsection{Ions}
-Ion sodium : \ce{Na+}\quad
-Ion chlorure : \ce{Cl-}\quad
-Ion sulfate : \ce{SO4^{2-}}
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 4 :}
-\begin{itemize}
-\item Je sais écrire des formules chimiques avec \lstinline|\ce{H2O}|, \lstinline|\ce{CO2}|
-\item J'équilibre des réactions : \lstinline|\ce{CH4 + 2 O2 -> CO2 + 2 H2O}|
-\item Je représente les états (\lstinline|(g)|, \lstinline|(l)|, \lstinline|(s)|, \lstinline|(aq)|), isotopes (\lstinline|^{14}_{6}C|) et ions (\lstinline|Na+|)
-\item Je dessine des molécules avec \lstinline|chemfig|
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 5 : Tableaux, figures et schémas}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Créer des tableaux avec \lstinline|tabular| et \lstinline|booktabs|
-\item Combiner formules mathématiques et chimiques dans un tableau
-\item Insérer des images avec \lstinline|includegraphics|
-\item Dessiner des circuits électriques, schémas d'optique et d'atomes avec TikZ
+\item Créer des tableaux avec \lstinline|tabular|
+\item Insérer des images et dessiner des schémas avec TikZ
 \end{itemize}
-
 \subsection{Tableaux}
-
 \begin{lstlisting}[style=mylatex]
 \begin{tabular}{|l|c|r|}
 \hline
-\textbf{Nom} & \textbf{Symbole} & \textbf{Masse (g)} \\
+Nom & Symbole & Masse (g) \\
 \hline
-Hydrogène & H & $1,\!008$ \\
-Carbone   & C & $12,\!011$ \\
-Azote     & N & $14,\!007$ \\
-Oxygène   & O & $15,\!999$ \\
+Hydrogène & H & 1,008 \\
+Carbone & C & 12,011 \\
 \hline
 \end{tabular}
 \end{lstlisting}
-
-Résultat :
-\begin{center}
-\begin{tabular}{|l|c|r|}
-\hline
-\textbf{Nom} & \textbf{Symbole} & \textbf{Masse (g)} \\
-\hline
-Hydrogène & H & $1,\!008$ \\
-Carbone   & C & $12,\!011$ \\
-Azote     & N & $14,\!007$ \\
-Oxygène   & O & $15,\!999$ \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Tableau avec \texttt{booktabs} (recommandé)}
-
-\begin{lstlisting}[style=mylatex]
-\begin{tabular}{lcr}
-\toprule
-\textbf{Planète} & \textbf{Distance (UA)} & \textbf{Diamètre (km)} \\
-\midrule
-Mercure & 0,39 & 4 879 \\
-Vénus   & 0,72 & 12 104 \\
-Terre   & 1,00 & 12 756 \\
-Mars    & 1,52 & 6 792 \\
-\bottomrule
-\end{tabular}
-\end{lstlisting}
-
-Résultat :
-\begin{center}
-\begin{tabular}{lcr}
-\toprule
-\textbf{Planète} & \textbf{Distance (UA)} & \textbf{Diamètre (km)} \\
-\midrule
-Mercure & 0,39 & 4 879 \\
-Vénus   & 0,72 & 12 104 \\
-Terre   & 1,00 & 12 756 \\
-Mars    & 1,52 & 6 792 \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\newpage
-
-\subsection{Tableaux combinant formules et chimie}
-
-\begin{lstlisting}[style=mylatex]
-\begin{tabular}{lcc}
-\toprule
-\textbf{Molécule} & \textbf{Formule} & \textbf{Modèle} \\
-\midrule
-Eau       & \ce{H2O} & $\mathrm{H\!-\!O\!-\!H}$ \\
-Dioxygène & \ce{O2}  & $\mathrm{O\!=\![2]O}$ \\
-Méthane   & \ce{CH4} & tétraédrique \\
-\bottomrule
-\end{tabular}
-\end{lstlisting}
-
-\subsection{Insérer une image}
-
-\begin{lstlisting}[style=mylatex]
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{schema_atome.png}
-\caption{Structure d'un atome}
-\label{fig:atome}
-\end{figure}
-
-Voir la figure~\ref{fig:atome} page~\pageref{fig:atome}.
-\end{lstlisting}
-
-\begin{center}
-\colorbox{yellow!30}{\parbox{0.8\textwidth}{\centering
-\textbf{Conseil} : Placez les images dans un sous-dossier
-\texttt{images/} et utilisez \texttt{\textbackslash includegraphics...}
-avec le chemin relatif.
-}}
-\end{center}
-
-\subsection{Mise en pratique -- Tableaux}
-
-Créez un tableau de mesures scientifiques avec \texttt{booktabs}.
-
-\begin{lstlisting}[style=mylatex]
-\begin{table}[h]
-\centering
-\caption{Résultats de l'expérience}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Échantillon} & \textbf{Masse (g)} & \textbf{Volume (mL)} & \textbf{Masse vol. (g/mL)} \\
-\midrule
-Eau     & 100,0 & 100 & 1,00 \\
-Huile   & 91,5  & 100 & 0,915 \\
-Alcool  & 78,9  & 100 & 0,789 \\
-\bottomrule
-\end{tabular}
-\label{tab:mesures}
-\end{table}
-\end{lstlisting}
-
-\newpage
-
-% ===================================================================
-\section{Leçon 5 : Tableaux, figures et schémas}
-% ===================================================================
-
-Le paquet \texttt{tikz} permet de créer des schémas scientifiques
-directement dans le code \LaTeX.
-
-\subsection{Circuit électrique simple}
-
-\begin{lstlisting}[style=mylatex]
-\begin{tikzpicture}[>=stealth, thick]
-  \draw (0,0) -- (2,0) -- (2,1) -- (0,1) -- cycle;
-  \draw (1,0) -- (1,-0.5);
-  \draw (0.5,-0.5) circle (0.15);
-  \draw (1.5,-0.5) circle (0.15);
-  \draw (0,-0.5) -- (0,-1) -- (2,-1) -- (2,-0.5);
-\end{tikzpicture}
-\end{lstlisting}
-
-\subsection{Schéma de lentille}
-
-\begin{lstlisting}[style=mylatex]
-\begin{tikzpicture}[>=stealth]
-  \draw[thick] (0,-1.5) -- (0,1.5);
-  \draw[<->] (-2,0) -- node[above] {$f'$} (0,0);
-  \draw[->] (-3,1) -- (3,1);
-  \draw[->] (-3,-1) -- (3,-1);
-  \draw[fill=black] (0,0) node[below] {$O$};
-\end{tikzpicture}
-\end{lstlisting}
-
-\subsection{Schéma de l'atome}
-
+\subsection{TikZ}
 \begin{lstlisting}[style=mylatex]
 \begin{tikzpicture}
-  % Noyau
-  \fill[red] (0,0) circle (0.3);
-  % Électrons
-  \draw[blue,thick] (0,0) circle (1);
-  \draw[blue,thick] (0,0) circle (1.8);
-  \fill[blue] ({cos(30)},{sin(30)}) circle (0.08);
-  \fill[blue] ({cos(150)},{sin(150)}) circle (0.08);
-  \fill[blue] ({1.8*cos(60)},{1.8*sin(60)}) circle (0.08);
-  \fill[blue] ({1.8*cos(240)},{1.8*sin(240)}) circle (0.08);
+\draw[->] (0,0) -- (3,0);
+\draw[->] (0,0) -- (0,3);
 \end{tikzpicture}
 \end{lstlisting}
-
-Résultat :
-\begin{center}
-\begin{tikzpicture}[scale=0.7]
-  \fill[red] (0,0) circle (0.3);
-  \draw[blue,thick] (0,0) circle (1);
-  \draw[blue,thick] (0,0) circle (1.8);
-  \fill[blue] ({cos(30)},{sin(30)}) circle (0.08);
-  \fill[blue] ({cos(150)},{sin(150)}) circle (0.08);
-  \fill[blue] ({1.8*cos(60)},{1.8*sin(60)}) circle (0.08);
-  \fill[blue] ({1.8*cos(240)},{1.8*sin(240)}) circle (0.08);
-\end{tikzpicture}
-\end{center}
-
-\subsection{Mise en pratique -- Schémas TikZ}
-
-Dessinez un schéma simple avec \texttt{tikz}.
-
-\begin{lstlisting}[style=mylatex]
-\begin{tikzpicture}[scale=1.5]
-% Axes
-\draw[->] (-0.5,0) -- (3,0) node[right] {$x$};
-\draw[->] (0,-0.5) -- (0,3) node[above] {$y$};
-
-% Courbe
-\draw[blue,thick] plot[domain=0:2.5] (\x, {0.5*\x*\x});
-
-% Points
-\fill[red] (1,0.5) circle (0.05) node[right] {$M_1$};
-\fill[red] (2,2) circle (0.05) node[right] {$M_2$};
-
-% Étiquettes
-\draw (0,0) node[below left] {$O$};
-\end{tikzpicture}
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 5 :}
-\begin{itemize}
-\item Je sais créer des tableaux simples et avec \lstinline|booktabs|
-\item Je peux insérer des images avec \lstinline|includegraphics|
-\item Je dessine des circuits électriques et schémas d'optique avec TikZ
-\item Je maîtrise les schémas d'atomes et de lentilles
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 6 : Pédagogie -- exercices et présentations}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
 \item Structurer un énoncé d'exercice et sa correction
-\item Utiliser des consignes de type \og brevet \fg
 \item Créer un diaporama avec Beamer
-\item Ajouter des animations et des pauses dans une présentation
 \end{itemize}
-
-Voici comment structurer un énoncé d'exercice et sa correction
-dans le même document.
-
 \subsection{Énoncé d'exercice}
-
 \begin{lstlisting}[style=mylatex]
 \textbf{Exercice 1 -- Vitesse}
-
-Un automobiliste parcourt 150~km en 2~h~30~min.
-
+Un automobiliste parcourt 150 km en 2h30min.
 \begin{enumerate}
 \item Quelle est sa vitesse moyenne en km/h ?
 \item Exprime cette vitesse en m/s.
 \end{enumerate}
 \end{lstlisting}
-
-\subsection{Correction}
-
-\begin{lstlisting}[style=mylatex]
-\textbf{Correction de l'exercice 1}
-
-\begin{enumerate}
-\item $t = 2~\text{h}~30~\text{min} = 2,\!5$~h
-
-      $v = \dfrac{d}{t} = \dfrac{150}{2,\!5} = 60$~km/h
-
-\item $60~\text{km/h} = \dfrac{60 \times 1000}{3600}
-      = \dfrac{60}{3,\!6} \approx 16,\!7$~m/s
-\end{enumerate}
-\end{lstlisting}
-
-\subsection{Avec des consignes type \og brevet \fg}
-
-\begin{lstlisting}[style=mylatex]
-\paragraph{Doc. 1 -- Le carbonate de calcium}
-
-Le carbonate de calcium (\ce{CaCO3}) se décompose sous
-l'effet de la chaleur :
-
-\ce{CaCO3_{(s)} -> CaO_{(s)} + CO2_{(g)}}
-
-\begin{enumerate}
-\item[1.] Quels sont les réactifs ? Les produits ?
-\item[2.] Écris le bilan de cette transformation.
-\item[3.] De quel type de réaction s'agit-il ?
-\end{enumerate}
-\end{lstlisting}
-
-\newpage
-
-% ===================================================================
-\section{Leçon 6 : Pédagogie -- exercices et présentations}
-% ===================================================================
-
-Pour vos cours en classe, \textbf{Beamer} permet de créer des
-diaporamas professionnels.
-
-\subsection{Structure d'un diaporama}
-
-\begin{lstlisting}[style=mylatex]
-\documentclass{beamer}
-\usepackage[french]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath,mhchem}
-
-\usetheme{Madrid}
-\title{Les ions}
-\author{M. Dupont}
-\date{}
-
-\begin{document}
-
-\begin{frame}
-\titlepage
-\end{frame}
-
-\begin{frame}{Que sont les ions ?}
-Un \textbf{ion} est un atome (ou groupe d'atomes) qui a
-perdu ou gagné un ou plusieurs électrons.
-\begin{itemize}
-\item \textbf{Cation} : ion positif (\ce{Na+}, \ce{Ca^{2+}})
-\item \textbf{Anion} : ion négatif (\ce{Cl-}, \ce{SO4^{2-}})
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Formation des ions}
-\centering
-\ce{Na -> Na+ + e-}\\
-\ce{Cl + e- -> Cl-}
-\end{frame}
-
-\end{document}
-\end{lstlisting}
-
-\subsection{Animations et pauses}
-
-\begin{lstlisting}[style=mylatex]
-\begin{frame}{Loi d'Ohm -- étape par étape}
-\begin{itemize}
-\item<1-> La tension $U$ aux bornes d'une résistance...
-\item<2-> $U = R \times I$
-\item<3-> $R$ est la résistance en ohms ($\Omega$)
-\end{itemize}
-\end{frame}
-\end{lstlisting}
-
-\subsection{Mise en pratique -- Diaporama Beamer}
-
-Créez une présentation Beamer de 3 diapositives.
-
+\subsection{Beamer}
 \begin{lstlisting}[style=mylatex]
 \documentclass{beamer}
 \usetheme{Madrid}
-\usepackage[french]{babel}
-\usepackage[utf8]{inputenc}
-
-\title{Les états de la matière}
-\author{Votre nom}
-
-\begin{document}
-
-\begin{frame}
-\titlepage
+\begin{frame}{Titre}
+Contenu...
 \end{frame}
-
-\begin{frame}{Les trois états}
-\begin{itemize}
-\item Solide : forme propre, volume propre
-\item Liquide : forme du récipient, volume propre
-\item Gaz : occupe tout l'espace disponible
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Changements d'état}
-\centering
-\ce{H2O_{(s)} -> H2O_{(l)} -> H2O_{(g)}}
-\end{frame}
-
-\end{document}
 \end{lstlisting}
-
-\textbf{Bilan de la leçon 6 :}
-\begin{itemize}
-\item Je sais structurer un exercice et sa correction dans un même document
-\item Je crée des diaporamas avec Beamer : slides, \lstinline|frame|, \lstinline|titlepage|
-\item J'ajoute des animations avec \lstinline|\pause|
-\item Je maîtrise les thèmes Beamer (\lstinline|Madrid|, \lstinline|Warsaw|, \lstinline|default|)
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 7 : Mise en page avancée}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Encadrer du texte avec des boîtes (\lstinline|fbox|, \lstinline|parbox|, \lstinline|colorbox|)
-\item Utiliser les couleurs avec \lstinline|textcolor| et \lstinline|colorbox|
-\item Ajouter un filigrane (\lstinline|draftwatermark|) à un document
-\item Personnaliser les en-têtes et pieds de page
-\item Dessiner des boîtes décoratives avec \lstinline|bclogo|
-\item Configurer les marges avec \lstinline|geometry|
+\item Encadrer du texte avec \lstinline|fbox|, \lstinline|colorbox|
+\item Utiliser les couleurs avec \lstinline|textcolor|
+\item Ajouter un filigrane avec \lstinline|draftwatermark|
 \end{itemize}
-
-\subsection{Paquets utiles pour les sciences}
-
-\begin{center}
-\begin{tabular}{ll}
-\toprule
-\textbf{Paquet} & \textbf{Utilité} \\
-\midrule
-\lstinline|amsmath| & Formules mathématiques avancées \\
-\lstinline|amssymb| & Symboles mathématiques supplémentaires \\
-\lstinline|mhchem| & Formules et équations chimiques \\
-\lstinline|chemfig| & Dessin de molécules \\
-\lstinline|siunitx| & Unités du Système International \\
-\lstinline|pgfplots| & Graphiques de fonctions \\
-\lstinline|tikz| & Dessins et schémas \\
-\lstinline|booktabs| & Beaux tableaux \\
-\lstinline|multirow| & Fusion de cellules \\
-\lstinline|multicol| & Texte sur plusieurs colonnes \\
-\lstinline|geometry| & Marges personnalisées \\
-\lstinline|hyperref| & Liens hypertextes \\
-\lstinline|fancyhdr| & En-têtes et pieds de page \\
-\lstinline|listings| & Code source \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection{Ressources en ligne}
-
-\begin{itemize}
-\item \href{https://www.overleaf.com/learn}{Overleaf - Documentation}
-  \hfill \url{https://www.overleaf.com/learn}
-\item \href{https://tex.stackexchange.com}{TeX StackExchange}
-  \hfill \url{https://tex.stackexchange.com}
-\item \href{https://www.ctan.org}{CTAN -- Comprehensive TeX Archive Network}
-  \hfill \url{https://www.ctan.org}
-\item \href{https://detexify.kirelabs.org}{Detexify -- reconnaissance de symboles}
-  \hfill \url{https://detexify.kirelabs.org}
-\end{itemize}
-
-\subsection{Modèle de document complet}
-
-\begin{lstlisting}[style=mylatex,basicstyle=\ttfamily\footnotesize]
-\documentclass[a4paper,12pt]{article}
-\usepackage[french]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{amsmath,amssymb}
-\usepackage[version=4]{mhchem}
-\usepackage{booktabs}
-\usepackage{graphicx}
-\usepackage{hyperref}
-
-\title{Mon cours de sciences}
-\author{Nom du professeur}
-\date{}
-
-\begin{document}
-\maketitle
-\tableofcontents
-\newpage
-
-\section{La matière}
-
-\subsection{Les atomes}
-
-Un atome est constitué d'un noyau et d'électrons...
-
-\subsection{Les molécules}
-
-\ce{H2O}, \ce{CO2}...
-
-\section{Le mouvement}
-
-$v = \dfrac{d}{t}$...
-
-\end{document}
-\end{lstlisting}
-
-\newpage
-
-% ===================================================================
-\section{Leçon 7 : Mise en page avancée}
-% ===================================================================
-
-\subsection{Les boîtes (TextBox)}
-
-\LaTeX{} permet de créer des boîtes pour encadrer, structurer ou aligner du texte. Ces commandes sont essentielles pour la mise en page.
-
+\subsection{Boîtes et couleurs}
 \begin{lstlisting}[style=mylatex]
-\fbox{Texte encadré simple}
-\framebox[5cm]{Boîte de 5 cm}
-\makebox[5cm][r]{Aligné à droite}
-\parbox{5cm}{Texte sur plusieurs lignes avec retour automatique}
-\mbox{Texte insécable (pas de coupure)}
-\colorbox{blue!20}{Fond coloré bleu clair}
-\fcolorbox{red}{yellow!20}{Cadre rouge, fond jaune}
-\end{lstlisting}
-
-Résultats :
-
-\medskip
-\begin{itemize}
-\item \fbox{Texte encadré simple}
-\item \colorbox{blue!20}{Fond coloré bleu clair}
-\item \fcolorbox{red}{yellow!20}{Cadre rouge, fond jaune}
-\end{itemize}
-
-\newpage
-
-\subsection{Les couleurs}
-
-Avec le paquet \texttt{xcolor}, on peut définir et utiliser des couleurs.
-
-\begin{lstlisting}[style=mylatex]
-% Définir une couleur personnalisée
+\fbox{Texte encadré}
+\colorbox{blue!20}{Fond bleu}
+\textcolor{red}{Texte rouge}
 \definecolor{myblue}{RGB}{0,102,204}
-\definecolor{mygreen}{HTML}{2E8B57}
-
-% Texte coloré
-\textcolor{red}{Texte en rouge}
-\textcolor{myblue}{Texte en bleu personnalisé}
-\textcolor{blue!50!white}{Bleu mélangé à 50\% blanc}
-
-% Fond coloré
-\colorbox{mygreen!20}{Fond vert clair}
 \end{lstlisting}
-
-\medskip
-\textcolor{red}{Texte en rouge},\quad
-\textcolor{blue!50!white}{Bleu à 50\%},\quad
-\colorbox{green!10}{Fond vert clair}
-
-\newpage
-
-\subsection{Propriétés des objets}
-
-\LaTeX{} permet de transformer le texte avec des propriétés géométriques.
-
+\subsection{Filigrane}
 \begin{lstlisting}[style=mylatex]
-% Rotation
-\rotatebox{45}{Texte incliné à 45°}
-
-% Mise à l'échelle
-\scalebox{2}{Texte agrandi (×2)}
-\scalebox{0.5}{Texte réduit (×0.5)}
-
-% Effet miroir
-\reflectbox{Texte inversé}
-
-% Redimensionnement exact
-\resizebox{5cm}{!}{Largeur 5 cm, hauteur proportionnelle}
-
-% Élévation
-\raisebox{1ex}{Texte surélevé}
-\raisebox{-1ex}{Texte abaissé}
-\end{lstlisting}
-
-\newpage
-
-\subsection{Filigrane (Watermark)}
-
-Le paquet \texttt{draftwatermark} permet d'ajouter un filigrane en arrière-plan de chaque page.
-
-\begin{lstlisting}[style=mylatex]
-% Dans le préambule
 \usepackage{draftwatermark}
-
-% Configuration du filigrane
 \SetWatermarkText{CONFIDENTIEL}
 \SetWatermarkScale{3}
-\SetWatermarkColor{red!30}
-\SetWatermarkAngle{45}
-
-% Filigrane différent sur une page
-\SetWatermarkText{PROJET EN COURS}
-\SetWatermarkScale{2}
 \end{lstlisting}
-
-\subsection{En-têtes et pieds de page avancés}
-
-Le paquet \texttt{fancyhdr} offre un contrôle total sur les en-têtes et pieds de page.
-
-\begin{lstlisting}[style=mylatex]
-% Style de page personnalisé
-\pagestyle{fancy}
-
-% Effacer les en-têtes et pieds existants
-\fancyhf{}
-
-% Définir l'en-tête
-\fancyhead[L]{\textbf{Chapitre 1 -- Introduction}}
-\fancyhead[C]{\leftmark}
-\fancyhead[R]{\thepage}
-
-% Définir le pied de page
-\fancyfoot[L]{\textit{Document confidentiel}}
-\fancyfoot[C]{}
-\fancyfoot[R]{\today}
-
-% Épaisseur des filets
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0.2pt}
-
-% Style spécial pour la première page
-\fancypagestyle{firstpage}{
-  \fancyhf{}
-  \fancyfoot[C]{\thepage}
-  \renewcommand{\headrulewidth}{0pt}
-}
-\end{lstlisting}
-
-\subsection{Mise en pratique -- Boîtes et couleurs}
-
-Utilisez des boîtes et des couleurs pour mettre en forme un document.
-
-\begin{lstlisting}[style=mylatex]
-\section{Résultats}
-
-\colorbox{green!20}{\parbox{\textwidth}{
-\textbf{Réussite :} 85\% des élèves ont réussi l'exercice.
-}}
-
-\medskip
-\colorbox{red!20}{\parbox{\textwidth}{
-\textbf{Points difficiles :}
-\begin{itemize}
-\item \textcolor{red}{La division} des fractions
-\item L'utilisation des \textcolor{blue}{unités}
-\end{itemize}
-}}
-
-\medskip
-\fcolorbox{blue}{yellow!10}{\parbox{0.8\textwidth}{
-\centering
-\textbf{Note moyenne :} \textcolor{blue}{14,5/20}
-}}
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 7 :}
-\begin{itemize}
-\item Je sais encadrer du texte avec \lstinline|fbox|, \lstinline|colorbox|, \lstinline|fcolorbox|
-\item J'ajoute un filigrane avec \lstinline|SetWatermarkText|
-\item Je personnalise les en-têtes et pieds de page avec \lstinline|fancyhdr|
-\item Je crée des boîtes décoratives avec \lstinline|bclogo| et ses icônes
-\item Je modifie les marges avec \lstinline|geometry|
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 8 : Mathématiques et sciences au lycée}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Tracer des courbes de fonctions avec \lstinline|pgfplots|
+\item Tracer des courbes avec \lstinline|pgfplots|
 \item Construire des tableaux de signe et de variation
-\item Dessiner des circuits électriques (collège et lycée)
-\item Appliquer ces outils à des exercices concrets
+\item Dessiner des circuits électriques
 \end{itemize}
-
-\subsection{Graphiques de fonctions (pgfplots)}
-
-Le paquet \texttt{pgfplots} permet de tracer des courbes de fonctions.
-
+\subsection{pgfplots}
 \begin{lstlisting}[style=mylatex]
-% Courbes de fonctions
-\begin{tikzpicture}
-\begin{axis}[
-  xlabel=$x$, ylabel=$y$,
-  grid=major, domain=-3:3,
-  samples=100, legend pos=north west
-]
+\begin{axis}[xlabel=$x$, ylabel=$y$, grid=major]
 \addplot[blue,thick] {x^2};
-\addlegendentry{$f(x)=x^2$}
-\addplot[red,thick] {2*x+1};
-\addlegendentry{$g(x)=2x+1$}
 \end{axis}
-\end{tikzpicture}
 \end{lstlisting}
-
-\subsection{Tableaux de signe}
-
-Avec \texttt{tkz-tab}, on étudie le signe d'une expression.
-
+\subsection{circuitikz}
 \begin{lstlisting}[style=mylatex]
-% Signe de f(x) = (x-2)(x+1)
-\begin{tikzpicture}
-\tkzTabInit{$x$ / 1, $(x-2)(x+1)$ / 2}
-           {$-\infty$, $-1$, $2$, $+\infty$}
-\tkzTabLine{ , +, 0, -, 0, +, }
-\end{tikzpicture}
-\end{lstlisting}
-
-\subsection{Tableaux de variation}
-
-Ils résument la croissance, décroissance et les extremums.
-
-\begin{lstlisting}[style=mylatex]
-% Variation de f(x)=x^2 sur [-2,2]
-\begin{tikzpicture}
-\tkzTabInit{$x$ / 1, $f(x)$ / 2}
-           {$-2$, $0$, $2$}
-\tkzTabLine{ , -, 0, +, }
-\tkzTabVar{+/$4$, -/$0$, +/$4$}
-\end{tikzpicture}
-\end{lstlisting}
-
-\subsection{Circuits électriques -- Collège}
-
-Avec \texttt{circuitikz}, on dessine des circuits simples.
-
-\begin{lstlisting}[style=mylatex]
-% Circuit simple : pile, lampe, interrupteur
 \begin{circuitikz}
-\draw (0,0) to[battery] (0,2)
-            to[lamp] (3,2)
-            to[switch] (3,0) -- (0,0);
-\end{circuitikz}
-
-% Circuit en série
-\begin{circuitikz}
-\draw (0,0) to[battery] (0,2)
-            to[lamp] (2,2) to[lamp] (4,2)
-            to[switch] (4,0) -- (0,0);
+\draw (0,0) to[battery] (0,2) to[lamp] (3,2) to[switch] (3,0) -- (0,0);
 \end{circuitikz}
 \end{lstlisting}
-
-\subsection{Circuits électriques -- Lycée}
-
-Résistances, condensateurs et lois électriques.
-
-\begin{lstlisting}[style=mylatex]
-% Loi d'Ohm
-\begin{circuitikz}
-\draw (0,0) to[battery,l=$E$] (0,2)
-            to[resistor,l=$R$] (3,2)
-            to[ammeter] (3,0) -- (0,0);
-\draw (1.5,2) to[voltmeter] (1.5,0);
-\end{circuitikz}
-
-% Circuit RC
-\begin{circuitikz}
-\draw (0,0) to[battery,l=$E$] (0,2)
-            to[switch] (2,2)
-            to[resistor,l=$R$] (4,2)
-            to[capacitor,l=$C$] (4,0) -- (0,0);
-\end{circuitikz}
-\end{lstlisting}
-
-\subsection{Mise en pratique -- Graphiques et circuits}
-
-Créez un document avec une courbe et un circuit électrique.
-
-\begin{lstlisting}[style=mylatex]
-\documentclass[a4paper,12pt]{article}
-\usepackage{pgfplots}
-\usepackage{circuitikz}
-\pgfplotsset{compat=1.18}
-
-\begin{document}
-
-\section{Exercice -- Fonction affine}
-
-Tracez la fonction $f(x) = -2x + 3$.
-
-\begin{tikzpicture}
-\begin{axis}[grid=major, domain=-2:4]
-\addplot[blue,thick] {-2*x+3};
-\addlegendentry{$f(x)=-2x+3$}
-\end{axis}
-\end{tikzpicture}
-
-\section{Exercice -- Circuit électrique}
-
-Dessinez un circuit avec une pile et deux lampes.
-
-\begin{circuitikz}
-\draw (0,0) to[battery] (0,2)
-            to[lamp] (2,2)
-            to[lamp] (4,2)
-            to[switch] (4,0) -- (0,0);
-\end{circuitikz}
-
-\end{document}
-\end{lstlisting}
-
-\textbf{Bilan de la leçon 8 :}
-\begin{itemize}
-\item Je trace des courbes de fonctions avec \lstinline|pgfplots| (courbes, légendes, grille)
-\item Je construis des tableaux de signe (\lstinline|tkzTabInit|) et de variation (\lstinline|tkzTabVar|)
-\item Je dessine des circuits électriques simples et avancés avec \lstinline|circuitikz|
-\end{itemize}
-
 \newpage
 
 % ===================================================================
 \section{Leçon 9 : Pédagogie -- interactivité et évaluation}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
-\item Créer des exercices à trous, vrai/faux et QCM en \LaTeX
-\item Rédiger des situations problèmes
-\item Intégrer des images dans le texte avec \lstinline|wrapfig|
-\item Concevoir une évaluation formative complète
-\item Mettre en page des consignes et des corrigés
+\item Créer des exercices à trous, vrai/faux et QCM
+\item Intégrer des images avec \lstinline|wrapfig|
+\item Utiliser \lstinline|bclogo| pour des boîtes décoratives
 \end{itemize}
-
 \subsection{Exercices à trous}
-
-Pour créer des exercices à trous, on utilise des espaces vides à remplir par l'élève.
-
 \begin{lstlisting}[style=mylatex]
-% Trou simple (ligne vierge)
 Le nom de ce gaz est \rule{3cm}{0.5pt}.
-
-% Espace pointillé
-Complétez la phrase : \dotfill
-
-% Souligné à remplir
-La capitale de la France est \underline{\hspace{3cm}}.
-
-% Trou avec espace horizontal (mode maths)
 $\_\_ + 5 = 12$
-
-% Zone de réponse encadrée
-\framebox[4cm]{\hfill\textit{?}\hfill}
 \end{lstlisting}
-
-\medskip
-Résultats :
-\begin{itemize}
-\item Le nom de ce gaz est \rule{3cm}{0.5pt}.
-\item $\_\_ + 5 = 12$
-\end{itemize}
-
-\newpage
-
-\subsection{Vrai ou Faux}
-
+\subsection{QCM}
 \begin{lstlisting}[style=mylatex]
-\textbf{Consigne :} Cochez Vrai ou Faux.
-
-\begin{enumerate}
-\item L'eau bout à 100°C.
-      \hfill $\square$ Vrai \hfill $\square$ Faux
-\item Le Soleil tourne autour de la Terre.
-      \hfill $\square$ Vrai \hfill $\square$ Faux
-\item L'atome est la plus petite unité de matière.
-      \hfill $\square$ Vrai \hfill $\square$ Faux
-\item $2 + 2 = 5$
-      \hfill $\square$ Vrai \hfill $\square$ Faux
-\end{enumerate}
-\end{lstlisting}
-
-\subsection{Questions à choix unique (QCU)}
-
-\begin{lstlisting}[style=mylatex]
-\textbf{Consigne :} Entourez la bonne réponse.
-
-\medskip
-\noindent\textbf{1.} Quelle est la formule de l'eau ?
-\begin{enumerate}[label=\alph*)]
-  \item \ce{CO2}
-  \item \ce{H2O}
-  \item \ce{NaCl}
-  \item \ce{CH4}
-\end{enumerate}
-
-\medskip
-\noindent\textbf{2.} La vitesse se calcule par~:
-\begin{enumerate}[label=\alph*)]
-  \item $v = d \times t$
-  \item $v = \dfrac{t}{d}$
-  \item $v = \dfrac{d}{t}$
-  \item $v = d + t$
-\end{enumerate}
-\end{lstlisting}
-
-\newpage
-
-\subsection{Situations problèmes}
-
-\begin{lstlisting}[style=mylatex]
-\noindent\fbox{\parbox{\textwidth}{
-\textbf{\large Problème : La fusée}
-
-\medskip
-Une fusée décolle avec une accélération constante.
-Sa vitesse après 10 secondes est de 100 m/s.
-
-\medskip
-\noindent\textbf{Questions :}
-\begin{enumerate}
-\item Calculez son accélération.
-\item Quelle distance a-t-elle parcourue ?
-\item Quelle serait sa vitesse après 30 s ?
-\end{enumerate}
-}}
-\end{lstlisting}
-
-\subsection{Intégration d'image (Wrapfig)}
-
-Le paquet \texttt{wrapfig} fait flotter une image à droite (ou à gauche) du texte.
-
-\begin{lstlisting}[style=mylatex]
-\usepackage{wrapfig}
-
-\begin{wrapfigure}{r}{0.4\textwidth}
-\centering
-\includegraphics[width=\linewidth]{schema.png}
-\caption{Structure de l'atome}
-\label{fig:atome}
-\end{wrapfigure}
-
-Le texte s'écrit autour de l'image placée
-à droite. Idéal pour économiser de la place
-et présenter une figure avec sa description.
-\end{lstlisting}
-
-\newpage
-
-\subsection{Boîtes décoratives (bclogo)}
-
-Le paquet \texttt{bclogo} crée des boîtes colorées avec icônes pour attirer l'attention sur des consignes, avertissements ou exemples.
-
-\begin{lstlisting}[style=mylatex]
-\usepackage{bclogo}
-
-% Boîtes simples avec icônes
-\bcboite{Texte dans une boîte simple}
-\bcinfo{Information importante à retenir}
-\bcattention{Attention à ne pas oublier !}
-\bcexemple{Exemple concret d'application}
-\bcquestion{Question à se poser}
-\bcdanger{Danger : manipulation à éviter}
-\end{lstlisting}
-
-\medskip
-\textbf{Personnalisation des couleurs et du style :}
-
-\begin{lstlisting}[style=mylatex]
-% Boîte avec couleurs personnalisées
-\bcboite[couleur=blue!10, arrondi=0.5,
-         ombre=true, logo=\bclogo{info}]
-{Information personnalisée}
-
-% Boîte avec bordure colorée
-\bcattention[couleur=yellow!20,
-             bordure=red, epBordure=2]
-{Attention : bordure rouge !}
-
-% Boîte sans icône
-\bcboite[couleur=green!15, logo=none]
-{Boîte simple sans icône}
-\end{lstlisting}
-
-\medskip
-\textbf{Types d'icônes disponibles :}
-
-\begin{lstlisting}[style=mylatex]
-\bcboite[logo=\bclogo{ampoule}]{Idée}
-\bcboite[logo=\bclogo{crayon}]{Exercice}
-\bcboite[logo=\bclogo{livre}]{Lecture}
-\bcboite[logo=\bclogo{loupe}]{Observation}
-\bcboite[logo=\bclogo{clef}]{Solution}
-\bcboite[logo=\bclogo{horloge}]{Temps}
-\end{lstlisting}
-
-\medskip
-\textbf{Contenu structuré dans une boîte :}
-
-\begin{lstlisting}[style=mylatex]
-\bcinfo[couleur=blue!10]{
-\textbf{À retenir :}
-\begin{itemize}
-\item La vitesse se calcule par $v = \frac{d}{t}$
-\item L'unité SI de la vitesse est le m/s
-\item La vitesse est une grandeur vectorielle
-\end{itemize}
-}
-\end{lstlisting}
-
-\subsection{Mise en pratique -- bclogo}
-
-Créez un document utilisant \texttt{bclogo} pour encadrer des consignes et des résultats.
-
-\begin{lstlisting}[style=mylatex]
-\documentclass[a4paper,12pt]{article}
-\usepackage[french]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage{bclogo}
-\usepackage{amsmath}
-
-\begin{document}
-
-\section{Activité expérimentale}
-
-\bcattention[couleur=red!10, arrondi=0.3]{
-\textbf{Consignes de sécurité :}
-\begin{itemize}
-\item Porter des lunettes de protection
-\item Manipuler avec précaution
-\end{itemize}
-}
-
-\bcexemple[couleur=blue!10]{
-\textbf{Résultats attendus :}
-\[
-U = R \times I \quad \text{(loi d'Ohm)}
-\]
-}
-
-\bcquestion[couleur=green!10]{
-\textbf{Pour aller plus loin :}
-Que se passe-t-il si on augmente la résistance ?
-}
-
-\end{document}
-\end{lstlisting}
-
-\subsection{Configuration des marges}
-
-Le paquet \texttt{geometry} permet de régler les marges.
-
-\begin{lstlisting}[style=mylatex]
-% Marges identiques
-\usepackage[margin=2cm]{geometry}
-
-% Marges différentes
-\usepackage[top=3cm, bottom=2.5cm,
-            left=2cm, right=2cm]{geometry}
-
-% Format A4
-\usepackage[a4paper, margin=2.5cm]{geometry}
-
-% Changement en cours de document
-\newgeometry{margin=1.5cm, top=3cm}
-% ... contenu ...
-\restoregeometry
-\end{lstlisting}
-
-\subsection{Mise en pratique -- Exercices interactifs}
-
-Créez un QCM et un exercice à trous sur un thème scientifique.
-
-\begin{lstlisting}[style=mylatex]
-\section{Évaluation formative}
-
-\subsection{Questions à choix unique}
-
-\textbf{1.} Quelle est la formule de l'eau ?
 \begin{enumerate}[label=\alph*)]
 \item \ce{CO2}
 \item \ce{H2O}
-\item \ce{NaCl}
 \end{enumerate}
-
-\textbf{2.} L'atome est composé :
-\begin{enumerate}[label=\alph*)]
-\item De protons et neutrons seulement
-\item D'un noyau et d'électrons
-\item De molécules uniquement
-\end{enumerate}
-
-\subsection{Exercice à trous}
-
-Complétez les phrases suivantes :
-
-\medskip
-\noindent
-L'eau bout à \underline{\hspace{1.5cm}} degrés Celsius.\\
-La formule du dioxyde de carbone est \underline{\hspace{2cm}}.\\
-\rule{8cm}{0.5pt}
 \end{lstlisting}
-
-\textbf{Bilan de la leçon 9 :}
-\begin{itemize}
-\item Je crée des exercices à trous, vrai/faux et QCM en \LaTeX
-\item Je rédige des situations problèmes avec des consignes claires
-\item J'intègre des images dans le texte avec \lstinline|wrapfig|
-\item Je crée des boîtes décoratives avec \lstinline|bclogo|
-\item Je conçois une évaluation formative complète
-\end{itemize}
-
+\subsection{bclogo}
+\begin{lstlisting}[style=mylatex]
+\bcattention{Attention !}
+\bcinfo{Information}
+\bcexemple{Exemple}
+\end{lstlisting}
 \newpage
 
 % ===================================================================
 \section{Leçon 10 : Projet final et ressources}
 % ===================================================================
-
 \textbf{Objectifs de cette leçon :}
 \begin{itemize}
 \item Synthétiser toutes les compétences acquises
-\item Rédiger un document scientifique complet
-\item Consulter des ressources et paquets complémentaires
-\item Utiliser l'aide-mémoire des commandes essentielles
+\item Consulter l'aide-mémoire
 \end{itemize}
-
-\subsection{Exercice 1 -- Premier document}
-
-Créez un document \LaTeX\, contenant :
+\subsection{Exercice final}
+Créez un document complet avec :
 \begin{enumerate}
-\item Un titre \og Mon premier document \LaTeX \fg
-\item Une section \og Introduction \fg
-\item Une formule mathématique : $E = m c^{2}$
-\item Une équation chimique : \ce{2 H2 + O2 -> 2 H2O}
-\item Un tableau avec les symboles de 5 éléments chimiques
+\item Titre, section, formule mathématique
+\item Équation chimique
+\item Tableau
+\item Figure TikZ
 \end{enumerate}
-
-\subsection{Exercice 2 -- Sujet de brevet}
-
-Rédigez un énoncé de brevet en physique-chimie avec :
-\begin{enumerate}
-\item Un document présentant une expérience
-\item Une formule : $P = U \times I$
-\item Un tableau de mesures
-\item Trois questions
-\end{enumerate}
-
-\subsection{Exercice 3 -- Diaporama}
-
-Créez une présentation Beamer de 5 diapositives sur
-\og Les transformations chimiques \fg{} contenant :
-\begin{enumerate}
-\item Diapositive de titre
-\item Diapositive de définition
-\item Diapositive avec une équation chimique
-\item Diapositive avec un tableau
-\item Diapositive de conclusion
-\end{enumerate}
-
-\textbf{Bilan de la leçon 10 -- Félicitations !}
-\begin{itemize}
-\item Je suis capable de créer un document \LaTeX\, complet et structuré
-\item Je maîtrise l'écriture mathématique, chimique et les schémas
-\item Je sais créer des tableaux, des présentations et des exercices
-\item Je connais les ressources pour continuer à apprendre
-\item Je peux consulter l'aide-mémoire pour les commandes essentielles
-\end{itemize}
-
-\newpage
-
-% ===================================================================
-\section{Annexe -- Aide-mémoire des commandes essentielles}
-% ===================================================================
-
+\subsection{Aide-mémoire}
 \begin{center}
-\small
-\begin{tabular}{lll}
-\toprule
-\textbf{Commande} & \textbf{Utilisation} & \textbf{Exemple} \\
-\midrule
-\lstinline|\textbf{}| & Gras & \textbf{texte} \\
-\lstinline|\textit{}| & Italique & \textit{texte} \\
-\lstinline|\underline{}| & Souligné & \underline{texte} \\
-\lstinline|\texttt{}| & Machine à écrire & \texttt{texte} \\
-\lstinline|\textsc{}| & Petites capitales & \textsc{texte} \\
-\midrule
-\lstinline|$...$| & Maths en ligne & $x^2$ \\
-\lstinline|\[...\]| & Maths centrées & \[x^2\] \\
-\lstinline|\frac{}{}| & Fraction & $\frac{1}{2}$ \\
-\lstinline|^{}| & Exposant & $x^2$ \\
-\lstinline|_{}| & Indice & $x_2$ \\
-\lstinline|\sqrt{}| & Racine carrée & $\sqrt{2}$ \\
-\lstinline|\sum| & Somme & $\sum$ \\
-\lstinline|\int| & Intégrale & $\int$ \\
-\lstinline|\lim| & Limite & $\lim$ \\
-\midrule
-\lstinline|\ce{}| & Formule chimique & \ce{H2O} \\
-\lstinline|->| & Flèche réaction & $\rightarrow$ \\
-\lstinline|<->| & Flèche équilibre & $\leftrightarrow$ \\
-\lstinline|_{( )}| & État (s), (l), (g), (aq) & \ce{H2O_{(l)}} \\
-\lstinline|^{}| & Nombre de masse & \ce{^{14}C} \\
-\midrule
-\lstinline|\times| & Signe multiplier & $\times$ \\
-\lstinline|\div| & Signe diviser & $\div$ \\
-\lstinline|\pm| & Plus ou moins & $\pm$ \\
-\lstinline|\approx| & Approximativement & $\approx$ \\
-\lstinline|\neq| & Différent de & $\neq$ \\
-\lstinline|\leq| & Inférieur ou égal & $\leq$ \\
-\lstinline|\geq| & Supérieur ou égal & $\geq$ \\
-\lstinline|\vec{}| & Vecteur & $\vec{v}$ \\
-\lstinline|\circ| & Degré & $45^\circ$ \\
-\bottomrule
+\begin{tabular}{ll}
+\lstinline|\textbf{}| & Gras \\
+\lstinline|\textit{}| & Italique \\
+\lstinline|$...$| & Maths en ligne \\
+\lstinline|\frac{}{}| & Fraction \\
+\lstinline|\ce{}| & Formule chimique \\
+\lstinline|\times| & Multiplier \\
+\lstinline|\vec{}| & Vecteur \\
 \end{tabular}
 \end{center}
-
-\vfill
-\begin{center}
-\fbox{\parbox{0.75\textwidth}{\centering
-\textbf{Rappel} : Pour compiler un fichier \LaTeX :
-\begin{enumerate}
-\item Sauvegarder le fichier avec l'extension \texttt{.tex}
-\item Compiler avec \texttt{pdflatex document.tex}\\
-  (ou cliquer sur \og Compiler \fg{} dans Overleaf)
-\item Ouvrir le fichier \texttt{.pdf} généré
-\end{enumerate}}}
-\end{center}
-
 \end{document}
+`;
 
-`;  // Fin de LATEX_SOURCE
+// =================================================================
+// 4. FONCTIONS DU MODE COMPOSEUR
+// =================================================================
+let widgets = [];
+let filteredWidgets = [];
+let projectorIndex = 0;
+let isProjecting = false;
 
-    // ----------------------------------------------------------
-    // 2. VARIABLES GLOBALES
-    // ----------------------------------------------------------
-    let widgets = [];        // Tableau de tous les widgets extraits
-    let filteredWidgets = []; // Widgets après filtrage par section
-    let projectorIndex = 0;   // Index du widget actuellement affiché dans le projecteur
-    let isProjecting = false; // Indique si le mode projection est actif
+function parseLaTeX(source) {
+  const listings = [];
+  const lines = source.split('\n');
+  let currentSection = 'PREAMBULE';
+  let currentSub = '';
+  let inListing = false;
+  let listingLines = [];
+  let listingStartLine = 0;
+  let explanation = '';
+  let buf = [];
 
-    // ----------------------------------------------------------
-    // 3. FONCTION : parseLaTeX(source)
-    //    Parcourt la source LaTeX ligne par ligne, détecte les
-    //    blocs \begin{lstlisting}...\end{lstlisting} et les
-    //    extrait avec leur section, sous-section et explication.
-    // ----------------------------------------------------------
-    function parseLaTeX(source) {
-      const listings = [];       // Résultat : tableau d'objets {code, section, subsection, explanation, line}
-      const lines = source.split('\n');  // Découpage en lignes
-      let currentSection = 'PREAMBULE';  // Section par défaut (avant toute \section)
-      let currentSub = '';               // Sous-section courante
-      let inListing = false;             // Sommes-nous à l'intérieur d'un bloc lstlisting ?
-      let listingLines = [];              // Lignes du bloc en cours
-      let listingStartLine = 0;           // Numéro de ligne de début du bloc
-      let explanation = '';               // Explication collectée
-      let buf = [];                       // Tampon des lignes récentes pour l'explication
+  function collectExplanation() {
+    let text = [];
+    for (let i = buf.length - 1; i >= 0; i--) {
+      const ln = buf[i].trim();
+      if (!ln || ln.startsWith('%') || ln.startsWith('\\') || ln.startsWith('\\begin') || ln.startsWith('\\end') || ln.startsWith('\\item') || /^\\[a-z]/.test(ln)) continue;
+      if (ln.length > 8 && !ln.startsWith('\\') && !ln.startsWith('%')) text.unshift(ln);
+      if (text.length >= 4) break;
+    }
+    return text.join(' ').replace(/\s+/g, ' ').trim();
+  }
 
-      // collectExplanation() : remonte dans le tampon pour trouver
-      // le texte explicatif précédant immédiatement le listing.
-      function collectExplanation() {
-        let text = [];
-        for (let i = buf.length - 1; i >= 0; i--) {
-          const ln = buf[i].trim();
-          // On ignore : lignes vides, commentaires, commandes, \begin,\end,\item...
-          if (!ln || ln.startsWith('%') || ln.startsWith('\\') || ln.startsWith('\\begin') || ln.startsWith('\\end') || ln.startsWith('\\item') || /^\\[a-z]/.test(ln)) continue;
-          // On garde les lignes de texte significatives (plus de 8 caractères)
-          if (ln.length > 8 && !ln.startsWith('\\') && !ln.startsWith('%')) text.unshift(ln);
-          if (text.length >= 4) break; // On se limite à 4 lignes max
-        }
-        return text.join(' ').replace(/\s+/g, ' ').trim();
-      }
+  function flushListing() {
+    if (listingLines.length > 0) {
+      const code = listingLines.join('\n');
+      const expl = collectExplanation();
+      listings.push({ code, section: currentSection, subsection: currentSub, explanation: expl, line: listingStartLine + 1 });
+      listingLines = [];
+    }
+  }
 
-      // flushListing() : finalise le bloc de listing courant
-      // et l'ajoute au tableau avec son contexte.
-      function flushListing() {
-        if (listingLines.length > 0) {
-          const code = listingLines.join('\n');
-          const expl = collectExplanation();
-          listings.push({ code, section: currentSection, subsection: currentSub, explanation: expl, line: listingStartLine + 1 });
-          listingLines = [];  // Réinitialise pour le prochain bloc
-        }
-      }
-
-      // Boucle principale : parcours de toutes les lignes
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        // Détection d'une nouvelle \section{...}
-        const secMatch = line.match(/^\s*\\section\{(.+?)\}/);
-        if (secMatch) {
-          currentSection = secMatch[1]
-            .replace(/\\LaTeX/g, 'LaTeX')
-            .replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1')
-            .replace(/[{}`'~,]/g, '')
-            .replace(/\s+/g, ' ').trim();
-          currentSub = '';
-          buf = []; // On vide le tampon pour la nouvelle section
-        }
-
-        // Détection d'une nouvelle \subsection{...}
-        const subMatch = line.match(/^\s*\\subsection\{(.+?)\}/);
-        if (subMatch) {
-          currentSub = subMatch[1]
-            .replace(/\\LaTeX/g, 'LaTeX')
-            .replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1')
-            .replace(/[{}`'~,]/g, '')
-            .replace(/\s+/g, ' ').trim();
-          buf = [];
-        }
-
-        // Détection du début d'un bloc lstlisting
-        if (line.includes('\\begin{lstlisting}')) {
-          explanation = collectExplanation();
-          flushListing();    // On finalise un éventuel bloc précédent
-          inListing = true;
-          listingLines = [];
-          listingStartLine = i;
-          continue;
-        }
-
-        // Détection de la fin d'un bloc lstlisting
-        if (line.includes('\\end{lstlisting}')) {
-          flushListing();   // On enregistre le bloc complet
-          inListing = false;
-          continue;
-        }
-
-        // Si on n'est pas dans un listing, on alimente le tampon
-        if (!inListing) buf.push(line);
-        // Si on est dans un listing, on stocke la ligne
-        if (inListing) listingLines.push(line);
-      }
-
-      // Au cas où le fichier se termine sans \end{lstlisting}
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const secMatch = line.match(/^\s*\\section\{(.+?)\}/);
+    if (secMatch) {
+      currentSection = secMatch[1].replace(/\\LaTeX/g, 'LaTeX').replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1').replace(/[{}`'~,]/g, '').replace(/\s+/g, ' ').trim();
+      currentSub = '';
+      buf = [];
+    }
+    const subMatch = line.match(/^\s*\\subsection\{(.+?)\}/);
+    if (subMatch) {
+      currentSub = subMatch[1].replace(/\\LaTeX/g, 'LaTeX').replace(/\\(?:texttt|textbf|textit|textsc|textsf|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|textbackslash|textasciitilde|textsuperscript|textsubscript|textcolor|colorbox|mbox|lstinline|url|href)\{([^}]*)\}/g, '$1').replace(/[{}`'~,]/g, '').replace(/\s+/g, ' ').trim();
+      buf = [];
+    }
+    if (line.includes('\\begin{lstlisting}')) {
+      explanation = collectExplanation();
       flushListing();
-      return listings;
+      inListing = true;
+      listingLines = [];
+      listingStartLine = i;
+      continue;
     }
-
-    // ----------------------------------------------------------
-    // 4. FONCTION : sanitize(s)
-    //    Échappe les caractères HTML spéciaux pour éviter les
-    //    injections XSS et afficher le code correctement.
-    // ----------------------------------------------------------
-    function sanitize(s) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    if (line.includes('\\end{lstlisting}')) {
+      flushListing();
+      inListing = false;
+      continue;
     }
-    function escHtml(s) {
-      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (!inListing) buf.push(line);
+    if (inListing) listingLines.push(line);
+  }
+  flushListing();
+  return listings;
+}
+
+function highlightLaTeX(code) {
+  let h = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  h = h
+    .replace(/(%.*)/g, '<span class="hl-cmt">$1</span>')
+    .replace(/(\\ce\{[^}]*\})/g, '<span class="hl-str">$1</span>')
+    .replace(/(\\(?:documentclass|usepackage|begin|end|chapter|section|subsection|subsubsection|textbf|textit|underline|texttt|textsc|textsf|includegraphics|tabular|hline|itemize|enumerate|description|item|equation|align|split|frac|sqrt|sum|int|lim|alpha|beta|gamma|delta|epsilon|theta|pi|omega|times|div|pm|approx|neq|leq|geq|vec|circ|label|ref|footnote|par|newpage|textcolor|colorbox|mbox|lstset|lstinline|ce|chemfig|caption|tableofcontents|printindex|maketitle|textsuperscript|textsubscript|textbackslash|textasciitilde|left|right|quad|qquad|hfill|vfill|medskip|bigskip|smallskip|centering|large|small|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|displaystyle|textstyle|scriptstyle|scriptscriptstyle|choose|over|above|atop|brace|bracket|lines|plain|toprule|midrule|bottomrule|columnbreak|multicols))\b/g, '<span class="hl-kw">$1</span>')
+    .replace(/(\$)/g, '<span class="hl-sec">$1</span>')
+    .replace(/([\[\]|])/g, '<span class="hl-bra">$1</span>')
+    .replace(/({|})/g, '<span class="hl-bra">$1</span>')
+    .replace(/\b(\d+[.,]?\d*)\b/g, '<span class="hl-num">$1</span>');
+  return h;
+}
+
+function renderWidgetsComposeur() {
+  const grid = document.getElementById('widgetGridComposeur');
+  if (!grid) return;
+  filteredWidgets = widgets;
+  const stats = document.getElementById('statsComposeur');
+  if (stats) {
+    stats.innerHTML = '<strong>' + filteredWidgets.length + '</strong> widget' + (filteredWidgets.length > 1 ? 's' : '') +
+      ' sur <strong>' + widgets.length + '</strong> extrai' + (widgets.length > 1 ? 'ts' : 't');
+  }
+  if (filteredWidgets.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>Aucun widget trouvé</p></div>';
+    return;
+  }
+  grid.innerHTML = filteredWidgets.map(function(w, i) {
+    const code = highlightLaTeX(w.code);
+    const sec = w.section.length > 32 ? escHtml(w.section.substring(0, 30)) + '...' : escHtml(w.section);
+    const expl = w.explanation ? sanitize(w.explanation) : '';
+    return '<div class="widget" data-index="' + i + '">' +
+      '<div class="widget-header">' +
+        '<span class="label">&#9998; Code LaTeX</span>' +
+        '<span class="section-tag" title="' + sanitize(w.section) + (w.subsection ? ' > ' + sanitize(w.subsection) : '') + '">' + sec + '</span>' +
+      '</div>' +
+      (expl ? '<div class="widget-expl" id="expl-c-' + i + '">' +
+        '<div class="expl-label">&#128214; Explication</div>' +
+        '<div class="expl-text">' + expl + '</div>' +
+        (expl.length > 180 ? '<button class="expl-toggle" onclick="toggleExplComposeur(\'expl-c-' + i + '\')">Afficher plus</button>' : '') +
+      '</div>' : '') +
+      '<div class="widget-code">' +
+        '<pre>' + code + '</pre>' +
+        '<button class="copy-btn" onclick="copyCodeComposeur(this, ' + i + ')">Copier</button>' +
+      '</div>' +
+      '<div class="widget-footer">' +
+        '<span class="index">#' + (i + 1) + (w.subsection ? ' - ' + escHtml(w.subsection) : '') + '</span>' +
+        '<button class="project-btn" onclick="projectFromComposeur(' + i + ')">&#9654; Projeter</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleExplComposeur(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.toggle('expanded'); const btn = el.querySelector('.expl-toggle'); if (btn) btn.textContent = el.classList.contains('expanded') ? 'Reduire' : 'Afficher plus'; }
+}
+function copyCodeComposeur(btn, index) {
+  const code = filteredWidgets[index].code;
+  navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copie !'; setTimeout(() => btn.textContent = 'Copier', 1500); }).catch(() => {});
+}
+function projectFromComposeur(index) {
+  projectorIndex = index;
+  toggleProjection(true);
+}
+
+function updateProjector() {
+  if (filteredWidgets.length === 0) return;
+  const w = filteredWidgets[projectorIndex];
+  const code = highlightLaTeX(w.code);
+  const expl = w.explanation ? sanitize(w.explanation) : '';
+  document.getElementById('projectorSlide').innerHTML =
+    '<div class="slide-section">' + escHtml(w.section) + '</div>' +
+    '<div class="slide-title">' + (w.subsection ? escHtml(w.subsection) : 'Code LaTeX') + '</div>' +
+    (expl ? '<div class="slide-expl">' + expl + '</div>' : '') +
+    '<div class="slide-code"><pre>' + code + '</pre></div>' +
+    '<div class="slide-hint">&#9000; &#8592; &#8594; navigation &bull; &#9096; copier &bull; Esc quitter</div>';
+  document.getElementById('projectorCounter').textContent = (projectorIndex + 1) + ' / ' + filteredWidgets.length;
+  document.getElementById('prevBtn').disabled = projectorIndex === 0;
+  document.getElementById('nextBtn').disabled = projectorIndex === filteredWidgets.length - 1;
+}
+function projectorNext() { if (projectorIndex < filteredWidgets.length - 1) { projectorIndex++; updateProjector(); } }
+function projectorPrev() { if (projectorIndex > 0) { projectorIndex--; updateProjector(); } }
+function toggleProjection(force) {
+  const proj = document.getElementById('projector');
+  if (force === true) { proj.classList.add('active'); isProjecting = true; updateProjector(); document.body.style.overflow = 'hidden'; }
+  else if (force === false) { proj.classList.remove('active'); isProjecting = false; document.body.style.overflow = ''; }
+  else { isProjecting = !isProjecting; proj.classList.toggle('active'); document.body.style.overflow = isProjecting ? 'hidden' : ''; if (isProjecting) updateProjector(); }
+}
+
+// =================================================================
+// 5. FONCTIONS DU MODE FORMATION
+// =================================================================
+function renderFormationWidgets() {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  const grid = document.getElementById('widgetGridFormation');
+  const stats = document.getElementById('statsFormation');
+
+  if (!module) {
+    stats.innerHTML = 'Aucun module trouvé.';
+    grid.innerHTML = '<div class="empty-state"><p>Choisissez un niveau et une matière.</p></div>';
+    return;
+  }
+
+  const chapters = module.chapters;
+  stats.innerHTML = '<strong>' + chapters.length + '</strong> chapitre' + (chapters.length > 1 ? 's' : '') +
+    ' dans <strong>' + module.title + '</strong>';
+
+  if (chapters.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>Aucun chapitre disponible.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = chapters.map(function(chap, i) {
+    const code = highlightLaTeX(chap.code);
+    const packagesHtml = chap.packages && chap.packages.length ? chap.packages.map(pkg => {
+      const info = PACKAGE_INFO[pkg] || { role: 'Rôle à préciser', importance: 'Information à compléter' };
+      return `<div class="pkg-item"><span class="pkg-name">${pkg}</span><span class="pkg-role">${info.role}</span><span class="pkg-importance">⭐ <strong>Importance :</strong> ${info.importance}</span></div>`;
+    }).join('') : '<div class="pkg-item">Aucun package spécifique.</div>';
+
+    const previewId = 'preview-' + i;
+    return '<div class="widget" data-index="' + i + '">' +
+      '<div class="widget-header">' +
+        '<span class="label">📘 Chapitre</span>' +
+        '<span class="section-tag">' + escHtml(chap.title) + '</span>' +
+      '</div>' +
+      '<div class="widget-expl">' +
+        '<div class="expl-label">📦 Packages</div>' +
+        '<div class="expl-text">' + packagesHtml + '</div>' +
+      '</div>' +
+      '<div class="widget-code">' +
+        '<pre>' + code + '</pre>' +
+        '<button class="copy-btn" onclick="copyCodeFormation(this, ' + i + ')">Copier</button>' +
+      '</div>' +
+      '<div class="widget-preview">' +
+        '<div class="preview-toggle" onclick="togglePreview(\'' + previewId + '\')">Afficher l\'aperçu</div>' +
+        '<div class="preview-content" id="' + previewId + '">' + chap.preview + '</div>' +
+      '</div>' +
+      '<div class="widget-footer">' +
+        '<span class="index">#' + (i + 1) + '</span>' +
+        '<button class="project-btn" onclick="projectChapterFormation(' + i + ')">&#9654; Projeter</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(() => {});
+  }
+}
+
+function togglePreview(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('open');
+    const toggle = el.previousElementSibling;
+    if (toggle) toggle.textContent = el.classList.contains('open') ? 'Masquer l\'aperçu' : 'Afficher l\'aperçu';
+    if (el.classList.contains('open') && window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise().catch(() => {});
     }
+  }
+}
 
-    // ----------------------------------------------------------
-    // 5. FONCTION : highlightLaTeX(code)
-    //    Applique une coloration syntaxique basique au code LaTeX
-    //    en entourant les motifs de <span> avec des classes CSS.
-    // ----------------------------------------------------------
-    function highlightLaTeX(code) {
-      // On commence par échapper le HTML
-      let h = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function copyCodeFormation(btn, index) {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  if (!module) return;
+  const chap = module.chapters[index];
+  if (!chap) return;
+  navigator.clipboard.writeText(chap.code).then(() => { btn.textContent = 'Copie !'; setTimeout(() => btn.textContent = 'Copier', 1500); }).catch(() => {});
+}
 
-      // On applique les règles de coloration dans un ordre précis
-      h = h
-        // Commentaires (lignes commençant par %)
-        .replace(/(%.*)/g, '<span class="hl-cmt">$1</span>')
-        // Commandes \ce{...} (chimie) traitées comme des chaînes (AVANT les accolades)
-        .replace(/(\\ce\{[^}]*\})/g, '<span class="hl-str">$1</span>')
-        // Commandes LaTeX principales (mots-clés)
-        .replace(/(\\(?:documentclass|usepackage|begin|end|chapter|section|subsection|subsubsection|textbf|textit|underline|texttt|textsc|textsf|includegraphics|tabular|hline|itemize|enumerate|description|item|equation|align|split|frac|sqrt|sum|int|lim|alpha|beta|gamma|delta|epsilon|theta|pi|omega|times|div|pm|approx|neq|leq|geq|vec|circ|label|ref|footnote|par|newpage|textcolor|colorbox|mbox|lstset|lstinline|ce|chemfig|caption|tableofcontents|printindex|maketitle|textsuperscript|textsubscript|textbackslash|textasciitilde|left|right|quad|qquad|hfill|vfill|medskip|bigskip|smallskip|centering|large|small|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|displaystyle|textstyle|scriptstyle|scriptscriptstyle|choose|over|above|atop|brace|bracket|lines|plain|toprule|midrule|bottomrule|columnbreak|multicols))\b/g, '<span class="hl-kw">$1</span>')
-        // Symboles dollar (mode maths)
-        .replace(/(\$)/g, '<span class="hl-sec">$1</span>')
-        // Crochets et barres verticales
-        .replace(/([\[\]|])/g, '<span class="hl-bra">$1</span>')
-        // Accolades (après \ce{...} pour ne pas casser les formules chimiques)
-        .replace(/({|})/g, '<span class="hl-bra">$1</span>')
-        // Nombres (entiers ou décimaux)
-        .replace(/\b(\d+[.,]?\d*)\b/g, '<span class="hl-num">$1</span>');
+function projectChapterFormation(index) {
+  const niveau = document.getElementById('niveauSelect').value;
+  const matiere = document.getElementById('matiereSelect').value;
+  const module = data[niveau]?.[matiere];
+  if (!module) return;
+  const chap = module.chapters[index];
+  if (!chap) return;
 
-      return h;
+  const overlay = document.createElement('div');
+  overlay.id = 'projectionOverlay';
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #0f172a; z-index: 99999;
+    padding: 40px 60px; overflow-y: auto;
+    color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+  `;
+  const exitBtn = document.createElement('button');
+  exitBtn.textContent = '✕ Quitter la projection';
+  exitBtn.style.cssText = `
+    position: fixed; top: 20px; right: 30px;
+    background: #ef4444; color: white; border: none;
+    padding: 10px 24px; border-radius: 30px;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    z-index: 100000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: background 0.2s;
+  `;
+  exitBtn.onmouseover = () => { exitBtn.style.background = '#dc2626'; };
+  exitBtn.onmouseout = () => { exitBtn.style.background = '#ef4444'; };
+  exitBtn.onclick = () => {
+    document.body.removeChild(overlay);
+    document.body.removeChild(exitBtn);
+    document.body.classList.remove('projection-mode');
+    document.body.style.overflow = '';
+  };
+  const contentWrapper = document.createElement('div');
+  contentWrapper.style.maxWidth = '1000px';
+  contentWrapper.style.margin = '0 auto';
+  contentWrapper.innerHTML = `
+    <h2 style="color: #f1f5f9; border-left: 4px solid #3b82f6; padding-left: 14px;">${module.title} – ${chap.title}</h2>
+    ${chap.preview}
+  `;
+  overlay.appendChild(contentWrapper);
+  document.body.appendChild(overlay);
+  document.body.appendChild(exitBtn);
+  document.body.classList.add('projection-mode');
+  document.body.style.overflow = 'hidden';
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(() => {});
+  }
+}
+
+// =================================================================
+// 6. FONCTIONS DE BASCULE DE MODE
+// =================================================================
+function switchMode(mode) {
+  document.body.classList.remove('composeur-mode');
+  if (mode === 'composeur') {
+    document.body.classList.add('composeur-mode');
+    document.getElementById('modeFormationBtn').classList.remove('active');
+    document.getElementById('modeComposeurBtn').classList.add('active');
+  } else {
+    document.getElementById('modeFormationBtn').classList.add('active');
+    document.getElementById('modeComposeurBtn').classList.remove('active');
+    renderFormationWidgets();
+  }
+}
+
+function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function sanitize(s) { return escHtml(s); }
+
+// =================================================================
+// 7. INITIALISATION
+// =================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('niveauSelect').addEventListener('change', function() { renderFormationWidgets(); });
+  document.getElementById('matiereSelect').addEventListener('change', function() { renderFormationWidgets(); });
+
+  renderFormationWidgets();
+
+  widgets = parseLaTeX(LATEX_SOURCE);
+  renderWidgetsComposeur();
+
+  document.getElementById('projectorBtn').addEventListener('click', function() {
+    document.body.classList.toggle('projector-mode');
+    this.textContent = document.body.classList.contains('projector-mode') ? '🔲 Quitter projecteur' : '🔲 Mode projecteur';
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (!isProjecting) return;
+    if (e.key === 'Escape') { toggleProjection(false); e.preventDefault(); }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { projectorNext(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { projectorPrev(); e.preventDefault(); }
+    if (e.key === 'c' || e.key === 'C') {
+      if (filteredWidgets[projectorIndex]) navigator.clipboard.writeText(filteredWidgets[projectorIndex].code);
+      e.preventDefault();
     }
-
-    // ----------------------------------------------------------
-    // 6. FONCTION : renderWidgets()
-    //    Génère le HTML de la grille de widgets à partir du
-    //    tableau filteredWidgets, en tenant compte du filtre.
-    // ----------------------------------------------------------
-    function renderWidgets() {
-      const filter = document.getElementById('sectionFilter').value;
-      const grid = document.getElementById('widgetGrid');
-
-      // Filtrage des widgets par section
-      filteredWidgets = filter ? widgets.filter(function(w) { return w.section === filter; }) : widgets;
-
-      // Mise à jour des statistiques
-      const nw = widgets.length;       // Nombre total de widgets
-      const nf = filteredWidgets.length; // Nombre après filtrage
-      document.getElementById('stats').innerHTML =
-        '<strong>' + nf + '</strong> widget' + (nf > 1 ? 's' : '') +
-        ' sur <strong>' + nw + '</strong> extrai' + (nw > 1 ? 'ts' : 't');
-
-      // Si aucun widget ne correspond, on affiche un état vide
-      if (nf === 0) {
-        grid.innerHTML = '<div class="empty-state"><p>Aucun widget trouve</p></div>';
-        return;
-      }
-
-      // Construction du HTML de chaque widget
-      grid.innerHTML = filteredWidgets.map(function(w, i) {
-        const code = highlightLaTeX(w.code);
-        // Troncature du nom de section si trop long (pour le tag)
-        const sec = w.section.length > 32 ? escHtml(w.section.substring(0, 30)) + '...' : escHtml(w.section);
-        const expl = w.explanation ? sanitize(w.explanation) : '';
-
-        return '<div class="widget" data-index="' + i + '">' +
-          // En-tête
-          '<div class="widget-header">' +
-            '<span class="label">&#9998; Code LaTeX</span>' +
-            '<span class="section-tag" title="' + sanitize(w.section) + (w.subsection ? ' > ' + sanitize(w.subsection) : '') + '">' + sec + '</span>' +
-          '</div>' +
-          // Explication (si présente)
-          (expl ? '<div class="widget-expl" id="expl-' + i + '">' +
-            '<div class="expl-label">&#128214; Explication</div>' +
-            '<div class="expl-text">' + expl + '</div>' +
-            (expl.length > 180 ? '<button class="expl-toggle" onclick="toggleExpl(' + i + ')">Afficher plus</button>' : '') +
-          '</div>' : '') +
-          // Code avec coloration
-          '<div class="widget-code">' +
-            '<pre>' + code + '</pre>' +
-            '<button class="copy-btn" onclick="copyCode(' + i + ', this)">Copier</button>' +
-          '</div>' +
-          // Pied de page
-          '<div class="widget-footer">' +
-            '<span class="index">#' + (i + 1) + (w.subsection ? ' - ' + escHtml(w.subsection) : '') + '</span>' +
-            '<button class="project-btn" onclick="projectFrom(' + i + ')">&#9654; Projeter</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    // ----------------------------------------------------------
-    // 7. FONCTION : toggleExpl(i)
-    //    Déplie / replie le texte d'explication d'un widget.
-    // ----------------------------------------------------------
-    function toggleExpl(i) {
-      const el = document.getElementById('expl-' + i);
-      if (el) {
-        el.classList.toggle('expanded');  // Bascule la classe
-        const btn = el.querySelector('.expl-toggle');
-        if (btn) btn.textContent = el.classList.contains('expanded') ? 'Reduire' : 'Afficher plus';
-      }
-    }
-
-    // ----------------------------------------------------------
-    // 8. FONCTION : copyCode(index)
-    //    Copie le code LaTeX du widget dans le presse-papier.
-    //    Utilise l'API Clipboard moderne, avec fallback ancien.
-    // ----------------------------------------------------------
-    function copyCode(index, el) {
-      const code = filteredWidgets[index].code;
-      const btn = el || event.target;
-      navigator.clipboard.writeText(code).then(function() {
-        btn.textContent = 'Copie !';
-        setTimeout(function() { btn.textContent = 'Copier'; }, 1500);
-      }).catch(function() {
-        // Fallback pour les navigateurs anciens
-        const ta = document.createElement('textarea');
-        ta.value = code;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        btn.textContent = 'Copie !';
-        setTimeout(function() { btn.textContent = 'Copier'; }, 1500);
-      });
-    }
-
-    // ----------------------------------------------------------
-    // 9. FONCTIONS DE PROJECTION
-    // ----------------------------------------------------------
-
-    // projectFrom(index) : lance la projection à partir du widget index
-    function projectFrom(index) {
-      projectorIndex = index;
-      toggleProjection(true);
-    }
-
-    // toggleProjection(force) : bascule l'affichage du mode projection
-    function toggleProjection(force) {
-      const proj = document.getElementById('projector');
-      if (force === true) {
-        proj.classList.add('active');
-        isProjecting = true;
-        updateProjector();
-        document.body.style.overflow = 'hidden'; // Empêche le scroll
-      } else if (force === false) {
-        proj.classList.remove('active');
-        isProjecting = false;
-        document.body.style.overflow = ''; // Restaure le scroll
-      } else {
-        // Bascule simple (appel sans argument)
-        isProjecting = !isProjecting;
-        proj.classList.toggle('active');
-        document.body.style.overflow = isProjecting ? 'hidden' : '';
-        if (isProjecting) updateProjector();
-      }
-    }
-
-    // updateProjector() : met à jour le contenu de la diapositive
-    // avec le widget courant (section, titre, explication, code).
-    function updateProjector() {
-      if (filteredWidgets.length === 0) return;
-      const w = filteredWidgets[projectorIndex];
-      const code = highlightLaTeX(w.code);
-      const expl = w.explanation ? sanitize(w.explanation) : '';
-      document.getElementById('projectorSlide').innerHTML =
-        '<div class="slide-section">' + escHtml(w.section) + '</div>' +
-        '<div class="slide-title">' + (w.subsection ? escHtml(w.subsection) : 'Code LaTeX') + '</div>' +
-        (expl ? '<div class="slide-expl">' + expl + '</div>' : '') +
-        '<div class="slide-code"><pre>' + code + '</pre></div>' +
-        '<div class="slide-hint">&#9000; &#8592; &#8594; navigation &bull; &#9096; copier &bull; Esc quitter</div>';
-      // Compteur et état des boutons
-      document.getElementById('projectorCounter').textContent = (projectorIndex + 1) + ' / ' + filteredWidgets.length;
-      document.getElementById('prevBtn').disabled = projectorIndex === 0;
-      document.getElementById('nextBtn').disabled = projectorIndex === filteredWidgets.length - 1;
-    }
-
-    // projectorNext() : passe à la diapositive suivante
-    function projectorNext() {
-      if (projectorIndex < filteredWidgets.length - 1) { projectorIndex++; updateProjector(); }
-    }
-
-    // projectorPrev() : revient à la diapositive précédente
-    function projectorPrev() {
-      if (projectorIndex > 0) { projectorIndex--; updateProjector(); }
-    }
-
-    // ----------------------------------------------------------
-    // 10. GESTION DES ÉVÉNEMENTS CLAVIER
-    //     Permet de naviguer en mode projection avec le clavier.
-    // ----------------------------------------------------------
-    document.addEventListener('keydown', function(e) {
-      if (!isProjecting) return;  // Ignoré si pas en projection
-      if (e.key === 'Escape') { toggleProjection(false); e.preventDefault(); }
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { projectorNext(); e.preventDefault(); }
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { projectorPrev(); e.preventDefault(); }
-      if (e.key === 'c' || e.key === 'C') {
-        // Touche C pour copier le code en cours
-        if (filteredWidgets[projectorIndex]) navigator.clipboard.writeText(filteredWidgets[projectorIndex].code);
-        e.preventDefault();
-      }
-    });
-
-    // ----------------------------------------------------------
-    // 11. FONCTION D'INITIALISATION
-    //     Parse le source LaTeX, peuple le filtre de sections,
-    //     et affiche les widgets.
-    // ----------------------------------------------------------
-    function init() {
-      // Étape 1 : extraire tous les listings du source LaTeX
-      widgets = parseLaTeX(LATEX_SOURCE);
-
-      // Étape 2 : construire la liste des sections uniques pour le filtre
-      var sections = [];
-      for (var wi = 0; wi < widgets.length; wi++) {
-        if (sections.indexOf(widgets[wi].section) < 0) sections.push(widgets[wi].section);
-      }
-
-      // Étape 3 : peupler le <select> avec les sections
-      var filter = document.getElementById('sectionFilter');
-      for (var si = 0; si < sections.length; si++) {
-        var opt = document.createElement('option');
-        opt.value = sections[si];
-        opt.textContent = sections[si];
-        filter.appendChild(opt);
-      }
-
-      // Étape 4 : écouter les changements du filtre
-      filter.addEventListener('change', renderWidgets);
-
-      // Étape 5 : affichage initial des widgets
-      renderWidgets();
-    }
-
-    // ----------------------------------------------------------
-    // 12. DÉMARRAGE
-    //     On appelle init() au chargement de la page.
-    // ----------------------------------------------------------
-    init();
-  </script>
+  });
+});
+</script>
 </body>
 </html>
