@@ -5,8 +5,9 @@
   Description :
     Version finale avec tous les chapitres enrichis,
     filtre de recherche par chapitre, responsive,
-    contenu pédagogique complet avec exemples et exercices.
-    Le mode Composeur contient des blocs lstlisting réels.
+    contenu pédagogique complet.
+    Le mode Composeur contient des blocs lstlisting réels et variés,
+    incluant une section spécifique "Exemples et exercices".
 ============================================================ -->
 <html lang="fr">
 <head>
@@ -396,52 +397,6 @@
       .projector-slide .slide-code pre { font-size: 10px; }
       .projector-header .title { font-size: 13px; }
     }
-
-    /* ========== EXERCICES ET CORRIGÉS ========== */
-    .exercise-box {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      border-radius: 8px;
-      padding: 16px 18px;
-      margin: 16px 0;
-    }
-    .exercise-box .ex-title {
-      font-weight: 700;
-      color: #0369a1;
-      margin-bottom: 6px;
-      font-size: 15px;
-    }
-    .exercise-box .ex-correction {
-      margin-top: 10px;
-      padding: 10px 14px;
-      background: #f0fdf4;
-      border-left: 4px solid #22c55e;
-      border-radius: 0 6px 6px 0;
-      display: none;
-    }
-    .exercise-box .ex-correction.show { display: block; }
-    .exercise-box .ex-toggle {
-      display: inline-block;
-      margin-top: 6px;
-      font-size: 12px;
-      color: #2563eb;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .exercise-box .ex-toggle:hover { text-decoration: underline; }
-    .example-box {
-      background: #fefce8;
-      border: 1px solid #fde68a;
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin: 14px 0;
-    }
-    .example-box .ex-title {
-      font-weight: 700;
-      color: #92400e;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -518,43 +473,43 @@
 
 <script>
 // =================================================================
-// 1. INFORMATION SUR LES PACKAGES (commentaires détaillés)
+// 1. INFORMATION SUR LES PACKAGES
 // =================================================================
 const PACKAGE_INFO = {
-  'article': { role: 'Classe de document de base pour les articles, devoirs et épreuves', importance: 'Essentielle – toute épreuve commence par \\documentclass{article}' },
-  'babel': { role: 'Gestion des règles typographiques et des césures en français', importance: 'Indispensable pour un document en français' },
-  'inputenc': { role: 'Encodage des caractères (accents, symboles)', importance: 'Nécessaire pour utiliser les accents correctement' },
-  'fontenc': { role: 'Encodage des polices pour une meilleure qualité d\'affichage', importance: 'Améliore la qualité des polices dans le PDF' },
-  'geometry': { role: 'Gestion des marges et de la mise en page', importance: 'Permet de personnaliser les marges facilement' },
-  'xcolor': { role: 'Définition et utilisation de couleurs', importance: 'Essentiel pour colorer les boîtes, le texte, les tableaux' },
-  'fancyhdr': { role: 'Personnalisation des en-têtes et pieds de page', importance: 'Indispensable pour les épreuves officielles (établissement, matière, numéro de page)' },
-  'tcolorbox': { role: 'Création de boîtes de texte décoratives (définitions, théorèmes, consignes)', importance: 'Permet de structurer visuellement le cours et de mettre en valeur les points clés' },
-  'array': { role: 'Étend les fonctionnalités des tableaux (colonnes de largeur fixe, alignement personnalisé)', importance: 'Très utile pour créer des tableaux de notes, de mesures ou de résultats' },
-  'multirow': { role: 'Fusion de cellules verticalement dans les tableaux', importance: 'Utile pour les tableaux complexes avec des en-têtes sur plusieurs lignes' },
-  'makecell': { role: 'Permet de formater du texte dans les cellules de tableaux', importance: 'Facilite la mise en forme des cellules' },
-  'graphicx': { role: 'Insertion d\'images (PNG, JPG, PDF, EPS)', importance: 'Indispensable pour intégrer des schémas, graphiques ou photos' },
-  'float': { role: 'Placement précis des figures avec l\'option [H]', importance: 'Utile pour forcer l\'image à rester exactement à l\'endroit du code' },
-  'amsmath': { role: 'Environnements mathématiques avancés (equation, align, gather, etc.)', importance: 'Indispensable pour les mathématiques au lycée (équations, dérivées, intégrales)' },
-  'amssymb': { role: 'Symboles mathématiques supplémentaires (\\mathbb, \\mathcal, etc.)', importance: 'Essentiel pour les ensembles de nombres et les notations avancées' },
-  'systeme': { role: 'Écriture et alignement des systèmes d\'équations', importance: 'Facilite l\'écriture des systèmes avec un alignement parfait' },
-  'tikz': { role: 'Dessin vectoriel pour les figures géométriques, graphiques, schémas', importance: 'Permet de créer des figures de haute qualité directement dans le document' },
-  'tkz-euclide': { role: 'Géométrie euclidienne avec TikZ (tracés de triangles, cercles, angles)', importance: 'Simplifie grandement la création de figures géométriques' },
-  'pgfplots': { role: 'Tracé de courbes de fonctions, graphiques et histogrammes', importance: 'Indispensable pour représenter des données expérimentales ou des fonctions' },
-  'caption': { role: 'Personnalisation des légendes des figures et tableaux', importance: 'Permet de gérer les légendes proprement' },
-  'subcaption': { role: 'Création de sous-figures (images côte à côte)', importance: 'Utile pour comparer plusieurs images ou graphiques' },
-  'enumitem': { role: 'Personnalisation des listes (espaces, symboles, numérotation)', importance: 'Permet d\'adapter les listes aux besoins du document' },
-  'parskip': { role: 'Espacement automatique entre les paragraphes', importance: 'Améliore la lisibilité des textes longs' },
-  'longtable': { role: 'Tableaux sur plusieurs pages avec en-tête répété', importance: 'Indispensable pour les tableaux de données volumineux' },
-  'lastpage': { role: 'Permet d\'obtenir le nombre total de pages avec \\pageref{LastPage}', importance: 'Utile pour afficher "Page X sur Y" dans les en-têtes/pieds' },
-  'eso-pic': { role: 'Ajout d\'éléments en arrière-plan (filigranes, logos)', importance: 'Permet d\'ajouter des filigranes ou des fonds personnalisés' },
-  'siunitx': { role: 'Gestion des unités du Système International (SI) et des nombres', importance: 'Indispensable pour la physique et la chimie (affichage des unités)' },
-  'chemformula': { role: 'Écriture des formules chimiques (H2O, CO2, etc.)', importance: 'Essentiel pour la chimie (formules et équations)' },
-  'mhchem': { role: 'Écriture des formules chimiques (alternative à chemformula)', importance: 'Alternative pour les formules chimiques et les équations' },
-  'circuitikz': { role: 'Schémas électriques (résistances, condensateurs, générateurs, etc.)', importance: 'Indispensable pour l\'électricité (collège et lycée)' },
+  'article': { role: 'Classe de document de base', importance: 'Essentielle – toute épreuve commence par \\documentclass{article}' },
+  'babel': { role: 'Gestion des règles typographiques en français', importance: 'Indispensable pour un document en français' },
+  'inputenc': { role: 'Encodage des caractères', importance: 'Nécessaire pour les accents' },
+  'fontenc': { role: 'Encodage des polices', importance: 'Améliore la qualité des polices' },
+  'geometry': { role: 'Gestion des marges', importance: 'Permet de personnaliser les marges facilement' },
+  'xcolor': { role: 'Définition et utilisation de couleurs', importance: 'Essentiel pour colorer les boîtes' },
+  'fancyhdr': { role: 'Personnalisation des en-têtes et pieds de page', importance: 'Indispensable pour les épreuves officielles' },
+  'tcolorbox': { role: 'Création de boîtes de texte décoratives', importance: 'Permet de structurer visuellement le cours' },
+  'array': { role: 'Étend les fonctionnalités des tableaux', importance: 'Très utile pour les tableaux de notes' },
+  'multirow': { role: 'Fusion de cellules verticalement', importance: 'Utile pour les tableaux complexes' },
+  'makecell': { role: 'Formatage du texte dans les cellules', importance: 'Facilite la mise en forme' },
+  'graphicx': { role: 'Insertion d\'images', importance: 'Indispensable pour intégrer des schémas' },
+  'float': { role: 'Placement précis des figures', importance: 'Utile pour forcer l\'image à rester à l\'endroit du code' },
+  'amsmath': { role: 'Environnements mathématiques avancés', importance: 'Indispensable pour les équations' },
+  'amssymb': { role: 'Symboles mathématiques supplémentaires', importance: 'Essentiel pour les ensembles de nombres' },
+  'systeme': { role: 'Écriture et alignement des systèmes', importance: 'Facilite l\'écriture des systèmes' },
+  'tikz': { role: 'Dessin vectoriel pour les figures', importance: 'Permet de créer des figures de haute qualité' },
+  'tkz-euclide': { role: 'Géométrie euclidienne avec TikZ', importance: 'Simplifie la création de figures géométriques' },
+  'pgfplots': { role: 'Tracé de courbes de fonctions', importance: 'Indispensable pour les graphiques' },
+  'caption': { role: 'Personnalisation des légendes', importance: 'Permet de gérer les légendes proprement' },
+  'subcaption': { role: 'Création de sous-figures', importance: 'Utile pour comparer plusieurs images' },
+  'enumitem': { role: 'Personnalisation des listes', importance: 'Permet d\'adapter les listes' },
+  'parskip': { role: 'Espacement entre les paragraphes', importance: 'Améliore la lisibilité' },
+  'longtable': { role: 'Tableaux sur plusieurs pages', importance: 'Indispensable pour les données volumineuses' },
+  'lastpage': { role: 'Nombre total de pages', importance: 'Utile pour afficher "Page X sur Y"' },
+  'eso-pic': { role: 'Ajout d\'éléments en arrière-plan', importance: 'Permet d\'ajouter des filigranes' },
+  'siunitx': { role: 'Gestion des unités SI', importance: 'Indispensable pour la physique et la chimie' },
+  'chemformula': { role: 'Écriture des formules chimiques', importance: 'Essentiel pour la chimie' },
+  'mhchem': { role: 'Écriture des formules chimiques (alternative)', importance: 'Alternative pour les équations' },
+  'circuitikz': { role: 'Schémas électriques', importance: 'Indispensable pour l\'électricité' },
 };
 
 // =================================================================
-// 2. DONNÉES COMPLÈTES DE LA FORMATION (avec exemples et exercices)
+// 2. DONNÉES COMPLÈTES DE LA FORMATION
 // =================================================================
 const data = {
   college: {
@@ -567,48 +522,12 @@ const data = {
           code: `% ---- Structure minimale ----\n\\documentclass{article}\n\\begin{document}\nBonjour, ceci est mon premier document.\n\\end{document}`,
           preview: `<p>LaTeX est un système de composition de documents de haute qualité, particulièrement adapté aux mathématiques.</p>
             <div class="box box-definition"><span class="box-title">Structure minimale</span>
-            <p>Un fichier LaTeX se compose d'un préambule (déclaration de la classe et des packages) et d'un corps (entre <code>\\begin{document}</code> et <code>\\end{document}</code>).</p></div>
+            <p>Un fichier LaTeX se compose d'un préambule et d'un corps.</p></div>
             <ul><li><code>article</code> : pour des devoirs, épreuves.</li>
             <li><code>report</code> : pour des rapports.</li>
             <li><code>book</code> : pour des livres.</li>
             <li><code>beamer</code> : pour des présentations.</li></ul>
-            <div class="box box-attention"><span class="box-title">Astuce</span><p>Pour compiler : <code>pdflatex mon_fichier.tex</code></p></div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Voici un exemple de document minimal :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\documentclass{article}
-\\begin{document}
-Bonjour, ceci est mon premier document LaTeX.
-\\end{document}</pre>
-            <p>Ce code produit un PDF avec le texte "Bonjour, ceci est mon premier document LaTeX."</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 1.1</div>
-              <p>Modifiez le code ci-dessus pour afficher votre nom et la date du jour.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\documentclass{article}
-\\begin{document}
-KOLA Maniwah Essohouna, 30 août 2026.
-J'apprends LaTeX.
-\\end{document}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 1.2</div>
-              <p>Ajoutez un deuxième paragraphe contenant : <em>J'apprends les bases de LaTeX.</em></p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\documentclass{article}
-\\begin{document}
-Bonjour, ceci est mon premier document LaTeX.
-
-J'apprends les bases de LaTeX.
-\\end{document}</pre>
-              </div>
-            </div>`
+            <div class="box box-attention"><span class="box-title">Astuce</span><p>Pour compiler : <code>pdflatex mon_fichier.tex</code></p></div>`
         },
         {
           title: "2. En-têtes et pieds de page",
@@ -617,43 +536,7 @@ J'apprends les bases de LaTeX.
           preview: `<p>Le package <code>fancyhdr</code> personnalise l'en-tête et le pied de page.</p>
             <div class="box box-propriete"><span class="box-title">Configuration type</span>
             <pre>\\usepackage{fancyhdr}\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyhead[L]{\\textbf{Établissement}}\n\\fancyhead[C]{\\textbf{Devoir}}\n\\fancyhead[R]{\\textbf{Nom}}</pre></div>
-            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date. Le package <code>lastpage</code> permet d'obtenir le nombre total de pages.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Configuration complète pour un devoir :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\usepackage{fancyhdr,lastpage}
-\\pagestyle{fancy}
-\\fancyhf{}
-\\fancyhead[L]{\\textbf{Lycée Moderne}}
-\\fancyhead[C]{\\textbf{Devoir de Mathématiques}}
-\\fancyhead[R]{\\textbf{Classe : 3ème}}
-\\fancyfoot[L]{\\textit{Page \\thepage/\\pageref{LastPage}}}
-\\fancyfoot[C]{\\textit{Année 2024}}
-\\fancyfoot[R]{\\today}
-\\renewcommand{\\headrulewidth}{0.5pt}
-\\renewcommand{\\footrulewidth}{0.2pt}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 2.1</div>
-              <p>Créez un en-tête avec "Lycée Moderne" à gauche, "Devoir Surveillé" au centre, et "NOM : \ldots" à droite.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\fancyhead[L]{\\textbf{Lycée Moderne}}
-\\fancyhead[C]{\\textbf{Devoir Surveillé}}
-\\fancyhead[R]{\\textbf{NOM : \\ldots}}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 2.2</div>
-              <p>Modifiez le pied de page pour afficher le numéro de page au centre et la date à droite.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\fancyfoot[C]{\\thepage}
-\\fancyfoot[R]{\\today}</pre>
-              </div>
-            </div>`
+            <p>On utilise <code>\\thepage</code> pour le numéro de page et <code>\\today</code> pour la date.</p>`
         },
         {
           title: "3. Boîtes de texte",
@@ -662,39 +545,7 @@ J'apprends les bases de LaTeX.
           preview: `<p>Le package <code>tcolorbox</code> encadre définitions, théorèmes, consignes.</p>
             <div class="box box-definition"><span class="box-title">Définition</span><p>Une fonction affine est $f(x)=ax+b$.</p></div>
             <div class="box box-theoreme"><span class="box-title">Pythagore</span><p>$BC^2 = AB^2 + AC^2$.</p></div>
-            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages), <code>drop fuzzy shadow</code> (ombre).</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Boîte avec ombre et coins arrondis :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,
-  title=Propriété, drop fuzzy shadow, rounded corners]
-$a^2 - b^2 = (a-b)(a+b)$
-\\end{tcolorbox}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 3.1</div>
-              <p>Créez une boîte rouge intitulée "Attention" contenant : <em>Ne pas confondre $2x$ et $x^2$.</em></p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Attention]
-Ne pas confondre $2x$ et $x^2$.
-\\end{tcolorbox}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 3.2</div>
-              <p>Créez une boîte verte intitulée "Méthode" pour résoudre une équation du premier degré.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Méthode]
-Pour résoudre $ax+b=0$ :
-1. Isoler le terme en $x$ : $ax = -b$
-2. Diviser par $a$ : $x = -\\frac{b}{a}$
-\\end{tcolorbox}</pre>
-              </div>
-            </div>`
+            <p>Options : <code>colback</code> (fond), <code>colframe</code> (bordure), <code>title</code> (titre), <code>breakable</code> (multipages).</p>`
         },
         {
           title: "4. Tableaux",
@@ -704,56 +555,7 @@ Pour résoudre $ax+b=0$ :
             <div class="table-wrap"><table><thead><tr><th>Élève</th><th>Note</th><th>Appréciation</th></tr></thead>
             <tbody><tr><td>Alice</td><td>18</td><td>Très bien</td></tr>
             <tr><td>Bob</td><td>12</td><td>Bien</td></tr></tbody></table></div>
-            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe centrée verticalement). Le package <code>array</code> permet d'ajouter des préfixes comme <code>\\centering</code>.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Tableau des carrés parfaits :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tabular}{|c|c|}
-\\hline
-$n$ & $n^2$ \\\\
-\\hline
-1 & 1 \\\\
-2 & 4 \\\\
-3 & 9 \\\\
-4 & 16 \\\\
-5 & 25 \\\\
-\\hline
-\\end{tabular}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 4.1</div>
-              <p>Créez un tableau des carrés parfaits de 1 à 10.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tabular}{|c|c|}
-\\hline
-$n$ & $n^2$ \\\\
-\\hline
-1 & 1 \\\\ 2 & 4 \\\\ 3 & 9 \\\\
-4 & 16 \\\\ 5 & 25 \\\\ 6 & 36 \\\\
-7 & 49 \\\\ 8 & 64 \\\\ 9 & 81 \\\\ 10 & 100 \\\\
-\\hline
-\\end{tabular}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 4.2</div>
-              <p>Créez un tableau de proportionnalité avec 4 colonnes (valeurs de $x$, valeurs de $y$, rapport $y/x$, et le produit en croix).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tabular}{|c|c|c|c|}
-\\hline
-$x$ & $y$ & $y/x$ & $x \\times y$ \\\\
-\\hline
-1 & 2 & 2 & 2 \\\\
-2 & 4 & 2 & 8 \\\\
-3 & 6 & 2 & 18 \\\\
-\\hline
-\\end{tabular}</pre>
-              </div>
-            </div>`
+            <p>Colonnes : <code>l</code> (gauche), <code>c</code> (centre), <code>r</code> (droite), <code>m{largeur}</code> (largeur fixe).</p>`
         },
         {
           title: "5. Insertion d'images",
@@ -762,172 +564,41 @@ $x$ & $y$ & $y/x$ & $x \\times y$ \\\\
           preview: `<p><code>graphicx</code> insère des images.</p>
             <div class="box box-propriete"><span class="box-title">Placement</span>
             <ul><li><code>h</code> : ici</li><li><code>t</code> : en haut</li><li><code>b</code> : en bas</li><li><code>H</code> : exactement (package <code>float</code>)</li></ul></div>
-            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>. Les légendes sont gérées par <code>caption</code>.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{figure}[h]
-  \\centering
-  \\includegraphics[width=0.3\\textwidth]{logo.png}
-  \\caption{Logo de l'établissement}
-  \\label{fig:logo}
-\\end{figure}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 5.1</div>
-              <p>Insérez une image avec une largeur de 5cm et une légende "Mon image".</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{figure}[h]
-  \\centering
-  \\includegraphics[width=5cm]{mon_image.png}
-  \\caption{Mon image}
-  \\label{fig:monimage}
-\\end{figure}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 5.2</div>
-              <p>Insérez la même image avec trois largeurs différentes (2cm, 0.3\\textwidth, 5cm).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\includegraphics[width=2cm]{image.png}
-\\includegraphics[width=0.3\\textwidth]{image.png}
-\\includegraphics[width=5cm]{image.png}</pre>
-              </div>
-            </div>`
+            <p>Redimensionnement : <code>width</code>, <code>height</code>, <code>scale</code>.</p>`
         },
         {
           title: "6. Modèles d'épreuves",
           packages: ['article', 'fancyhdr', 'tcolorbox'],
           code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} (4 pts) ...\n\\end{document}`,
           preview: `<p>Structure d'une épreuve : en-tête, consigne, exercices numérotés, barème, pied de page.</p>
-            <div class="box box-consigne"><span class="box-title">Structure d'un devoir</span>
-            <ul><li>En-tête : établissement, matière, classe, date, durée</li>
-            <li>Consigne générale</li>
-            <li>Exercices avec barème entre parenthèses</li>
-            <li>Pied de page : numéro de page, date</li></ul></div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\documentclass[12pt,a4paper]{article}
-\\begin{document}
-\\begin{center}
-  \\textbf{Devoir de Mathématiques}
-\\end{center}
-\\textbf{Exercice 1 :} (4 points) Calculer $A = 3(2+5)-4$.
-\\textbf{Exercice 2 :} (6 points) Résoudre $4x-7=2x+3$.
-\\end{document}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 6.1</div>
-              <p>Concevez un devoir maison de 2 exercices (l'un de calcul numérique, l'autre de géométrie).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{document}
-\\begin{center}
-  \\textbf{Devoir Maison}
-\\end{center}
-\\textbf{Exercice 1 :} (4 pts) Calculer $A = 3 \\times (2+5) - 4$.
-\\textbf{Exercice 2 :} (6 pts) Dans un triangle ABC rectangle en A, AB=3 cm, AC=4 cm.
-Calculer BC.
-\\end{document}</pre>
-              </div>
-            </div>`
+            <div class="box box-consigne"><span class="box-title">Structure</span><ul><li>En-tête</li><li>Consigne</li><li>Exercices avec barème</li><li>Pied de page</li></ul></div>`
         },
         {
           title: "7. Outils mathématiques",
           packages: ['amsmath', 'amssymb'],
           code: `$\\frac{a}{b}$, $x^n$, $\\sqrt{2}$\n$(a+b)^2 = a^2+2ab+b^2$\n$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$`,
-          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$, $\\sqrt[3]{8}$</li></ul>
-            <div class="box box-theoreme">Identités remarquables :<br>$(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
-            <h4>Trigonométrie (3ème)</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
-            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr></thead>
-            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td><td>1</td></tr>
-            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td><td>0</td></tr>
-            <tr><td>$\\tan$</td><td>0</td><td>$\\frac{\\sqrt3}{3}$</td><td>1</td><td>$\\sqrt3$</td><td>—</td></tr></tbody></table></div>
-            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q} \\subset \\mathbb{R}$</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Calculer $(x+3)^2 - (x-3)^2$ :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-$(x+3)^2 - (x-3)^2 = (x^2+6x+9) - (x^2-6x+9) = 12x$</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 7.1</div>
-              <p>Simplifiez l'expression $\\sqrt{72}$ et résolvez l'équation $2x^2 - 8 = 0$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-$\\sqrt{72} = 6\\sqrt{2}$
-$2x^2 - 8 = 0 \\Rightarrow x^2 = 4 \\Rightarrow x = \\pm 2$</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 7.2</div>
-              <p>Dans un triangle rectangle, les côtés de l'angle droit mesurent 3 et 4. Calculer l'hypoténuse.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-$c = \\sqrt{3^2 + 4^2} = \\sqrt{9+16} = \\sqrt{25} = 5$</pre>
-              </div>
-            </div>`
+          preview: `<h4>Algèbre</h4><ul><li>Fraction : $\\frac{a}{b}$</li><li>Puissance : $x^n$</li><li>Racine : $\\sqrt{2}$</li></ul>
+            <div class="box box-theoreme">Identités : $(a+b)^2 = a^2+2ab+b^2$<br>$(a-b)^2 = a^2-2ab+b^2$<br>$(a-b)(a+b)=a^2-b^2</div>
+            <h4>Trigonométrie</h4><p>$\\cos\\beta = \\frac{\\text{adj}}{\\text{hyp}}$, $\\sin\\beta = \\frac{\\text{opp}}{\\text{hyp}}$, $\\tan\\beta = \\frac{\\text{opp}}{\\text{adj}}$</p>
+            <div class="table-wrap"><table><thead><tr><th>Angle</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th></tr></thead>
+            <tbody><tr><td>$\\sin$</td><td>0</td><td>$\\frac12$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac{\\sqrt3}{2}$</td></tr>
+            <tr><td>$\\cos$</td><td>1</td><td>$\\frac{\\sqrt3}{2}$</td><td>$\\frac{\\sqrt2}{2}$</td><td>$\\frac12$</td></tr></tbody></table></div>
+            <h4>Ensembles</h4><p>$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{D} \\subset \\mathbb{Q}$</p>`
         },
         {
           title: "8. Ressources et compilation",
           packages: ['article', 'inputenc', 'fontenc'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Compilation : <code>pdflatex</code> (ou <code>lualatex</code>) génère un PDF. Erreurs fréquentes : <code>Undefined control sequence</code> (commande inconnue), <code>Missing $ inserted</code> (formule mal délimitée), <code>File not found</code> (image introuvable).</p>
-            <div class="box box-attention"><span class="box-title">Bonnes pratiques</span><ul><li>Toujours compiler deux fois pour les références croisées.</li><li>Utiliser un éditeur avec auto-complétion (TeXstudio, VS Code).</li></ul></div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Compiler avec la ligne de commande :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-pdflatex mon_fichier.tex</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 8.1</div>
-              <p>Quelle commande utilisez-vous pour compiler un fichier LaTeX en PDF ?</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-pdflatex mon_fichier.tex</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 8.2</div>
-              <p>Que signifie l'erreur "Undefined control sequence" ?</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>Cette erreur signifie que vous avez utilisé une commande qui n'est pas définie (package manquant ou faute de frappe).</p>
-              </div>
-            </div>`
+          preview: `<p>Compilation : <code>pdflatex</code>. Erreurs fréquentes : <code>Undefined control sequence</code>, <code>Missing $</code>, <code>File not found</code>.</p>
+            <div class="box box-attention"><span class="box-title">Erreurs</span><ul><li>Commande inconnue</li><li>Oubli de $</li><li>Image introuvable</li></ul></div>`
         },
         {
           title: "9. Nombres et calculs",
           packages: ['amsmath', 'xcolor'],
           code: `$\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$\n$(-3)+(-5)=-8$\n$2+3\\times4=14$`,
-          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{4}{6}+\\frac{5}{6} = \\frac{9}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{10}{18} = \\frac{5}{9}$</div>
-            <div class="box box-propriete">Nombres relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$, $(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
-            <div class="box box-attention">Priorités des opérations : $2+3\\times4=2+12=14$, $(2+3)\\times4=5\\times4=20$. Les puissances sont calculées avant les multiplications.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Calculer $\\frac{3}{4} + \\frac{1}{2} = \\frac{3}{4} + \\frac{2}{4} = \\frac{5}{4}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 9.1</div>
-              <p>Calculez $\\frac{5}{6} - \\frac{1}{3}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\frac{5}{6} - \\frac{1}{3} = \\frac{5}{6} - \\frac{2}{6} = \\frac{3}{6} = \\frac{1}{2}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice 9.2</div>
-              <p>Calculez $(-3) \\times (-4) + 2$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$(-3) \\times (-4) + 2 = 12 + 2 = 14$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Fractions : $\\frac{2}{3}+\\frac{5}{6} = \\frac{3}{2}$<br>Multiplication : $\\frac{2}{3}\\times\\frac{5}{6} = \\frac{5}{9}$</div>
+            <div class="box box-propriete">Relatifs : $(-3)+(-5)=-8$, $(-2)\\times(-4)=8$<br>$(-6)\\div3=-2$, $12\\div(-4)=-3$</div>
+            <div class="box box-attention">Priorités : $2+3\\times4=14$, $(2+3)\\times4=20$<br>Puissances avant multiplications.</div>`
         }
       ]
     },
@@ -938,31 +609,8 @@ pdflatex mon_fichier.tex</pre>
           title: "1. Introduction et rappels",
           packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
           code: `\\usepackage{siunitx}\n\\usepackage{chemformula}\n\\usepackage{circuitikz}\n\\usepackage{pgfplots}`,
-          preview: `<p>Les packages spécifiques pour la physique au collège :</p>
-            <ul><li><code>siunitx</code> : gestion des unités SI.</li>
-            <li><code>chemformula</code> : écriture des formules chimiques.</li>
-            <li><code>circuitikz</code> : schémas électriques.</li>
-            <li><code>pgfplots</code> : tracé de graphiques.</li></ul>
-            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Écrire une masse de 250 grammes avec <code>siunitx</code> : <code>\\SI{250}{g}</code> → $\\SI{250}{g}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P1.1</div>
-              <p>Écrivez une vitesse de 3,0×10⁸ m/s avec <code>siunitx</code>.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\SI{3.0e8}{m/s}</code> → $\\SI{3.0e8}{m/s}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P1.2</div>
-              <p>Quel package permet d'écrire des schémas électriques ?</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>circuitikz</code></p>
-              </div>
-            </div>`
+          preview: `<p>Packages : <code>siunitx</code> (unités), <code>chemformula</code> (chimie), <code>circuitikz</code> (électricité), <code>pgfplots</code> (graphiques).</p>
+            <div class="box box-definition">Ces packages sont indispensables pour les sciences physiques au collège.</div>`
         },
         {
           title: "2. Formules chimiques",
@@ -970,26 +618,7 @@ pdflatex mon_fichier.tex</pre>
           code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{NaCl}\n\\ch{2H2 + O2 -> 2H2O}`,
           preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Chlorure de sodium : $\\ch{NaCl}$</li></ul>
             <div class="box box-definition">Équation équilibrée : $\\ch{2H2 + O2 -> 2H2O}$</div>
-            <p>Les états physiques se notent : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux. Exemple : $\\ch{H2O_{(l)}}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Écrire la combustion du méthane : <code>\\ch{CH4 + 2O2 -> CO2 + 2H2O}</code> → $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P2.1</div>
-              <p>Écrivez la formule chimique de l'acide chlorhydrique.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\ch{HCl}</code> → $\\ch{HCl}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P2.2</div>
-              <p>Écrivez l'équation de la réaction entre le zinc et l'acide chlorhydrique (donne du chlorure de zinc et du dihydrogène).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\ch{Zn + 2HCl -> ZnCl2 + H2}</code> → $\\ch{Zn + 2HCl -> ZnCl2 + H2}$</p>
-              </div>
-            </div>`
+            <p>États : (s) solide, (l) liquide, (g) gazeux, (aq) aqueux.</p>`
         },
         {
           title: "3. Grandeurs et unités",
@@ -997,30 +626,8 @@ pdflatex mon_fichier.tex</pre>
           code: `$\\SI{250}{g}$\n$\\SI{1.5}{L}$\n$\\SI{3.0e8}{m/s}$`,
           preview: `<ul><li>Masse : $\\SI{250}{g}$</li><li>Volume : $\\SI{1.5}{L}$</li><li>Vitesse : $\\SI{3.0e8}{m/s}$</li></ul>
             <div class="table-wrap"><table><thead><tr><th>Préfixe</th><th>Symbole</th><th>Facteur</th></tr></thead>
-            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr>
-            <tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
-            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr>
-            <tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>
-            <div class="box box-attention">Attention à la casse : <code>m</code> = milli, <code>M</code> = méga.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Convertir 25 cm en mètres : <code>\\SI{25}{cm}</code> = $\\SI{25}{cm}$ = $\\SI{0.25}{m}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P3.1</div>
-              <p>Écrivez une pression de 1013 hPa en Pa.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\SI{1013}{hPa}</code> = $\\SI{1013}{hPa}$ = $\\SI{101300}{Pa}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P3.2</div>
-              <p>Convertissez 36 km/h en m/s.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\SI{36}{km/h}</code> = $\\SI{36}{km/h}$ = $\\SI{10}{m/s}$</p>
-              </div>
-            </div>`
+            <tbody><tr><td>kilo</td><td>k</td><td>$10^3$</td></tr><tr><td>centi</td><td>c</td><td>$10^{-2}$</td></tr>
+            <tr><td>milli</td><td>m</td><td>$10^{-3}$</td></tr><tr><td>micro</td><td>$\\mu$</td><td>$10^{-6}$</td></tr></tbody></table></div>`
         },
         {
           title: "4. Tableaux de mesures",
@@ -1029,62 +636,14 @@ pdflatex mon_fichier.tex</pre>
           preview: `<div class="table-wrap"><table><thead><tr><th>Temps (s)</th><th>Température (°C)</th></tr></thead>
             <tbody><tr><td>0</td><td>20,0</td></tr><tr><td>10</td><td>25,5</td></tr>
             <tr><td>20</td><td>31,2</td></tr><tr><td>30</td><td>37,8</td></tr></tbody></table></div>
-            <p>Pour aligner les nombres avec leurs unités, utilisez <code>siunitx</code> avec <code>S[table-format=...]</code>.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tabular}{|c|S[table-format=3.1]|}
-\\hline
-\\textbf{Temps (s)} & \\textbf{Température (°C)} \\\\
-\\hline
-0 & 20,0 \\\\
-10 & 25,5 \\\\
-20 & 31,2 \\\\
-30 & 37,8 \\\\
-\\hline
-\\end{tabular}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P4.1</div>
-              <p>Créez un tableau de mesures de tension et d'intensité pour une résistance.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tabular}{|c|c|}
-\\hline
-\\textbf{Tension (V)} & \\textbf{Intensité (A)} \\\\
-\\hline
-0 & 0,0 \\\\
-2 & 0,02 \\\\
-4 & 0,04 \\\\
-6 & 0,06 \\\\
-\\hline
-\\end{tabular}</pre>
-              </div>
-            </div>`
+            <p>Utilisez <code>siunitx</code> pour aligner les nombres avec leurs unités.</p>`
         },
         {
           title: "5. Graphiques",
           packages: ['pgfplots', 'siunitx'],
           code: `\\begin{axis}[xlabel=Temps, ylabel=Température]\n\\addplot[only marks, mark=*] coordinates {(0,20) (10,25.5)};\n\\end{axis}`,
           preview: `<div class="figure-tikz">[Courbe température en fonction du temps]</div>
-            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et droites de tendance. Exemple : <code>\\addplot[red, thick] {0.5*x+20};</code></p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{axis}[xlabel={Temps (s)}, ylabel={Température (°C)}]
-\\addplot[only marks, mark=*, blue] coordinates {(0,20) (10,25.5) (20,31.2) (30,37.8)};
-\\addlegendentry{Mesures}
-\\addplot[red, thick] {0.59*x + 20};
-\\addlegendentry{Tendance}
-\\end{axis}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P5.1</div>
-              <p>Tracez la courbe de l'intensité en fonction de la tension pour une résistance (loi d'Ohm).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>Coordonnées : (0,0), (1,0.01), (2,0.02), (3,0.03), (4,0.04), (5,0.05). Utilisez <code>\\addplot[only marks, mark=*]</code>.</p>
-              </div>
-            </div>`
+            <p><code>pgfplots</code> permet de tracer des courbes expérimentales avec grille, légendes et tendances.</p>`
         },
         {
           title: "6. Circuits série et dérivation",
@@ -1092,78 +651,42 @@ pdflatex mon_fichier.tex</pre>
           code: `\\begin{circuitikz}\n\\draw (0,0) to[battery1] (0,3) to[switch] (2,3) to[lamp] (2,0) -- (0,0);\n\\end{circuitikz}`,
           preview: `<div class="figure-tikz">[Circuit série avec pile, interrupteur et lampe]</div>
             <div class="box box-propriete">Série : $I$ constante, $U=U_1+U_2$<br>Dérivation : $U$ constante, $I=I_1+I_2$</div>
-            <p>Composants courants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>, <code>inductor</code>.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Circuit en dérivation avec deux lampes :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{circuitikz}
-\\draw (0,0) to[battery1,l=6V] (0,3)
-      to[switch] (2,3) -- (4,3)
-      to[lamp,l=$L_1$] (4,1.5) -- (4,0)
-      (4,3) to[lamp,l=$L_2$] (6,1.5) -- (6,0)
-      (4,0) -- (6,0) -- (0,0);
-\\end{circuitikz}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P6.1</div>
-              <p>Dessinez un circuit série avec une pile de 12 V, deux résistances $R_1 = 100\\Omega$ et $R_2 = 200\\Omega$, et un interrupteur.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{circuitikz}
-\\draw (0,0) to[battery1,l=12V] (0,3)
-      to[resistor,l=$R_1=100\\Omega$] (3,3)
-      to[resistor,l=$R_2=200\\Omega$] (3,0)
-      to[switch] (0,0);
-\\end{circuitikz}</pre>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P6.2</div>
-              <p>Dessinez un circuit en dérivation avec une pile, deux lampes et un ampèremètre qui mesure l'intensité totale.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{circuitikz}
-\\draw (0,0) to[battery1,l=6V] (0,3)
-      to[ammeter,l=$A$] (2,3)
-      -- (4,3)
-      to[lamp,l=$L_1$] (4,1.5) -- (4,0)
-      (4,3) to[lamp,l=$L_2$] (6,1.5) -- (6,0)
-      (4,0) -- (6,0) -- (0,0);
-\\end{circuitikz}</pre>
-              </div>
-            </div>`
+            <p>Composants : <code>battery1</code>, <code>switch</code>, <code>lamp</code>, <code>resistor</code>, <code>capacitor</code>.</p>`
         },
         {
           title: "7. Schémas expérimentaux",
           packages: ['tikz'],
           code: `\\begin{tikzpicture}\n\\draw (0,0) -- (0,2) arc (180:0:1) -- (2,0);\n\\end{tikzpicture}`,
           preview: `<div class="figure-tikz">[Bécher]</div>
-            <p>Avec TikZ, on peut dessiner du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc. L'exemple ci-dessus dessine un bécher simple.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Montage de filtration :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tikzpicture}
-\\draw (0,0) -- (-1,-1) -- (1,-1) -- cycle;
-\\draw (0,0) -- (0,0.5);
-\\draw (-1.2,-1) -- (-1.2,-2) arc (180:0:1.2) -- (1.2,-1);
-\\draw[dashed] (-0.8,-1) -- (0.8,-1);
-\\end{tikzpicture}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice P7.1</div>
-              <p>Dessinez un erlenmeyer avec TikZ.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{tikzpicture}
-\\draw (0,0) -- (0,2.5) arc (180:0:0.8) -- (1.6,0);
-\\draw (0,2.5) -- (1.6,2.5);
-\\draw (0.2,2.5) -- (0.2,0.5);
-\\end{tikzpicture}</pre>
-              </div>
-            </div>`
+            <p>Avec TikZ, on dessine du matériel de laboratoire : bécher, éprouvette, erlenmeyer, montage de filtration, etc.</p>`
+        },
+        {
+          title: "8. Modèles d'épreuves",
+          packages: ['article', 'fancyhdr', 'circuitikz', 'pgfplots', 'chemformula'],
+          code: `\\documentclass{article}\n\\begin{document}\n\\begin{center}\\textbf{Devoir}\\end{center}\n\\textbf{Exercice 1} ...\n\\end{document}`,
+          preview: `<div class="box box-consigne">Structure d'une épreuve de physique :<ul><li>En-tête</li><li>Consignes</li><li>Exercices avec barème</li><li>Schémas et tableaux</li></ul></div>`
+        },
+        {
+          title: "9. Ressources",
+          packages: ['siunitx', 'chemformula', 'circuitikz', 'pgfplots'],
+          code: `pdflatex mon_fichier.tex`,
+          preview: `<p>Erreurs fréquentes : <code>chemformula</code> (syntaxe), <code>siunitx</code> (accolades), <code>circuitikz</code> (connexions).</p>`
+        },
+        {
+          title: "10. Optique",
+          packages: ['tikz'],
+          code: `\\begin{tikzpicture}\n\\draw[->] (0,0) -- (4,0);\n\\end{tikzpicture}`,
+          preview: `<div class="box box-definition">Propagation rectiligne de la lumière</div>
+            <div class="figure-tikz">[Schéma de lentille convergente]</div>
+            <p>La lumière se propage en ligne droite dans un milieu homogène. Les lentilles convergentes focalisent les rayons.</p>`
+        },
+        {
+          title: "11. Mécanique",
+          packages: ['amsmath', 'tikz'],
+          code: `$v = \\frac{d}{t}$\n$\\vec{P} = m\\vec{g}$`,
+          preview: `<div class="box box-definition">Vitesse moyenne : $v = \\frac{d}{t}$</div>
+            <div class="box box-theoreme">Poids : $\\vec{P} = m\\vec{g}$ avec $g \\approx 9,81$ m/s²</div>
+            <div class="figure-tikz">[Schéma de forces : poids et réaction]</div>`
         }
       ]
     },
@@ -1175,102 +698,30 @@ pdflatex mon_fichier.tex</pre>
           packages: ['chemformula'],
           code: `\\ch{H2O}\n\\ch{CO2}\n\\ch{HCl}\n\\ch{CH4 + 2O2 -> CO2 + 2H2O}`,
           preview: `<ul><li>Eau : $\\ch{H2O}$</li><li>Dioxyde de carbone : $\\ch{CO2}$</li><li>Acide chlorhydrique : $\\ch{HCl}$</li></ul>
-            <div class="box box-definition">Combustion du méthane : $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Écrire la formule du glucose : <code>\\ch{C6H12O6}</code> → $\\ch{C6H12O6}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C1.1</div>
-              <p>Écrivez la formule chimique de l'acide sulfurique.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\ch{H2SO4}</code> → $\\ch{H2SO4}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C1.2</div>
-              <p>Écrivez l'équation de la combustion complète du propane ($\\ch{C3H8}$).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>\\ch{C3H8 + 5O2 -> 3CO2 + 4H2O}</code></p>
-              </div>
-            </div>`
+            <div class="box box-definition">Combustion du méthane : $\\ch{CH4 + 2O2 -> CO2 + 2H2O}$</div>`
         },
         {
           title: "2. Équilibrage",
           packages: ['chemformula'],
           code: `\\ch{3Fe + 2O2 -> Fe3O4}`,
-          preview: `<p>Pour équilibrer une équation, on ajuste les coefficients stœchiométriques. Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
-            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients devant.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Équilibrer $\\ch{Al + O2 -> Al2O3}$ :<br>
-            $\\ch{4Al + 3O2 -> 2Al2O3}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C2.1</div>
-              <p>Équilibrer $\\ch{Fe + Cl2 -> FeCl3}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\ch{2Fe + 3Cl2 -> 2FeCl3}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C2.2</div>
-              <p>Équilibrer $\\ch{Ca + O2 -> CaO}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\ch{2Ca + O2 -> 2CaO}$</p>
-              </div>
-            </div>`
+          preview: `<p>Exemple : $\\ch{Fe + O2 -> Fe3O4}$ s'équilibre en $\\ch{3Fe + 2O2 -> Fe3O4}$.</p>
+            <div class="box box-attention">Ne jamais modifier les indices des formules, seulement les coefficients.</div>`
         },
         {
           title: "3. Solutions et concentration",
           packages: ['chemformula', 'siunitx'],
           code: `$C = \\frac{n}{V}$\n$n = \\frac{m}{M}$`,
-          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L).</p>
-            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol), avec $m$ la masse (g) et $M$ la masse molaire (g/mol).</p>
-            <div class="box box-definition">Préparer une solution : dissoudre une masse $m$ de soluté dans un volume $V$ de solvant.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Préparer 250 mL d'une solution de NaCl à 0,1 mol/L :<br>
-            $n = C \\times V = 0,1 \\times 0,25 = 0,025$ mol<br>
-            $m = n \\times M = 0,025 \\times 58,5 = 1,4625$ g</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C3.1</div>
-              <p>Quelle masse de NaOH faut-il dissoudre pour préparer 500 mL d'une solution 0,2 mol/L ? (M(NaOH)=40 g/mol)</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$n = 0,2 \\times 0,5 = 0,1$ mol<br>$m = 0,1 \\times 40 = 4$ g</p>
-              </div>
-            </div>`
+          preview: `<p>Concentration molaire : $C = \\frac{n}{V}$ (mol/L)</p>
+            <p>Quantité de matière : $n = \\frac{m}{M}$ (mol)</p>
+            <div class="box box-definition">Préparer une solution : dissoudre $m$ grammes de soluté dans $V$ litres de solvant.</div>`
         },
         {
           title: "4. Acides et bases",
           packages: ['chemformula', 'siunitx'],
           code: `$pH = -\\log[H_3O^+]$\n\\ch{HCl + NaOH -> NaCl + H2O}`,
-          preview: `<div class="box box-definition">Le pH est défini par $pH = -\\log[H_3O^+]$. Il varie de 0 (très acide) à 14 (très basique).</div>
+          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
             <div class="box box-definition">Neutralisation : $\\ch{HCl + NaOH -> NaCl + H2O}$</div>
-            <p>Indicateurs colorés : tournesol (rouge en acide, bleu en basique), BBT (jaune acide, bleu basique).</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Calculer le pH d'une solution de HCl à 0,01 mol/L :<br>
-            $[H_3O^+] = 0,01$ mol/L → $pH = -\\log(0,01) = 2$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C4.1</div>
-              <p>Calculez le pH d'une solution d'acide chlorhydrique à 0,001 mol/L.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$pH = -\\log(10^{-3}) = 3$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice C4.2</div>
-              <p>Écrivez l'équation de la neutralisation entre $\\ch{H2SO4}$ et $\\ch{NaOH}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\ch{H2SO4 + 2NaOH -> Na2SO4 + 2H2O}$</p>
-              </div>
-            </div>`
+            <p>Indicateurs : tournesol (rouge acide, bleu basique), BBT (jaune acide, bleu basique).</p>`
         }
       ]
     }
@@ -1283,319 +734,80 @@ pdflatex mon_fichier.tex</pre>
           title: "1. Introduction",
           packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
           code: `\\usepackage{amsmath, amssymb}\n\\usepackage{pgfplots}\n\\usepackage{tkz-euclide}`,
-          preview: `<p>Packages avancés pour le lycée :</p>
-            <ul><li><code>amsmath</code> : environnements mathématiques (equation, align, gather).</li>
-            <li><code>amssymb</code> : symboles supplémentaires ($\\mathbb{R}$, $\\mathcal{F}$).</li>
-            <li><code>pgfplots</code> : tracé de courbes de fonctions.</li>
-            <li><code>tkz-euclide</code> : géométrie euclidienne (tracés de triangles, cercles).</li></ul>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Tracer la fonction $f(x)=x^2$ avec <code>pgfplots</code> :</p>
-            <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{axis}[domain=-3:3, grid=major]
-\\addplot[blue, thick] {x^2};
-\\end{axis}</pre>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L1.1</div>
-              <p>Tracez la fonction $f(x) = \\sin(x)$ sur $[0, 2\\pi]$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <pre style="background:#f1f5f9; padding:8px 12px; border-radius:6px; font-size:13px; overflow-x:auto;">
-\\begin{axis}[domain=0:2*pi, samples=100]
-\\addplot[blue, thick] {sin(deg(x))};
-\\end{axis}</pre>
-              </div>
-            </div>`
+          preview: `<p>Packages avancés pour le lycée : <code>amsmath</code> (équations), <code>amssymb</code> (symboles), <code>pgfplots</code> (courbes), <code>tkz-euclide</code> (géométrie).</p>`
         },
         {
           title: "2. Fonctions usuelles",
           packages: ['amsmath', 'pgfplots'],
           code: `$\\exp(x)=e^x$, $(e^x)'=e^x$\n$\\ln x$, $(\\ln x)'=1/x$\n$\\cos^2 x+\\sin^2 x=1$`,
-          preview: `<div class="box box-definition">Fonction exponentielle : $e^x$, dérivée $(e^x)'=e^x$, primitive $\\int e^x dx = e^x+C$.</div>
-            <div class="box box-definition">Logarithme népérien : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$, primitive $\\int \\frac{1}{x} dx = \\ln|x|+C$.</div>
-            <div class="box box-theoreme">Identité fondamentale : $\\cos^2 x + \\sin^2 x = 1$.<br>Formules d'addition : $\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$, $\\sin(a+b)=\\sin a\\cos b + \\cos a\\sin b$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Dériver $f(x) = e^{2x} \\ln x$ :<br>
-            $f'(x) = 2e^{2x}\\ln x + e^{2x}\\cdot\\frac{1}{x}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L2.1</div>
-              <p>Calculez la dérivée de $f(x) = \\sin(2x)$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$f'(x) = 2\\cos(2x)$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L2.2</div>
-              <p>Calculez $\\int \\frac{1}{2x+1} dx$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\int \\frac{1}{2x+1} dx = \\frac{1}{2}\\ln|2x+1| + C$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Exponentielle : $e^x$, dérivée $(e^x)'=e^x$</div>
+            <div class="box box-definition">Logarithme : $\\ln x$ pour $x>0$, dérivée $(\\ln x)'=1/x$</div>
+            <div class="box box-theoreme">Identité : $\\cos^2 x + \\sin^2 x = 1$<br>$\\cos(a+b)=\\cos a\\cos b - \\sin a\\sin b$</div>`
         },
         {
           title: "3. Suites",
           packages: ['amsmath', 'pgfplots'],
           code: `$u_n=2n+1$\n$u_{n+1}=\\frac12 u_n+1$`,
-          preview: `<ul><li>Suite explicite : $u_n=2n+1$.</li><li>Suite récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$.</li></ul>
-            <div class="box box-propriete">Limite d'une suite : $\\lim_{n\\to\\infty} u_n = L$.</div>
-            <p>Représentation graphique : on utilise <code>pgfplots</code> avec <code>only marks</code> pour les points.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Les premiers termes de $u_n = \\frac{1}{n+1}$ : 1, 1/2, 1/3, 1/4, ...</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L3.1</div>
-              <p>Donnez les 5 premiers termes de la suite $u_n = n^2 - 2n + 3$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$u_0=3$, $u_1=2$, $u_2=3$, $u_3=6$, $u_4=11$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L3.2</div>
-              <p>Calculez $\\lim_{n\\to\\infty} \\frac{2n+1}{n+3}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\lim_{n\\to\\infty} \\frac{2n+1}{n+3} = \\lim_{n\\to\\infty} \\frac{2+1/n}{1+3/n} = 2$</p>
-              </div>
-            </div>`
+          preview: `<ul><li>Explicite : $u_n=2n+1$</li><li>Récurrente : $u_{n+1}=\\frac12 u_n+1$, $u_0=1$</li></ul>
+            <div class="box box-propriete">Limite : $\\lim_{n\\to\\infty} u_n = L$</div>`
         },
         {
           title: "4. Dérivation",
           packages: ['amsmath'],
           code: `$f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}$\n$(x^n)'=n x^{n-1}$`,
-          preview: `<div class="box box-theoreme">Formules de dérivation :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
-            <p>Tangente à la courbe en $a$ : $y=f'(a)(x-a)+f(a)$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Tangente à $f(x)=x^2$ en $x=1$ :<br>
-            $f(1)=1$, $f'(1)=2$ → $y=2(x-1)+1 = 2x-1$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L4.1</div>
-              <p>Calculez la dérivée de $f(x) = \\frac{x^2+1}{x-1}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$f'(x) = \\frac{2x(x-1) - (x^2+1)}{(x-1)^2} = \\frac{x^2 - 2x - 1}{(x-1)^2}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L4.2</div>
-              <p>Déterminez l'équation de la tangente à $f(x)=\\sin x$ en $x=\\frac{\\pi}{4}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$f(\\pi/4)=\\frac{\\sqrt2}{2}$, $f'(\\pi/4)=\\frac{\\sqrt2}{2}$<br>$y=\\frac{\\sqrt2}{2}(x-\\frac{\\pi}{4}) + \\frac{\\sqrt2}{2}$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-theoreme">Formules :<br>$(x^n)'=n x^{n-1}$<br>$(\\ln x)'=1/x$<br>$(e^x)'=e^x$<br>$(\\sin x)'=\\cos x$, $(\\cos x)'=-\\sin x$</div>
+            <p>Tangente : $y=f'(a)(x-a)+f(a)$</p>`
         },
         {
           title: "5. Intégration",
           packages: ['amsmath'],
           code: `$\\int_a^b f(x) dx$\n$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$`,
-          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ (pour $n\\neq -1$)<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$<br>$\\int \\sin x dx = -\\cos x+C$</div>
-            <p>L'intégrale définie $\\int_a^b f(x) dx$ représente l'aire sous la courbe entre $x=a$ et $x=b$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>$\\int_0^1 x^2 dx = [\\frac{x^3}{3}]_0^1 = \\frac{1}{3}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L5.1</div>
-              <p>Calculez $\\int_0^2 (x^2 - 1) dx$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\int_0^2 (x^2 - 1) dx = [\\frac{x^3}{3} - x]_0^2 = (\\frac{8}{3} - 2) - 0 = \\frac{2}{3}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L5.2</div>
-              <p>Calculez $\\int_1^e \\frac{1}{x} dx$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\int_1^e \\frac{1}{x} dx = [\\ln x]_1^e = 1 - 0 = 1$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Primitives usuelles :<br>$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$<br>$\\int \\frac{1}{x} dx = \\ln|x|+C$<br>$\\int e^x dx = e^x+C$<br>$\\int \\cos x dx = \\sin x+C$</div>`
         },
         {
           title: "6. Nombres complexes",
           packages: ['amsmath', 'amssymb', 'tkz-euclide'],
           code: `$z=a+ib$, $z=re^{i\\theta}$\n$e^{i\\theta}=\\cos\\theta+i\\sin\\theta$`,
-          preview: `<div class="box box-theoreme">Formule d'Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$.</div>
-            <div class="figure-tikz">[Plan complexe avec affixe $z=x+iy$]</div>
-            <p>Affixe : $z = x + iy$ correspond au point $(x; y)$. Le module est $|z|=\\sqrt{x^2+y^2}$, l'argument $\\arg(z)=\\theta$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>$z = 1+i$ a pour module $\\sqrt{2}$ et argument $\\pi/4$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L6.1</div>
-              <p>Écrire $z = 3 - 4i$ sous forme exponentielle.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$|z|=5$, $\\arg(z) = -\\arctan(4/3)$ → $z = 5e^{-i\\arctan(4/3)}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L6.2</div>
-              <p>Calculer $(1+i)^2$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$(1+i)^2 = 1 + 2i + i^2 = 2i$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-theoreme">Euler : $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$</div>
+            <div class="figure-tikz">[Plan complexe]</div>`
         },
         {
           title: "7. Géométrie analytique",
           packages: ['amsmath', 'tikz'],
           code: `$\\overrightarrow{AB}=\\begin{pmatrix} x_B-x_A \\\\ y_B-y_A \\end{pmatrix}$\n$\\vec u\\cdot\\vec v = x_ux_v+y_uy_v$`,
-          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$.</div>
-            <p>Orthogonalité : $\\vec u \\perp \\vec v \\iff \\vec u\\cdot\\vec v = 0$.</p>
-            <p>Équation de droite : $ax+by+c=0$. Vecteur normal $\\vec n(a,b)$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Droite passant par A(1,2) de vecteur directeur $\\vec u(3,4)$ :<br>
-            $(x-1, y-2) = t(3,4)$ → $\\begin{cases} x=1+3t \\\\ y=2+4t \\end{cases}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L7.1</div>
-              <p>Calculer le produit scalaire de $\\vec u(2,3)$ et $\\vec v(-1,4)$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\vec u\\cdot\\vec v = 2\\times(-1) + 3\\times4 = -2 + 12 = 10$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L7.2</div>
-              <p>Déterminer l'angle entre $\\vec u(1,1)$ et $\\vec v(3,1)$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\cos\\theta = \\frac{1\\times3 + 1\\times1}{\\sqrt{2}\\sqrt{10}} = \\frac{4}{\\sqrt{20}} = \\frac{2}{\\sqrt{5}}$<br>$\\theta = \\arccos(\\frac{2}{\\sqrt{5}}) \\approx 26,6°$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Produit scalaire : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v = \\|\\vec u\\|\\|\\vec v\\|\\cos\\theta$</div>`
         },
         {
-          title: "8. Géométrie dans l'espace",
+          title: "8. Géométrie 3D",
           packages: ['tikz', 'amsmath'],
           code: `$AB=\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$`,
-          preview: `<div class="figure-tikz">[Parallélépipède rectangle]</div>
-            <p>Distance : $AB=\\sqrt{\\Delta x^2+\\Delta y^2+\\Delta z^2}$.</p>
-            <p>Milieu : $I\\left(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}, \\frac{z_A+z_B}{2}\\right)$.</p>
-            <p>Produit scalaire dans l'espace : $\\vec u\\cdot\\vec v = x_ux_v+y_uy_v+z_uz_v$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Distance entre A(1,2,3) et B(4,6,8) :<br>
-            $AB = \\sqrt{(4-1)^2 + (6-2)^2 + (8-3)^2} = \\sqrt{9+16+25} = \\sqrt{50}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L8.1</div>
-              <p>Calculer la distance entre A(1,1,1) et B(2,3,4).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$AB = \\sqrt{(2-1)^2 + (3-1)^2 + (4-1)^2} = \\sqrt{1+4+9} = \\sqrt{14}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L8.2</div>
-              <p>Donner les coordonnées du milieu de [AB] avec A(1,2,3) et B(4,6,8).</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$M\\left(\\frac{1+4}{2}, \\frac{2+6}{2}, \\frac{3+8}{2}\\right) = (2,5; 4; 5,5)$</p>
-              </div>
-            </div>`
+          preview: `<div class="figure-tikz">[Parallélépipède]</div>`
         },
         {
           title: "9. Probabilités",
           packages: ['amsmath', 'pgfplots'],
           code: `$E(X)=\\sum x_i P(X=x_i)$\n$P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$`,
-          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$.</div>
-            <div class="box box-definition">Variance : $V(X)=E(X^2)-(E(X))^2$, écart-type $\\sigma=\\sqrt{V(X)}$.</div>
-            <div class="box box-definition">Loi binomiale : $X\\sim \\mathcal{B}(n,p)$ avec $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Lancer d'une pièce équilibrée 3 fois : $X\\sim\\mathcal{B}(3,0,5)$.<br>
-            $P(X=2)=\\binom{3}{2}(0,5)^2(0,5)^1 = 3\\times0,25\\times0,5 = 0,375$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L9.1</div>
-              <p>Une urne contient 3 boules rouges et 2 boules bleues. On tire 2 boules sans remise. Calculez l'espérance du nombre de boules rouges tirées.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$P(X=0)=\\frac{2}{5}\\times\\frac{1}{4}=0,1$<br>
-                $P(X=1)=\\frac{3}{5}\\times\\frac{2}{4}+\\frac{2}{5}\\times\\frac{3}{4}=0,6$<br>
-                $P(X=2)=\\frac{3}{5}\\times\\frac{2}{4}=0,3$<br>
-                $E(X)=0\\times0,1+1\\times0,6+2\\times0,3=1,2$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Espérance : $E(X)=\\sum x_i P(X=x_i)$</div>
+            <div class="box box-definition">Loi binomiale : $P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}$</div>`
         },
         {
           title: "10. Équations différentielles",
           packages: ['amsmath'],
           code: `$y'+ay=b$ solution : $y=Ce^{-ax}+b/a$\n$y''+\\omega^2 y=0$`,
-          preview: `<p>Équation différentielle linéaire d'ordre 1 : $y'+ay=b$.</p>
-            <p>Solution générale : $y(x)=Ce^{-ax}+\\frac{b}{a}$ (si $a\\neq0$).</p>
-            <p>Équation différentielle linéaire d'ordre 2 : $y''+\\omega^2 y=0$.</p>
-            <p>Solution : $y(x)=A\\cos(\\omega x)+B\\sin(\\omega x)$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>$y'+2y=4$ → $y(x)=Ce^{-2x}+2$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L10.1</div>
-              <p>Résoudre $y' - 3y = 0$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$y(x)=Ce^{3x}$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L10.2</div>
-              <p>Résoudre $y'' + 4y = 0$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$y(x)=A\\cos(2x)+B\\sin(2x)$</p>
-              </div>
-            </div>`
+          preview: `<p>Ordre 1 : $y'+ay=b \\Rightarrow y=Ce^{-ax}+\\frac{b}{a}$</p>
+            <p>Ordre 2 : $y''+\\omega^2 y=0 \\Rightarrow y=A\\cos(\\omega x)+B\\sin(\\omega x)$</p>`
         },
         {
           title: "11. Matrices",
           packages: ['amsmath'],
           code: `$A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$\n$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$`,
-          preview: `<div class="box box-definition">Matrice $2\\times2$ : $A=\\begin{pmatrix} a&b\\\\c&d \\end{pmatrix}$.</div>
-            <div class="box box-definition">Inverse : $A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$ (si $ad-bc\\neq0$).</div>
-            <p>Matrice identité : $I_2=\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>$A=\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}$, $\\det(A)=1\\times4-2\\times3=-2$,<br>
-            $A^{-1}=-\\frac{1}{2}\\begin{pmatrix}4&-2\\\\-3&1\\end{pmatrix}=\\begin{pmatrix}-2&1\\\\1,5&-0,5\\end{pmatrix}$</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L11.1</div>
-              <p>Calculer le déterminant de $A=\\begin{pmatrix}2&1\\\\1&1\\end{pmatrix}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\det(A)=2\\times1 - 1\\times1 = 1$</p>
-              </div>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L11.2</div>
-              <p>Inverser $A=\\begin{pmatrix}2&1\\\\1&1\\end{pmatrix}$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$A^{-1}=\\begin{pmatrix}1&-1\\\\-1&2\\end{pmatrix}$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Inverse d'une matrice 2×2 :<br>$A^{-1}=\\frac{1}{ad-bc}\\begin{pmatrix} d&-b\\\\-c&a\\end{pmatrix}$</div>`
         },
         {
           title: "12. Ressources",
           packages: ['amsmath', 'amssymb', 'pgfplots', 'tkz-euclide'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Packages incontournables pour le lycée : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>
-            <p>Compilation : <code>pdflatex</code> ou <code>lualatex</code>.</p>
-            <p>Ressources : Overleaf (en ligne), TeX StackExchange (forum), CTAN (documentation des packages).</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Compiler avec <code>pdflatex</code> puis <code>pdflatex</code> pour les références croisées.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice L12.1</div>
-              <p>Citez deux packages indispensables pour les mathématiques au lycée.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>amsmath</code> et <code>pgfplots</code></p>
-              </div>
-            </div>`
+          preview: `<p>Packages incontournables : <code>amsmath</code>, <code>amssymb</code>, <code>pgfplots</code>, <code>tkz-euclide</code>.</p>`
         }
       ]
     },
@@ -1606,167 +818,58 @@ pdflatex mon_fichier.tex</pre>
           title: "1. Introduction",
           packages: ['siunitx', 'pgfplots', 'circuitikz', 'tikz'],
           code: `\\usepackage{siunitx}\n\\usepackage{pgfplots}\n\\usepackage{circuitikz}\n\\usepackage{tikz}`,
-          preview: `<p>Packages essentiels pour la physique au lycée :</p>
-            <ul><li><code>siunitx</code> : unités SI.</li>
-            <li><code>pgfplots</code> : graphiques.</li>
-            <li><code>circuitikz</code> : schémas électriques.</li>
-            <li><code>tikz</code> : figures générales.</li></ul>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Écrire une température de 25°C : <code>\\SI{25}{\\celsius}</code> → $\\SI{25}{\\celsius}$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP1.1</div>
-              <p>Quel package utilisez-vous pour tracer des courbes ?</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p><code>pgfplots</code></p>
-              </div>
-            </div>`
+          preview: `<p>Packages : <code>siunitx</code> (unités), <code>pgfplots</code> (courbes), <code>circuitikz</code> (électricité), <code>tikz</code> (figures).</p>`
         },
         {
-          title: "2. Mécanique – Cinématique et dynamique",
+          title: "2. Mécanique",
           packages: ['amsmath', 'tikz', 'pgfplots'],
           code: `$\\vec v = \\frac{d\\vec{OM}}{dt}$\n$\\sum\\vec F_{ext}=m\\vec a$`,
-          preview: `<div class="box box-theoreme">Principe fondamental de la dynamique (PFD) : $\\sum\\vec F_{ext}=m\\vec a$.</div>
-            <div class="figure-tikz">[Schéma de forces sur un solide]</div>
-            <p>Projection sur les axes : $\\sum F_x = m a_x$, $\\sum F_y = m a_y$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Un solide de masse 2 kg est soumis à une force de 10 N. Accélération : $a = F/m = 5$ m/s².</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP2.1</div>
-              <p>Un solide de masse 5 kg est soumis à une force de 20 N. Calculez son accélération.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$a = F/m = 20/5 = 4$ m/s²</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-theoreme">PFD : $\\sum\\vec F_{ext}=m\\vec a$</div>
+            <div class="figure-tikz">[Schéma de forces]</div>`
         },
         {
           title: "3. Énergie mécanique",
           packages: ['amsmath', 'pgfplots'],
           code: `$E_c=\\frac12 mv^2$, $E_p=mgh$, $E_m=E_c+E_p$`,
-          preview: `<div class="box box-theoreme">Conservation de l'énergie mécanique : $\\Delta E_m = 0$ si les forces sont conservatives.</div>
-            <p>Énergie cinétique : $E_c=\\frac12 mv^2$.</p>
-            <p>Énergie potentielle de pesanteur : $E_p=mgh$.</p>
-            <p>Travail d'une force constante : $W_{AB}(\\vec F) = \\vec F \\cdot \\overrightarrow{AB}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Un objet de 2 kg tombe d'une hauteur de 10 m. $E_p = mgh = 2\\times9,81\\times10 = 196,2$ J.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP3.1</div>
-              <p>Un objet de 3 kg est lancé avec une vitesse de 4 m/s. Calculez son énergie cinétique.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$E_c = \\frac12 \\times 3 \\times 4^2 = 24$ J</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-theoreme">Conservation : $\\Delta E_m=0$ si forces conservatives</div>`
         },
         {
-          title: "4. Électricité – Régime continu et variable",
+          title: "4. Électricité",
           packages: ['amsmath', 'circuitikz', 'pgfplots'],
           code: `$u_C(t)=E(1-e^{-t/RC})$\n$i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$`,
-          preview: `<div class="figure-tikz">[Circuit RC série]</div>
-            <p>Charge d'un condensateur : $u_C(t)=E(1-e^{-t/RC})$, avec $\\tau=RC$ la constante de temps.</p>
-            <p>Décharge : $u_C(t)=E e^{-t/RC}$.</p>
-            <p>Circuit RL : $i(t)=\\frac{E}{R}(1-e^{-t/(L/R)})$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>$R=100\\Omega$, $C=10\\mu F$ → $\\tau = 100 \\times 10^{-5} = 10^{-3}$ s.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP4.1</div>
-              <p>Calculez la constante de temps d'un circuit RC avec $R=200\\Omega$ et $C=20\\mu F$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\tau = 200 \\times 20\\times10^{-6} = 4\\times10^{-3}$ s</p>
-              </div>
-            </div>`
+          preview: `<div class="figure-tikz">[Circuit RC]</div>`
         },
         {
-          title: "5. Thermodynamique – Gaz parfait",
+          title: "5. Thermodynamique",
           packages: ['amsmath', 'pgfplots'],
           code: `$PV=nRT$\n$\\Delta U=W+Q$`,
-          preview: `<div class="box box-definition">Équation d'état des gaz parfaits : $PV=nRT$.</div>
-            <div class="box box-definition">Premier principe de la thermodynamique : $\\Delta U = W + Q$.</div>
-            <p>Isotherme : $PV = \\text{cste}$ ; Isobare : $V/T = \\text{cste}$ ; Isochore : $P/T = \\text{cste}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>1 mole de gaz parfait à 0°C et 1 atm : $V = \\frac{nRT}{P} = \\frac{1\\times8,314\\times273,15}{101325} \\approx 22,4$ L.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP5.1</div>
-              <p>Quel est le volume occupé par 2 moles de gaz parfait à 27°C et 2 atm ?</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$V = \\frac{2\\times8,314\\times300,15}{2\\times101325} \\approx 24,6$ L</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Gaz parfait : $PV=nRT$</div>`
         },
         {
-          title: "6. Ondes mécaniques et lumineuses",
+          title: "6. Ondes",
           packages: ['amsmath', 'pgfplots'],
           code: `$y(x,t)=A\\cos(\\omega t-kx)$`,
-          preview: `<div class="figure-tikz">[Onde progressive sinusoïdale]</div>
-            <p>Onde progressive : $y(x,t)=A\\cos(\\omega t - kx)$.</p>
-            <p>Longueur d'onde : $\\lambda = \\frac{2\\pi}{k}$ ; Période : $T = \\frac{2\\pi}{\\omega}$ ; Célérité : $v = \\lambda f$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Une onde de fréquence 50 Hz et de longueur d'onde 2 m a pour célérité $v = 50 \\times 2 = 100$ m/s.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP6.1</div>
-              <p>Calculez la longueur d'onde d'une onde de fréquence 100 Hz et de célérité 340 m/s.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\lambda = v/f = 340/100 = 3,4$ m</p>
-              </div>
-            </div>`
+          preview: `<div class="figure-tikz">[Onde sinusoïdale]</div>`
         },
         {
           title: "7. Physique nucléaire",
           packages: ['amsmath', 'chemformula', 'pgfplots'],
           code: `$N(t)=N_0e^{-\\lambda t}$\n$t_{1/2}=\\frac{\\ln2}{\\lambda}$\n\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}`,
-          preview: `<div class="box box-definition">Loi de décroissance radioactive : $N(t)=N_0e^{-\\lambda t}$.</div>
-            <div class="box box-definition">Temps de demi-vie : $t_{1/2}=\\frac{\\ln 2}{\\lambda}$.</div>
-            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$.</div>
-            <div class="box box-theoreme">Fusion : $\\ch{^2_1H + ^3_1H -> ^4_2He + n}$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Un échantillon de 100 g de carbone 14 ($t_{1/2}=5730$ ans) : après 5730 ans, il reste 50 g.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP7.1</div>
-              <p>Calculer le temps de demi-vie si $\\lambda = 0,1$ s⁻¹.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$t_{1/2} = \\frac{\\ln2}{0,1} \\approx 6,93$ s</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Décroissance : $N=N_0e^{-\\lambda t}$, $t_{1/2}=\\ln2/\\lambda$</div>
+            <div class="box box-theoreme">Fission : $\\ch{^235_92U + n -> ^141_56Ba + ^92_36Kr + 3n}$</div>`
         },
         {
           title: "8. Mécanique des fluides",
           packages: ['amsmath', 'tikz'],
           code: `$P=F/S$\n$\\Delta P = \\rho g \\Delta h$\n$\\vec F_A = -\\rho_f V_{im}\\vec g$`,
-          preview: `<div class="box box-definition">Pression : $P=\\frac{F}{S}$ (Pa).</div>
-            <div class="box box-propriete">Pression hydrostatique : $\\Delta P = \\rho g \\Delta h$.</div>
-            <div class="box box-theoreme">Principe d'Archimède : $\\vec F_A = -\\rho_f V_{im} \\vec g$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Un cube de 10 cm d'arête immergé dans l'eau ($\\rho=1000$ kg/m³) subit une poussée d'Archimède de $F_A = 1000 \\times 0,001 \\times 9,81 \\approx 9,81$ N.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LP8.1</div>
-              <p>Calculez la pression exercée par une colonne d'eau de 5 m de hauteur.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\Delta P = 1000 \\times 9,81 \\times 5 = 49050$ Pa</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Pression : $P=F/S$</div>
+            <div class="box box-propriete">Archimède : $\\vec F_A = -\\rho_f V_{im}\\vec g$</div>`
         },
         {
           title: "9. Ressources",
           packages: ['siunitx', 'circuitikz', 'pgfplots', 'chemformula'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Erreurs fréquentes :</p>
-            <ul><li><code>circuitikz</code> : vérifier les coordonnées des connexions.</li>
-            <li><code>pgfplots</code> : adapter le domaine et les échantillons.</li>
-            <li><code>chemformula</code> : respecter la syntaxe (espaces, parenthèses).</li></ul>`
+          preview: `<p>Erreurs : <code>circuitikz</code> (connexions), <code>pgfplots</code> (domaines), <code>chemformula</code> (syntaxe).</p>`
         }
       ]
     },
@@ -1777,116 +880,45 @@ pdflatex mon_fichier.tex</pre>
           title: "1. Introduction",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `\\usepackage{chemformula}\n\\usepackage{siunitx}\n\\usepackage{pgfplots}`,
-          preview: `<p>Packages spécifiques pour la chimie au lycée :</p>
-            <ul><li><code>chemformula</code> : formules et équations chimiques.</li>
-            <li><code>siunitx</code> : unités et grandeurs.</li>
-            <li><code>pgfplots</code> : tracé de courbes de titrage, de cinétique.</li></ul>`
+          preview: `<p>Packages : <code>chemformula</code> (chimie), <code>siunitx</code> (unités), <code>pgfplots</code> (courbes de titrage).</p>`
         },
         {
-          title: "2. Acides et bases – pH",
+          title: "2. Acides et bases",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `$pH=-\\log[H_3O^+]$\n$K_a = \\frac{[A^-][H_3O^+]}{[HA]}$\n$pH = pK_a + \\log\\frac{[A^-]}{[HA]}$`,
-          preview: `<div class="box box-definition">$pH = -\\log[H_3O^+]$.</div>
-            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$.</div>
-            <div class="box box-propriete">Relation de Henderson-Hasselbalch : $pH = pK_a + \\log\\frac{[A^-]}{[HA]}$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Un acide $HA$ de $pK_a=4,76$ et $[A^-]/[HA]=10$ → $pH = 4,76 + \\log(10) = 5,76$.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LC2.1</div>
-              <p>Calculez le pH d'une solution où $[A^-]=0,1$ M et $[HA]=0,01$ M, $pK_a=4,76$.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$pH = 4,76 + \\log(10) = 5,76$</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">pH = -log[H₃O⁺]</div>
+            <div class="box box-definition">Constante d'acidité : $K_a = \\frac{[A^-][H_3O^+]}{[HA]}$</div>`
         },
         {
           title: "3. Oxydoréduction",
           packages: ['chemformula', 'amsmath'],
           code: `\\ch{Fe^{2+} -> Fe^{3+} + e-}\n\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}\n$E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$`,
-          preview: `<div class="box box-theoreme">Loi de Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$ (à 25°C).</div>
-            <p>Demi-équations : <br>$\\ch{Fe^{2+} -> Fe^{3+} + e-}$<br>$\\ch{MnO4- + 8H+ + 5e- -> Mn^{2+} + 4H2O}$</p>
-            <p>Pile : $E_{pile}=E_{cathode}-E_{anode}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Pour $\\ch{Fe^{3+}/Fe^{2+}}$, $E^\\circ=0,77$ V. Si $[Fe^{3+}]=0,1$ M et $[Fe^{2+}]=0,01$ M, $E=0,77+0,06\\log(10)=0,83$ V.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LC3.1</div>
-              <p>Calculez le potentiel d'une électrode $\\ch{Cu^{2+}/Cu}$ ($E^\\circ=0,34$ V) si $[Cu^{2+}]=0,01$ M.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$E = 0,34 + \\frac{0,06}{2}\\log(0,01) = 0,34 - 0,06 = 0,28$ V</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-theoreme">Nernst : $E=E^\\circ+\\frac{0.06}{n}\\log\\frac{[Ox]}{[Red]}$</div>`
         },
         {
-          title: "4. Cinétique chimique",
+          title: "4. Cinétique",
           packages: ['amsmath', 'pgfplots'],
           code: `$v=-\\frac{d[A]}{dt}$\n$v=k[A]$ (ordre 1)\n$t_{1/2}=\\frac{\\ln2}{k}$`,
-          preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>
-            <p>Vitesse de réaction : $v=-\\frac{d[A]}{dt}$.</p>
-            <p>Réaction d'ordre 1 : $v=k[A]$, temps de demi-réaction $t_{1/2}=\\frac{\\ln 2}{k}$.</p>
-            <p>Réaction d'ordre 2 : $v=k[A]^2$, $t_{1/2}=\\frac{1}{k[A]_0}$.</p>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Une réaction d'ordre 1 a $k=0,1$ s⁻¹. $t_{1/2}=\\frac{\\ln2}{0,1}\\approx6,93$ s.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LC4.1</div>
-              <p>Calculez le temps de demi-réaction d'une réaction d'ordre 1 avec $k=0,05$ s⁻¹.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$t_{1/2}=\\frac{\\ln2}{0,05}\\approx13,86$ s</p>
-              </div>
-            </div>`
+          preview: `<div class="figure-tikz">[Courbe de concentration $[A]=f(t)$]</div>`
         },
         {
           title: "5. Chimie organique",
           packages: ['chemformula'],
           code: `\\ch{C_nH_{2n+2}}\n\\ch{CH4}, \\ch{C2H6}, \\ch{C3H8}\nAlcool : \\ch{R-OH}`,
-          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$.</p>
-            <ul><li>Méthane $\\ch{CH4}$</li><li>Éthane $\\ch{C2H6}$</li><li>Propane $\\ch{C3H8}$</li></ul>
-            <p>Groupes fonctionnels :</p>
-            <ul><li>Alcool : $\\ch{R-OH}$</li><li>Acide carboxylique : $\\ch{R-COOH}$</li><li>Ester : $\\ch{R-COOR'}$</li></ul>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>L'éthanol $\\ch{C2H5OH}$ est un alcool primaire.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LC5.1</div>
-              <p>Donnez la formule semi-développée du propan-2-ol.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\ch{CH3-CH(OH)-CH3}$</p>
-              </div>
-            </div>`
+          preview: `<p>Alcanes : $\\ch{C_nH_{2n+2}}$.</p>`
         },
         {
           title: "6. Thermodynamique chimique",
           packages: ['amsmath', 'chemformula'],
           code: `$\\Delta H = H_{prod}-H_{réact}$\n$\\Delta G = \\Delta H - T\\Delta S$\n$\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod)-\\sum\\Delta H_f^\\circ(réact)$`,
-          preview: `<div class="box box-definition">Enthalpie de réaction : $\\Delta H = H_{prod}-H_{réact}$.</div>
-            <div class="box box-definition">Entropie : $\\Delta S = S_{prod}-S_{réact}$.</div>
-            <div class="box box-theoreme">Énergie libre de Gibbs : $\\Delta G = \\Delta H - T\\Delta S$. Réaction spontanée si $\\Delta G<0$.</div>
-            <div class="box box-theoreme">Loi de Hess : $\\Delta H_{rxn} = \\sum\\Delta H_f^\\circ(prod) - \\sum\\Delta H_f^\\circ(réact)$.</div>
-            <div class="example-box"><div class="ex-title">💡 Exemple</div>
-            <p>Pour $\\ch{2H2 + O2 -> 2H2O}$, $\\Delta H = 2\\times(-285,8) - 0 = -571,6$ kJ/mol.</p>
-            </div>
-            <div class="exercise-box">
-              <div class="ex-title">📝 Exercice LC6.1</div>
-              <p>Calculez $\\Delta G$ si $\\Delta H = -100$ kJ, $\\Delta S = 0,2$ kJ/K, $T=300$ K.</p>
-              <span class="ex-toggle" onclick="toggleCorrection(this)">🔍 Voir la correction</span>
-              <div class="ex-correction">
-                <p>$\\Delta G = -100 - 300\\times0,2 = -160$ kJ</p>
-              </div>
-            </div>`
+          preview: `<div class="box box-definition">Enthalpie</div>
+            <div class="box box-theoreme">Gibbs : $\\Delta G = \\Delta H - T\\Delta S$</div>`
         },
         {
           title: "7. Ressources",
           packages: ['chemformula', 'siunitx', 'pgfplots'],
           code: `pdflatex mon_fichier.tex`,
-          preview: `<p>Erreurs fréquentes :</p>
-            <ul><li><code>chemformula</code> : vérifier les espaces et parenthèses dans les formules.</li>
-            <li><code>siunitx</code> : séparer correctement le nombre et l'unité (ex: <code>\\SI{5}{mol}</code>).</li></ul>`
+          preview: `<p>Erreurs : <code>chemformula</code> (espaces, parenthèses), <code>siunitx</code> (séparation nombre/unité).</p>`
         }
       ]
     }
@@ -1894,7 +926,7 @@ pdflatex mon_fichier.tex</pre>
 };
 
 // =================================================================
-// 3. SOURCE LATEX POUR LE COMPOSEUR (identique à la version précédente)
+// 3. SOURCE LATEX POUR LE COMPOSEUR (enrichie avec exemples et exercices)
 // =================================================================
 const LATEX_SOURCE = String.raw`
 \documentclass[a4paper,12pt]{article}
@@ -2004,12 +1036,309 @@ des documents scientifiques de qualité
 \tableofcontents
 \newpage
 
-% Leçons 1 à 10 avec blocs lstlisting...
+% ===================================================================
+% Leçon 1 : Découverte de \LaTeX
+% ===================================================================
+\section{Leçon 1 : Découverte de \LaTeX}
+
+\textbf{Objectifs :}
+\begin{itemize}
+\item Comprendre le principe de compilation d'un document \LaTeX
+\item Connaître la structure minimale d'un fichier \lstinline|.tex|
+\item Savoir organiser un document avec \lstinline|\section| et \lstinline|\subsection|
+\item Maîtriser les commandes de base : \lstinline|\textbf|, \lstinline|\textit|, \lstinline|\underline|
+\end{itemize}
+
+\LaTeX\, est un système de composition de documents particulièrement adapté aux mathématiques, à la physique et à la chimie.
+
+\begin{lstlisting}[style=mylatex]
+\documentclass[a4paper,12pt]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\begin{document}
+Bonjour le monde ! Ceci est mon premier document \LaTeX.
+\end{document}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mylatex]
+\section{Introduction}
+\subsection{Première sous-section}
+Ceci est un texte \textbf{en gras}, \textit{en italique} et \underline{souligné}.
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 2 : Mathématiques -- notions fondamentales
+% ===================================================================
+\section{Leçon 2 : Mathématiques -- notions fondamentales}
+
+\subsection{Opérations de base}
+\begin{lstlisting}[style=mylatex]
+$a + b = c$, $a - b = c$, $a \times b = c$, $a \div b = c$
+$\frac{a}{b}$, $a^{n}$, $a_{n}$, $\sqrt{x}$, $\sqrt[n]{x}$
+\end{lstlisting}
+\subsection{Lettres grecques}
+\begin{lstlisting}[style=mylatex]
+$\alpha$, $\beta$, $\gamma$, $\delta$, $\theta$, $\pi$, $\omega$
+$\Gamma$, $\Delta$, $\Theta$, $\Pi$, $\Sigma$, $\Omega$
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 3 : Mathématiques -- outils avancés
+% ===================================================================
+\section{Leçon 3 : Mathématiques -- outils avancés}
+
+\subsection{Intégrales et dérivées}
+\begin{lstlisting}[style=mylatex]
+$\int_{a}^{b} f(x) dx$, $\iint_{D} f(x,y) dxdy$
+$f'(x)=\frac{df}{dx}$, $\frac{\partial f}{\partial x}$
+$\lim_{x\to a} f(x)=L$, $\nabla f$
+\end{lstlisting}
+\subsection{Matrices}
+\begin{lstlisting}[style=mylatex]
+$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$,
+$\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad-bc$
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 4 : Chimie avec \LaTeX
+% ===================================================================
+\section{Leçon 4 : Chimie avec \LaTeX}
+
+\subsection{Formules chimiques}
+\begin{lstlisting}[style=mylatex]
+\ce{H2O}, \ce{CO2}, \ce{C6H12O6}, \ce{NaCl}, \ce{H2SO4}
+\end{lstlisting}
+\subsection{Équations chimiques}
+\begin{lstlisting}[style=mylatex]
+\ce{2 H2 + O2 -> 2 H2O}
+\ce{CH4 + 2 O2 -> CO2 + 2 H2O}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 5 : Tableaux, figures et schémas
+% ===================================================================
+\section{Leçon 5 : Tableaux, figures et schémas}
+
+\subsection{Tableaux}
+\begin{lstlisting}[style=mylatex]
+\begin{tabular}{|l|c|r|}
+\hline
+Nom & Symbole & Masse (g) \\
+\hline
+Hydrogène & H & 1,008 \\
+Carbone & C & 12,011 \\
+\hline
+\end{tabular}
+\end{lstlisting}
+\subsection{TikZ}
+\begin{lstlisting}[style=mylatex]
+\begin{tikzpicture}
+\draw[->] (0,0) -- (3,0);
+\draw[->] (0,0) -- (0,3);
+\end{tikzpicture}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 6 : Pédagogie -- exercices et présentations
+% ===================================================================
+\section{Leçon 6 : Pédagogie -- exercices et présentations}
+
+\subsection{Énoncé d'exercice}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice 1 -- Vitesse}
+Un automobiliste parcourt 150 km en 2h30min.
+\begin{enumerate}
+\item Quelle est sa vitesse moyenne en km/h ?
+\item Exprime cette vitesse en m/s.
+\end{enumerate}
+\end{lstlisting}
+\subsection{Beamer}
+\begin{lstlisting}[style=mylatex]
+\documentclass{beamer}
+\usetheme{Madrid}
+\begin{frame}{Titre}
+Contenu...
+\end{frame}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 7 : Mise en page avancée
+% ===================================================================
+\section{Leçon 7 : Mise en page avancée}
+
+\subsection{Boîtes et couleurs}
+\begin{lstlisting}[style=mylatex]
+\fbox{Texte encadré}
+\colorbox{blue!20}{Fond bleu}
+\textcolor{red}{Texte rouge}
+\definecolor{myblue}{RGB}{0,102,204}
+\end{lstlisting}
+\subsection{Filigrane}
+\begin{lstlisting}[style=mylatex]
+\usepackage{draftwatermark}
+\SetWatermarkText{CONFIDENTIEL}
+\SetWatermarkScale{3}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 8 : Mathématiques et sciences au lycée
+% ===================================================================
+\section{Leçon 8 : Mathématiques et sciences au lycée}
+
+\subsection{pgfplots}
+\begin{lstlisting}[style=mylatex]
+\begin{axis}[xlabel=$x$, ylabel=$y$, grid=major]
+\addplot[blue,thick] {x^2};
+\end{axis}
+\end{lstlisting}
+\subsection{circuitikz}
+\begin{lstlisting}[style=mylatex]
+\begin{circuitikz}
+\draw (0,0) to[battery] (0,2) to[lamp] (3,2) to[switch] (3,0) -- (0,0);
+\end{circuitikz}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 9 : Pédagogie -- interactivité et évaluation
+% ===================================================================
+\section{Leçon 9 : Pédagogie -- interactivité et évaluation}
+
+\subsection{Exercices à trous}
+\begin{lstlisting}[style=mylatex]
+Le nom de ce gaz est \rule{3cm}{0.5pt}.
+$\_\_ + 5 = 12$
+\end{lstlisting}
+\subsection{QCM}
+\begin{lstlisting}[style=mylatex]
+\begin{enumerate}[label=\alph*)]
+\item \ce{CO2}
+\item \ce{H2O}
+\end{enumerate}
+\end{lstlisting}
+\subsection{bclogo}
+\begin{lstlisting}[style=mylatex]
+\bcattention{Attention !}
+\bcinfo{Information}
+\bcexemple{Exemple}
+\end{lstlisting}
+
+% ===================================================================
+% Leçon 10 : Projet final et ressources
+% ===================================================================
+\section{Leçon 10 : Projet final et ressources}
+
+\subsection{Aide-mémoire}
+\begin{lstlisting}[style=mylatex]
+\begin{tabular}{ll}
+\lstinline|\textbf{}| & Gras \\
+\lstinline|\textit{}| & Italique \\
+\lstinline|$...$| & Maths en ligne \\
+\lstinline|\frac{}{}| & Fraction \\
+\lstinline|\ce{}| & Formule chimique \\
+\lstinline|\times| & Multiplier \\
+\lstinline|\vec{}| & Vecteur \\
+\end{tabular}
+\end{lstlisting}
+
+% ===================================================================
+% Exemples et exercices supplémentaires
+% ===================================================================
+\section{Exemples et exercices}
+
+\subsection{Exemple 1 : Résolution d'équation}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Résoudre l'équation $2x+3=7$.
+\textbf{Solution :}
+\begin{align*}
+2x+3 &= 7 \\
+2x &= 4 \\
+x &= 2
+\end{align*}
+\end{lstlisting}
+
+\subsection{Exemple 2 : Tableau de valeurs}
+\begin{lstlisting}[style=mylatex]
+\begin{tabular}{|c|c|c|}
+\hline
+$x$ & $x^2$ & $2^x$ \\
+\hline
+0 & 0 & 1 \\
+1 & 1 & 2 \\
+2 & 4 & 4 \\
+3 & 9 & 8 \\
+4 & 16 & 16 \\
+\hline
+\end{tabular}
+\end{lstlisting}
+
+\subsection{Exemple 3 : Schéma TikZ simple}
+\begin{lstlisting}[style=mylatex]
+\begin{tikzpicture}
+\draw[->] (-1,0) -- (5,0) node[right] {$x$};
+\draw[->] (0,-1) -- (0,4) node[above] {$y$};
+\draw[blue, thick] plot[domain=0:4] (\x, {0.5*\x*\x});
+\end{tikzpicture}
+\end{lstlisting}
+
+\subsection{Exemple 4 : Formulaire}
+\begin{lstlisting}[style=mylatex]
+\begin{equation}
+E = mc^2
+\end{equation}
+\begin{equation}
+\int_0^\infty e^{-x} dx = 1
+\end{equation}
+\end{lstlisting}
+
+\subsection{Exercice 1 : Factorisation}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Factoriser l'expression $x^2 - 4x + 4$.
+\textbf{Solution :} $(x-2)^2$.
+\end{lstlisting}
+
+\subsection{Exercice 2 : Produit scalaire}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Soit $\vec{u}(1,2)$ et $\vec{v}(3,4)$. Calculer $\vec{u}\cdot\vec{v}$.
+\textbf{Solution :} $1\times3 + 2\times4 = 3+8 = 11$.
+\end{lstlisting}
+
+\subsection{Exercice 3 : Équation chimique}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Équilibrer l'équation $\ce{Fe + O2 -> Fe3O4}$.
+\textbf{Solution :} $\ce{3Fe + 2O2 -> Fe3O4}$.
+\end{lstlisting}
+
+\subsection{Exemple 5 : Circuit électrique}
+\begin{lstlisting}[style=mylatex]
+\begin{circuitikz}
+\draw (0,0) to[battery] (0,2) to[lamp] (3,2) to[switch] (3,0) -- (0,0);
+\end{circuitikz}
+\end{lstlisting}
+
+\subsection{Exercice 4 : Limite}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Calculer $\lim_{x\to 0} \frac{\sin x}{x}$.
+\textbf{Solution :} 1.
+\end{lstlisting}
+
+\subsection{Exemple 6 : Intégrale définie}
+\begin{lstlisting}[style=mylatex]
+\begin{equation}
+\int_0^1 x^2 dx = \left[\frac{x^3}{3}\right]_0^1 = \frac{1}{3}
+\end{equation}
+\end{lstlisting}
+
+\subsection{Exercice 5 : Inéquation}
+\begin{lstlisting}[style=mylatex]
+\textbf{Exercice :} Résoudre $3x - 5 \leq 7$.
+\textbf{Solution :} $x \leq 4$.
+\end{lstlisting}
+
 \end{document}
 `;
 
 // =================================================================
-// 4. FONCTIONS DU MODE COMPOSEUR (extraction et affichage)
+// 4. FONCTIONS DU MODE COMPOSEUR
 // =================================================================
 let widgets = [];
 let filteredWidgets = [];
@@ -2176,7 +1505,7 @@ function toggleProjection(force) {
 }
 
 // =================================================================
-// 5. FONCTIONS DU MODE FORMATION (avec introduction, packages, code)
+// 5. FONCTIONS DU MODE FORMATION
 // =================================================================
 let currentSearchTerm = '';
 
@@ -2210,7 +1539,6 @@ function renderFormationWidgets() {
   grid.innerHTML = chapters.map(function(chap, i) {
     const code = highlightLaTeX(chap.code);
 
-    // Construction de la section des packages
     let packagesHtml = '';
     if (chap.packages && chap.packages.length) {
       packagesHtml = `<div class="widget-packages">
@@ -2233,15 +1561,12 @@ function renderFormationWidgets() {
         '<span class="label">📘 Chapitre</span>' +
         '<span class="section-tag">' + escHtml(chap.title) + '</span>' +
       '</div>' +
-      // Introduction
       '<div class="widget-intro" id="intro-' + i + '">' +
         '<div class="intro-label">📖 Introduction</div>' +
         '<div class="intro-content">' + chap.preview + '</div>' +
         '<span class="intro-toggle" onclick="toggleIntro(' + i + ')">Afficher moins</span>' +
       '</div>' +
-      // Packages
       packagesHtml +
-      // Code
       '<div class="widget-code">' +
         '<pre>' + code + '</pre>' +
         '<button class="copy-btn" onclick="copyCodeFormation(this, ' + i + ')">Copier</button>' +
@@ -2258,31 +1583,41 @@ function renderFormationWidgets() {
   }
 }
 
-// Fonction pour réduire/afficher l'introduction
 function toggleIntro(index) {
   const intro = document.getElementById('intro-' + index);
   if (!intro) return;
-  intro.classList.toggle('expanded');
+  const content = intro.querySelector('.intro-content');
   const toggleBtn = intro.querySelector('.intro-toggle');
-  if (toggleBtn) toggleBtn.textContent = intro.classList.contains('expanded') ? 'Afficher moins' : 'Afficher plus';
+  if (!content || !toggleBtn) return;
+  intro.classList.toggle('expanded');
+  if (intro.classList.contains('expanded')) {
+    toggleBtn.textContent = 'Afficher moins';
+    content.style.maxHeight = 'none';
+  } else {
+    toggleBtn.textContent = 'Afficher plus';
+    content.style.maxHeight = '180px';
+  }
 }
 
-// Fonction pour afficher/masquer les corrections d'exercices
-function toggleCorrection(btn) {
-  const parent = btn.parentElement;
-  const correction = parent.querySelector('.ex-correction');
-  if (!correction) return;
-  correction.classList.toggle('show');
-  btn.textContent = correction.classList.contains('show') ? '🔍 Masquer la correction' : '🔍 Voir la correction';
-}
-
-// Injection du CSS pour les toggles d'introduction
 (function() {
   const style = document.createElement('style');
   style.textContent = `
-    .widget-intro .intro-content { max-height: 180px; overflow: hidden; transition: max-height 0.3s ease; }
-    .widget-intro.expanded .intro-content { max-height: none; }
-    .widget-intro .intro-toggle { display: inline-block; margin-top: 4px; font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 500; }
+    .widget-intro .intro-content {
+      max-height: 180px;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .widget-intro.expanded .intro-content {
+      max-height: none;
+    }
+    .widget-intro .intro-toggle {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+    }
     .widget-intro .intro-toggle:hover { text-decoration: underline; }
   `;
   document.head.appendChild(style);
